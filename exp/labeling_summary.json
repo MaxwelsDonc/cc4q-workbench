@@ -25,16 +25,16 @@
       },
       "timings": {
         "quantum_related": {
-          "load_s": 0.06,
-          "infer_s": 152.15
+          "load_s": 0.13,
+          "infer_s": 340.43
         },
         "quantum_category": {
-          "load_s": 0.05,
-          "infer_s": 62.49
+          "load_s": 0.09,
+          "infer_s": 85.88
         },
         "developer_intent": {
-          "load_s": 0.05,
-          "infer_s": 169.5
+          "load_s": 0.04,
+          "infer_s": 180.66
         }
       }
     },
@@ -62,15 +62,15 @@
       "timings": {
         "quantum_related": {
           "load_s": 0.05,
-          "infer_s": 220.06
+          "infer_s": 239.55
         },
         "quantum_category": {
-          "load_s": 0.06,
-          "infer_s": 105.53
+          "load_s": 0.05,
+          "infer_s": 92.43
         },
         "developer_intent": {
-          "load_s": 0.06,
-          "infer_s": 235.55
+          "load_s": 0.05,
+          "infer_s": 217.51
         }
       }
     },
@@ -97,16 +97,16 @@
       },
       "timings": {
         "quantum_related": {
-          "load_s": 0.04,
-          "infer_s": 181.61
+          "load_s": 0.05,
+          "infer_s": 171.03
         },
         "quantum_category": {
-          "load_s": 0.06,
-          "infer_s": 102.41
+          "load_s": 0.05,
+          "infer_s": 84.22
         },
         "developer_intent": {
-          "load_s": 0.09,
-          "infer_s": 342.88
+          "load_s": 0.06,
+          "infer_s": 174.26
         }
       }
     }

@@ -1,0 +1,200 @@
+{"no": 1, "id": "1364-4", "comment_text": "Neural networks may be used, for example, with the\n~qiskit_machine_learning.algorithms.", "model_label": "non-quantum", "human_label": ""}
+{"no": 2, "id": "251-18", "comment_text": "Returns:", "model_label": "non-quantum", "human_label": ""}
+{"no": 3, "id": "67-1", "comment_text": "pylint: disable=arguments-differ\nDisable Lint warnings caused by different number of parameters between these methods and\nthe abstract ones in the parent class.", "model_label": "non-quantum", "human_label": ""}
+{"no": 4, "id": "1622-1", "comment_text": "This code is part of a Qiskit project.\n\n(C) Copyright IBM 2022, 2026.\n(C) Copyright UKRI-STFC (Hartree Centre) 2024, 2026.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must reta", "model_label": "non-quantum", "human_label": ""}
+{"no": 5, "id": "584-1", "comment_text": "training loop", "model_label": "non-quantum", "human_label": ""}
+{"no": 6, "id": "523-1", "comment_text": "Returns the used feature map.", "model_label": "non-quantum", "human_label": ""}
+{"no": 7, "id": "462-5", "comment_text": "Returns:", "model_label": "non-quantum", "human_label": ""}
+{"no": 8, "id": "303-3", "comment_text": "x_vecs (np.ndarray): Input sample vectors.\n\ni (int): Dimension index.", "model_label": "non-quantum", "human_label": ""}
+{"no": 9, "id": "1612-1", "comment_text": "Return the union of estimator options setting and gradient default options,\nwhere, if the same field is set in both, the gradient's default options override\nthe primitive's default setting.", "model_label": "non-quantum", "human_label": ""}
+{"no": 10, "id": "237-5", "comment_text": "List of truncated fidelities.", "model_label": "quantum", "human_label": ""}
+{"no": 11, "id": "1444-1", "comment_text": "QFI result class", "model_label": "non-quantum", "human_label": ""}
+{"no": 12, "id": "1619-1", "comment_text": "Abstract base class of gradient for Sampler.", "model_label": "non-quantum", "human_label": ""}
+{"no": 13, "id": "1152-1", "comment_text": "Nelder-Mead optimizer.", "model_label": "quantum", "human_label": ""}
+{"no": 14, "id": "215-4", "comment_text": "State fidelities", "model_label": "quantum", "human_label": ""}
+{"no": 15, "id": "1245-5", "comment_text": "dict[str, float]: Marginalized probability distribution.", "model_label": "quantum", "human_label": ""}
+{"no": 16, "id": "880-1", "comment_text": "Args:", "model_label": "non-quantum", "human_label": ""}
+{"no": 17, "id": "82-3", "comment_text": "each parameter k.", "model_label": "non-quantum", "human_label": ""}
+{"no": 18, "id": "76-1", "comment_text": "return sparse gradients", "model_label": "non-quantum", "human_label": ""}
+{"no": 19, "id": "226-4", "comment_text": "Returns:", "model_label": "non-quantum", "human_label": ""}
+{"no": 20, "id": "452-8", "comment_text": "Example", "model_label": "non-quantum", "human_label": ""}
+{"no": 21, "id": "491-1", "comment_text": "Amplitude amplification", "model_label": "quantum", "human_label": ""}
+{"no": 22, "id": "1032-1", "comment_text": "if blocking is enabled we need to keep track of the function values", "model_label": "non-quantum", "human_label": ""}
+{"no": 23, "id": "1266-4", "comment_text": "Args:", "model_label": "non-quantum", "human_label": ""}
+{"no": 24, "id": "71-3", "comment_text": "ctx: Context object that contains information from the forward pass.\ngrad_output (Tensor): Gradient of the loss with respect to the output of the forward pass.", "model_label": "non-quantum", "human_label": ""}
+{"no": 25, "id": "1186-2", "comment_text": "DIviding RECTangles (DIRECT) is a deterministic-search algorithms based on systematic division\nof the search domain into increasingly smaller hyper-rectangles.", "model_label": "non-quantum", "human_label": ""}
+{"no": 26, "id": "417-1", "comment_text": "predict is of shape (N, num_outputs)", "model_label": "non-quantum", "human_label": ""}
+{"no": 27, "id": "1559-4", "comment_text": "ValueError: If epsilon is not positive.", "model_label": "non-quantum", "human_label": ""}
+{"no": 28, "id": "1386-5", "comment_text": "The result of the neural network of the shape (output_shape).", "model_label": "non-quantum", "human_label": ""}
+{"no": 29, "id": "1514-1", "comment_text": "Compute the phase fix", "model_label": "non-quantum", "human_label": ""}
+{"no": 30, "id": "1151-1", "comment_text": "Nelder-Mead optimizer.", "model_label": "quantum", "human_label": ""}
+{"no": 31, "id": "875-1", "comment_text": "State of ~.GradientDescent.", "model_label": "non-quantum", "human_label": ""}
+{"no": 32, "id": "454-1", "comment_text": "This code is part of a Qiskit project.\n\n(C) Copyright IBM 2023, 2026.\n(C) Copyright UKRI-STFC (Hartree Centre) 2024, 2026.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must reta", "model_label": "non-quantum", "human_label": ""}
+{"no": 33, "id": "928-7", "comment_text": "For further detail, please refer to\nSee https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html", "model_label": "non-quantum", "human_label": ""}
+{"no": 34, "id": "1244-1", "comment_text": "Return None to indicate that this distribution is analytic, not sampled.", "model_label": "non-quantum", "human_label": ""}
+{"no": 35, "id": "589-3", "comment_text": "Therefore, these values are\nconverted into probabilities using the sigmoid activation\nfunction, which maps the real-valued outputs to the [0, 1] range.", "model_label": "non-quantum", "human_label": ""}
+{"no": 36, "id": "19-1", "comment_text": "This code is part of a Qiskit project.\n\n(C) Copyright IBM 2019, 2026.\n(C) Copyright UKRI-STFC (Hartree Centre) 2024, 2026.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must reta", "model_label": "non-quantum", "human_label": ""}
+{"no": 37, "id": "1654-1", "comment_text": "Preprocess the gradient.", "model_label": "non-quantum", "human_label": ""}
+{"no": 38, "id": "334-1", "comment_text": "pylint: disable=import-outside-toplevel", "model_label": "non-quantum", "human_label": ""}
+{"no": 39, "id": "1504-3", "comment_text": "Reference:", "model_label": "non-quantum", "human_label": ""}
+{"no": 40, "id": "880-4", "comment_text": "ValueError: If learning_rate is an array and its length is less than maxiter.", "model_label": "non-quantum", "human_label": ""}
+{"no": 41, "id": "706-2", "comment_text": "name: value name.\nvalue: value to check.\nminimum: minimum value allowed.\nmaximum: maximum value allowed.", "model_label": "non-quantum", "human_label": ""}
+{"no": 42, "id": "589-2", "comment_text": "The decision function values are\nnot bounded in the range [0, 1].", "model_label": "non-quantum", "human_label": ""}
+{"no": 43, "id": "329-3", "comment_text": "Practical limit: n <= 16 qubits (2^16 x 2^16 matrix).", "model_label": "quantum", "human_label": ""}
+{"no": 44, "id": "448-2", "comment_text": "Args:", "model_label": "non-quantum", "human_label": ""}
+{"no": 45, "id": "1658-3", "comment_text": "circuits: The list of quantum circuits to compute the QGTs.\nparameter_values: The list of parameter values to be bound to the circuits.\nparameters: The sequence of parameters with respect to which the QGTs should be\n\n<string>:8: (ERROR/3) Unexpected indentation.\n\ncomputed.", "model_label": "quantum", "human_label": ""}
+{"no": 46, "id": "702-3", "comment_text": "Raises:", "model_label": "non-quantum", "human_label": ""}
+{"no": 47, "id": "237-4", "comment_text": "Returns:", "model_label": "non-quantum", "human_label": ""}
+{"no": 48, "id": "225-5", "comment_text": "ValueError: when circuit_1 and circuit_2 don't have the\nsame number of qubits.", "model_label": "quantum", "human_label": ""}
+{"no": 49, "id": "795-1", "comment_text": "Continuous Univariate Marginal Distribution Algorithm (UMDA).", "model_label": "non-quantum", "human_label": ""}
+{"no": 50, "id": "231-1", "comment_text": "Preprocesses input parameter values to match the fidelity\ncircuit parametrization, and return in list format.", "model_label": "quantum", "human_label": ""}
+{"no": 51, "id": "739-2", "comment_text": "**kwargs: Arbitrary keyword arguments to pass to SVR constructor within\n\n<string>:3: (WARNING/2) Inline strong start-string without end-string.\n\nSVRLoss evaluation.", "model_label": "non-quantum", "human_label": ""}
+{"no": 52, "id": "712-4", "comment_text": "Loss is computed for each sample\nindividually.", "model_label": "non-quantum", "human_label": ""}
+{"no": 53, "id": "1268-3", "comment_text": "opts: Any options-like object.", "model_label": "non-quantum", "human_label": ""}
+{"no": 54, "id": "558-6", "comment_text": "Returns:", "model_label": "non-quantum", "human_label": ""}
+{"no": 55, "id": "105-1", "comment_text": "An abstract definition of the quantum kernel interface.\n\nThe general task of machine learning is to find and study patterns in data. For many\nalgorithms, the datapoints are better understood in a higher dimensional feature space,\nthrough the use of a kernel function:\n\n.. math::\n\n    K(x, y) = \\langle f(x), f(y)\\rangle.\n\nHere K is the kernel function, x, y are n dimensional inputs. f is a map from ", "model_label": "quantum", "human_label": ""}
+{"no": 56, "id": "1599-1", "comment_text": "Validate the arguments.", "model_label": "non-quantum", "human_label": ""}
+{"no": 57, "id": "941-1", "comment_text": "Args:", "model_label": "non-quantum", "human_label": ""}
+{"no": 58, "id": "1125-6", "comment_text": "Compared to SPSA, QN-SPSA requires 4 additional function\nevaluations of the fidelity.", "model_label": "quantum", "human_label": ""}
+{"no": 59, "id": "271-1", "comment_text": "|i>", "model_label": "non-quantum", "human_label": ""}
+{"no": 60, "id": "790-1", "comment_text": "pylint: disable=invalid-name", "model_label": "non-quantum", "human_label": ""}
+{"no": 61, "id": "205-4", "comment_text": "Returns:", "model_label": "non-quantum", "human_label": ""}
+{"no": 62, "id": "1164-2", "comment_text": "Args:", "model_label": "non-quantum", "human_label": ""}
+{"no": 63, "id": "620-3", "comment_text": "BaseKernel: a ~qiskit_machine_learning.kernels.BaseKernel\ninstance.", "model_label": "non-quantum", "human_label": ""}
+{"no": 64, "id": "1325-3", "comment_text": "interpret: A callable that maps the measured integer to another unsigned integer or\n\ntuple of unsigned integers. See constructor for more details.\n\noutput_shape: The output shape of the custom interpretation. It is ignored if no custom\n\ninterpret method is provided where the shape is taken to be\n2^circuit.num_qubits.", "model_label": "quantum", "human_label": ""}
+{"no": 65, "id": "1306-1", "comment_text": "Forward pass of the neural network.", "model_label": "non-quantum", "human_label": ""}
+{"no": 66, "id": "749-1", "comment_text": "Args:", "model_label": "non-quantum", "human_label": ""}
+{"no": 67, "id": "1217-1", "comment_text": "pylint: disable=too-many-return-statements", "model_label": "non-quantum", "human_label": ""}
+{"no": 68, "id": "396-6", "comment_text": "The result of the neural network.", "model_label": "non-quantum", "human_label": ""}
+{"no": 69, "id": "1524-2", "comment_text": "estimator: The estimator used to compute the gradients.\nderivative_type: The type of derivative. Can be either DerivativeType.REAL\n\n<string>:5: (ERROR/3) Unexpected indentation.\n\nDerivativeType.IMAG, or DerivativeType.COMPLEX. Defaults to\nDerivativeType.REAL.\n\nDerivativeType.REAL computes 2 mathrm{Re}[⟨ψ(ω)|O(θ)|dω ψ(ω)〉].\n\nDerivativeType.IMAG computes 2 mathrm{Im}[⟨ψ(ω)|O(θ)|dω ψ(ω)〉].\n\nDerivativ", "model_label": "quantum", "human_label": ""}
+{"no": 70, "id": "182-4", "comment_text": "Raises:", "model_label": "non-quantum", "human_label": ""}
+{"no": 71, "id": "109-1", "comment_text": "Returns the feature map of this kernel.", "model_label": "non-quantum", "human_label": ""}
+{"no": 72, "id": "1414-1", "comment_text": "calculate effective dimension for each data sample size out\nof normalized normalized_fisher", "model_label": "non-quantum", "human_label": ""}
+{"no": 73, "id": "476-1", "comment_text": "Create circuit", "model_label": "quantum", "human_label": ""}
+{"no": 74, "id": "615-3", "comment_text": "The class follows scikit-learn conventions and inherits methods such as fit and\npredict.", "model_label": "non-quantum", "human_label": ""}
+{"no": 75, "id": "206-1", "comment_text": "The priority of run options is as follows:\noptions in `evaluate` method > fidelity's default options >\nprimitive's default options.", "model_label": "non-quantum", "human_label": ""}
+{"no": 76, "id": "492-1", "comment_text": "If the measurement of the evidence qubits matches the evidence stop", "model_label": "quantum", "human_label": ""}
+{"no": 77, "id": "236-5", "comment_text": "Returns:", "model_label": "non-quantum", "human_label": ""}
+{"no": 78, "id": "932-14", "comment_text": "The optimizers from\nscikit-quant are not included in the\nQiskit Machine Learning library.", "model_label": "non-quantum", "human_label": ""}
+{"no": 79, "id": "1351-1", "comment_text": "Post-processing during backward pass of the network.", "model_label": "non-quantum", "human_label": ""}
+{"no": 80, "id": "760-1", "comment_text": "Predict on training data", "model_label": "quantum", "human_label": ""}
+{"no": 81, "id": "339-2", "comment_text": "Reference: Bermejo et al., arXiv:2408.12739, eq. (9).", "model_label": "non-quantum", "human_label": ""}
+{"no": 82, "id": "775-1", "comment_text": "Parallelized Limited-memory BFGS optimizer.", "model_label": "quantum", "human_label": ""}
+{"no": 83, "id": "728-3", "comment_text": "parameter_values: An array of values to assign to the user params\nquantum_kernel: A trainable quantum kernel object to evaluate\ndata: An (N, M) matrix containing the data\n\n<string>:8: (ERROR/3) Unexpected indentation.\n\nN = # samples, M = dimension of data\n\n<string>:9: (WARNING/2) Block quote ends without a blank line; unexpected unindent.\n\nlabels: A length-N array containing the truth labels", "model_label": "quantum", "human_label": ""}
+{"no": 84, "id": "442-5", "comment_text": "QiskitMachineLearningError: Model needs to be fit to some training data first", "model_label": "non-quantum", "human_label": ""}
+{"no": 85, "id": "1434-1", "comment_text": "Allow a single circuit to be passed in.", "model_label": "quantum", "human_label": ""}
+{"no": 86, "id": "566-1", "comment_text": "Returns quantum kernel", "model_label": "quantum", "human_label": ""}
+{"no": 87, "id": "1516-1", "comment_text": "type: ignore", "model_label": "non-quantum", "human_label": ""}
+{"no": 88, "id": "1462-7", "comment_text": "ValueError: If the derivative type is not supported.", "model_label": "non-quantum", "human_label": ""}
+{"no": 89, "id": "1383-1", "comment_text": "flatten lower dimensions, keep num_inputs as a last dimension", "model_label": "non-quantum", "human_label": ""}
+{"no": 90, "id": "187-3", "comment_text": "Args:", "model_label": "non-quantum", "human_label": ""}
+{"no": 91, "id": "1280-4", "comment_text": "Returns:", "model_label": "non-quantum", "human_label": ""}
+{"no": 92, "id": "1349-1", "comment_text": "no layout: circuit was not transpiled,\nkeep original behavior", "model_label": "quantum", "human_label": ""}
+{"no": 93, "id": "359-1", "comment_text": "---------------------------------------------------------------------------\nRegistry — maps model name to its module\n---------------------------------------------------------------------------", "model_label": "non-quantum", "human_label": ""}
+{"no": 94, "id": "1121-1", "comment_text": "Print algorithm-specific options.", "model_label": "non-quantum", "human_label": ""}
+{"no": 95, "id": "1598-1", "comment_text": "If parameters is not None, we calculate the gradients of the specified parameters.", "model_label": "non-quantum", "human_label": ""}
+{"no": 96, "id": "522-1", "comment_text": "construct circuit", "model_label": "quantum", "human_label": ""}
+{"no": 97, "id": "342-1", "comment_text": ": Ordered list of phase labels for the Cluster model.", "model_label": "quantum", "human_label": ""}
+{"no": 98, "id": "945-6", "comment_text": "Raises:", "model_label": "non-quantum", "human_label": ""}
+{"no": 99, "id": "793-1", "comment_text": "pylint: disable=too-many-positional-arguments\npylint: disable=unused-argument", "model_label": "non-quantum", "human_label": ""}
+{"no": 100, "id": "571-3", "comment_text": "Raises:", "model_label": "non-quantum", "human_label": ""}
+{"no": 101, "id": "1364-6", "comment_text": "See also the ~qiskit_machine_learning.connectors.", "model_label": "non-quantum", "human_label": ""}
+{"no": 102, "id": "1469-1", "comment_text": "Makes a circuit that computes the linear combination of the QGT circuits.", "model_label": "quantum", "human_label": ""}
+{"no": 103, "id": "1178-2", "comment_text": "'Subplex (a variant of Nelder-Mead that uses Nelder-Mead on a sequence of subspaces)\nis claimed to be much more efficient and robust than the original Nelder-Mead,\nwhile retaining the latter's facility with discontinuous objectives.", "model_label": "non-quantum", "human_label": ""}
+{"no": 104, "id": "453-2", "comment_text": "circuit: The quantum circuit that represents the Bayesian network. Each random variable\n\nshould be assigned to exactly one register of one qubit. The last qubit in the\ncircuit corresponds to the most significant bit in the binary string, which\nrepresents the measured quantum state.\n\n<string>:7: (WARNING/2) Definition list ends without a blank line; unexpected unindent.\n\nlimit: The maximum number o", "model_label": "quantum", "human_label": ""}
+{"no": 105, "id": "1463-5", "comment_text": "The circuit with unique parameters and the mapping from the original parameters to the\nunique parameters.", "model_label": "quantum", "human_label": ""}
+{"no": 106, "id": "674-1", "comment_text": "Mismatch in the circuits' num_qubits is unacceptable", "model_label": "quantum", "human_label": ""}
+{"no": 107, "id": "139-1", "comment_text": "if don't evaluate any duplicates", "model_label": "non-quantum", "human_label": ""}
+{"no": 108, "id": "481-1", "comment_text": "Run the circuit with the Grover operator and measurements", "model_label": "quantum", "human_label": ""}
+{"no": 109, "id": "82-4", "comment_text": "The weights' dimension is independent of the\nbatch size.", "model_label": "non-quantum", "human_label": ""}
+{"no": 110, "id": "662-1", "comment_text": "Emit a deprecation warning.", "model_label": "non-quantum", "human_label": ""}
+{"no": 111, "id": "829-6", "comment_text": "for further details on analytic gradients of parameterized quantum gates.", "model_label": "quantum", "human_label": ""}
+{"no": 112, "id": "569-1", "comment_text": "Pegasos Quantum Support Vector Classifier.", "model_label": "quantum", "human_label": ""}
+{"no": 113, "id": "175-1", "comment_text": "Args:", "model_label": "non-quantum", "human_label": ""}
+{"no": 114, "id": "443-4", "comment_text": "X: Test samples.\ny: True values for X.\nsample_weight: Sample weights. Default is None.", "model_label": "non-quantum", "human_label": ""}
+{"no": 115, "id": "1197-7", "comment_text": "This method supports arbitrary nonlinear inequality and equality constraints, in\naddition to the bound constraints.", "model_label": "non-quantum", "human_label": ""}
+{"no": 116, "id": "1567-1", "comment_text": "Prepare circuit-observable-parameter tuples (PUBs)", "model_label": "quantum", "human_label": ""}
+{"no": 117, "id": "661-2", "comment_text": "Args:", "model_label": "non-quantum", "human_label": ""}
+{"no": 118, "id": "445-3", "comment_text": "If initial point is passed,\nthen use this value, otherwise pick a random location.", "model_label": "non-quantum", "human_label": ""}
+{"no": 119, "id": "1400-1", "comment_text": "Sets network input samples.", "model_label": "non-quantum", "human_label": ""}
+{"no": 120, "id": "1007-1", "comment_text": "2 pi / 10", "model_label": "non-quantum", "human_label": ""}
+{"no": 121, "id": "819-5", "comment_text": "Uses scipy.optimize.minimize CG.", "model_label": "non-quantum", "human_label": ""}
+{"no": 122, "id": "1368-1", "comment_text": "Empty SparseArray class\nReplacement if sparse.", "model_label": "non-quantum", "human_label": ""}
+{"no": 123, "id": "940-2", "comment_text": "An implementation of the line search algorithm described in\nhttps://arxiv.org/pdf/1905.01332.pdf, using gradient approximation\nbased on Gaussian-smoothed samples on a sphere.", "model_label": "quantum", "human_label": ""}
+{"no": 124, "id": "307-1", "comment_text": "Stratified Sampling for x vector", "model_label": "non-quantum", "human_label": ""}
+{"no": 125, "id": "558-7", "comment_text": "The number of inferred classes.", "model_label": "non-quantum", "human_label": ""}
+{"no": 126, "id": "527-4", "comment_text": "Returns:", "model_label": "non-quantum", "human_label": ""}
+{"no": 127, "id": "1629-1", "comment_text": "Compute the sampler gradients on the given circuits.", "model_label": "quantum", "human_label": ""}
+{"no": 128, "id": "1186-3", "comment_text": "The DIRECT-L version is a \"locally biased\" variant of DIRECT that makes the algorithm more\nbiased towards local search, so that it is more efficient for functions with few local minima.", "model_label": "non-quantum", "human_label": ""}
+{"no": 129, "id": "1128-1", "comment_text": "pylint: disable=too-many-positional-arguments", "model_label": "non-quantum", "human_label": ""}
+{"no": 130, "id": "557-7", "comment_text": "Raises:", "model_label": "non-quantum", "human_label": ""}
+{"no": 131, "id": "1631-1", "comment_text": "type: ignore[arg-type]", "model_label": "non-quantum", "human_label": ""}
+{"no": 132, "id": "1232-3", "comment_text": "pub (SamplerPub): PUB containing circuit and parameters.", "model_label": "quantum", "human_label": ""}
+{"no": 133, "id": "894-5", "comment_text": "ValueError: If the gradient passed doesn't have the right dimension.", "model_label": "non-quantum", "human_label": ""}
+{"no": 134, "id": "1230-5", "comment_text": "PrimitiveResult[SamplerPubResult]: Exact results for each PUB.", "model_label": "non-quantum", "human_label": ""}
+{"no": 135, "id": "826-1", "comment_text": "This code is part of a Qiskit project.\n\n(C) Copyright IBM 2018, 2026.\n(C) Copyright UKRI-STFC (Hartree Centre) 2024, 2026.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must reta", "model_label": "non-quantum", "human_label": ""}
+{"no": 136, "id": "749-2", "comment_text": "**kwargs: Arbitrary keyword arguments to pass to SVR constructor within\n\n<string>:3: (WARNING/2) Inline strong start-string without end-string.\n\nMSRLoss evaluation.", "model_label": "non-quantum", "human_label": ""}
+{"no": 137, "id": "453-1", "comment_text": "Args:", "model_label": "non-quantum", "human_label": ""}
+{"no": 138, "id": "302-3", "comment_text": "n (int): Dimensionality of the data.\n\nn_samples (int): Number of samples to generate.", "model_label": "non-quantum", "human_label": ""}
+{"no": 139, "id": "1050-1", "comment_text": "loss at next parameters", "model_label": "non-quantum", "human_label": ""}
+{"no": 140, "id": "995-11", "comment_text": "SPSA can be used in the presence of noise, and it is therefore indicated in situations\ninvolving measurement uncertainty on a quantum computation when finding a minimum.\nIf you are executing a variational algorithm using a Quantum ASseMbly Language (QASM)\nsimulator or a real device, SPSA would be the most recommended choice among the optimizers\nprovided here.", "model_label": "quantum", "human_label": ""}
+{"no": 141, "id": "222-1", "comment_text": "Support ndarray", "model_label": "non-quantum", "human_label": ""}
+{"no": 142, "id": "1647-2", "comment_text": "Args:", "model_label": "non-quantum", "human_label": ""}
+{"no": 143, "id": "113-2", "comment_text": "The (symmetric) matrix should always be positive semi-definite by construction,\nbut this can be violated in case of noise, such as sampling noise.", "model_label": "quantum", "human_label": ""}
+{"no": 144, "id": "251-11", "comment_text": "from qiskit_machine_learning.circuit.library import qnn_circuit\nqnn_qc, fm_params, anz_params = qnn_circuit(2)\nqnn_qc.draw(fold=60)\n#      ┌───┐┌─────────────┐     »\n# q_0: ┤ H ├┤ P(2.0*x[0]) ├──■──»\n#      ├───┤├─────────────┤┌─┴─┐»\n# q_1: ┤ H ├┤ P(2.0*x[1]) ├┤ X ├»\n#      └───┘└─────────────┘└───┘»\n# «                                          ┌───┐»\n# «q_0: ──────────────────────────────────■──┤", "model_label": "quantum", "human_label": ""}
+{"no": 145, "id": "326-3", "comment_text": "Uses Qiskit's little-endian convention:\nsite 0 is the rightmost character in the Pauli string.", "model_label": "quantum", "human_label": ""}
+{"no": 146, "id": "1324-1", "comment_text": "Returns interpret function to be used by the neural network.", "model_label": "non-quantum", "human_label": ""}
+{"no": 147, "id": "336-1", "comment_text": "Evaluate energy expectation value for given parameters.", "model_label": "quantum", "human_label": ""}
+{"no": 148, "id": "1456-1", "comment_text": "Makes a circuit that computes the linear combination of the gradient circuits.", "model_label": "quantum", "human_label": ""}
+{"no": 149, "id": "880-2", "comment_text": "maxiter: The maximum number of iterations.\nlearning_rate: A constant, list, array or factory of generators yielding learning rates\n\n<string>:5: (ERROR/3) Unexpected indentation.\n\nfor the parameter updates. See the docstring for an example.\n\n<string>:6: (WARNING/2) Block quote ends without a blank line; unexpected unindent.\n\ntol: If the norm of the parameter update is smaller than this threshold, t", "model_label": "non-quantum", "human_label": ""}
+{"no": 150, "id": "1254-2", "comment_text": "Exposes SamplerV2-like methods on the whole array:", "model_label": "non-quantum", "human_label": ""}
+{"no": 151, "id": "167-1", "comment_text": "Combines the feature values and the trainable parameters into one array.", "model_label": "non-quantum", "human_label": ""}
+{"no": 152, "id": "795-21", "comment_text": "[1]: Vicente P. Soloviev, Pedro Larrañaga and Concha Bielza (2022, July). Quantum Parametric\nCircuit Optimization with Estimation of Distribution Algorithms. In 2022 The Genetic and\nEvolutionary Computation Conference (GECCO). DOI: https://doi.org/10.1145/3520304.3533963\n\n[2]: Vicente P. Soloviev. Python package EDAspy.\nhttps://github.com/VicentePerezSoloviev/EDAspy.", "model_label": "quantum", "human_label": ""}
+{"no": 153, "id": "795-8", "comment_text": "In this case, UMDA is a\nunivariate EDA as the embedded probabilistic model is univariate.", "model_label": "quantum", "human_label": ""}
+{"no": 154, "id": "1253-7", "comment_text": "ValueError: If the joint distributions are incompatible.", "model_label": "non-quantum", "human_label": ""}
+{"no": 155, "id": "961-3", "comment_text": "n: Dimension of the problem.\nx: Point around which the sample set is constructed.\nvar_lb: Vector of lower bounds on the decision variables. Vector elements can be -np.inf\n\n<string>:8: (ERROR/3) Unexpected indentation.\n\nif the corresponding variable is unbounded from below.\n\n<string>:9: (WARNING/2) Block quote ends without a blank line; unexpected unindent.\n\nvar_ub: Vector of lower bounds on the de", "model_label": "non-quantum", "human_label": ""}
+{"no": 156, "id": "1105-5", "comment_text": "function_wrapper: wrapper", "model_label": "non-quantum", "human_label": ""}
+{"no": 157, "id": "539-1", "comment_text": "Creates an objective function that depends on the classification we want to solve.", "model_label": "non-quantum", "human_label": ""}
+{"no": 158, "id": "1167-1", "comment_text": "Minimize using objective function", "model_label": "non-quantum", "human_label": ""}
+{"no": 159, "id": "37-1", "comment_text": "Submit the job for execution.", "model_label": "non-quantum", "human_label": ""}
+{"no": 160, "id": "1455-1", "comment_text": "Parameter shift gradient", "model_label": "non-quantum", "human_label": ""}
+{"no": 161, "id": "1574-3", "comment_text": "Raises:", "model_label": "non-quantum", "human_label": ""}
+{"no": 162, "id": "255-7", "comment_text": "Next, based on the mode argument, two pre-trained circuits, \"A\" and \"B\"\nare used for generating datapoints.", "model_label": "quantum", "human_label": ""}
+{"no": 163, "id": "1461-1", "comment_text": "pylint: disable=too-many-return-statements", "model_label": "non-quantum", "human_label": ""}
+{"no": 164, "id": "1125-9", "comment_text": "This component has some function that is normally random. If you want to reproduce behavior\nthen you should set the random number generator seed in the algorithm_globals\n(`` qiskit_machine_learning.utils.algorithm_globals.random_seed = seed``).", "model_label": "non-quantum", "human_label": ""}
+{"no": 165, "id": "1638-1", "comment_text": "Return the union of sampler options setting and gradient default options,\nwhere, if the same field is set in both, the gradient's default options override\nthe primitive's default setting.", "model_label": "non-quantum", "human_label": ""}
+{"no": 166, "id": "565-1", "comment_text": "if we don't delete, then this value clashes with our quantum kernel", "model_label": "quantum", "human_label": ""}
+{"no": 167, "id": "1364-10", "comment_text": ".. autosummary::\n   :toctree: ../stubs/\n   :nosignatures:\n\n   NeuralNetwork\n", "model_label": "non-quantum", "human_label": ""}
+{"no": 168, "id": "621-2", "comment_text": "This updates the underlying scikit-learn kernel callable to use\nquantum_kernel.evaluate.", "model_label": "quantum", "human_label": ""}
+{"no": 169, "id": "905-4", "comment_text": "The algorithm requires little memory and is invariant to diagonal\nrescaling of the gradients.", "model_label": "non-quantum", "human_label": ""}
+{"no": 170, "id": "330-6", "comment_text": "hamiltonian: Hamiltonian as a SparsePauliOp.\nbackend (object): Reserved for future hardware integration.  Currently unused;\n\n<string>:18: (ERROR/3) Unexpected indentation.\n\npass any non-None value to activate this pathway.", "model_label": "quantum", "human_label": ""}
+{"no": 171, "id": "932-15", "comment_text": "To continue using them, please import them from Qiskit Algorithms.", "model_label": "non-quantum", "human_label": ""}
+{"no": 172, "id": "13-2", "comment_text": "Args:", "model_label": "non-quantum", "human_label": ""}
+{"no": 173, "id": "1578-1", "comment_text": "pragma: no cover", "model_label": "non-quantum", "human_label": ""}
+{"no": 174, "id": "1573-1", "comment_text": "Compute the gradients of the sampling probability by the Simultaneous Perturbation Stochastic\nApproximation (SPSA)", "model_label": "quantum", "human_label": ""}
+{"no": 175, "id": "558-1", "comment_text": "Infers the number of classes from the targets.", "model_label": "non-quantum", "human_label": ""}
+{"no": 176, "id": "1013-1", "comment_text": "Estimate the standard deviation of the loss function.", "model_label": "non-quantum", "human_label": ""}
+{"no": 177, "id": "1656-5", "comment_text": "Returns:", "model_label": "non-quantum", "human_label": ""}
+{"no": 178, "id": "372-1", "comment_text": ": Ordered list of phase labels for the Heisenberg model.", "model_label": "quantum", "human_label": ""}
+{"no": 179, "id": "1042-1", "comment_text": "next parameters", "model_label": "non-quantum", "human_label": ""}
+{"no": 180, "id": "248-6", "comment_text": "Helper circuits", "model_label": "quantum", "human_label": ""}
+{"no": 181, "id": "1318-1", "comment_text": "Args:", "model_label": "non-quantum", "human_label": ""}
+{"no": 182, "id": "632-1", "comment_text": "An implementation of quantum neural network regressor.", "model_label": "quantum", "human_label": ""}
+{"no": 183, "id": "1364-2", "comment_text": "A neural network is a parametrized network which may be defined as an artificial\nneural network - classical neural network - or as parametrized quantum circuits\n- quantum neural network.", "model_label": "quantum", "human_label": ""}
+{"no": 184, "id": "1280-3", "comment_text": "circuit (QuantumCircuit): Circuit with final measurements.", "model_label": "quantum", "human_label": ""}
+{"no": 185, "id": "780-3", "comment_text": "However P_BFGS doesn't support spawn, so we revert to single process.", "model_label": "non-quantum", "human_label": ""}
+{"no": 186, "id": "1657-2", "comment_text": "parameters_", "model_label": "non-quantum", "human_label": ""}
+{"no": 187, "id": "337-6", "comment_text": "._annni      — Axial Next-Nearest-Neighbor Ising (ANNNI) model", "model_label": "non-quantum", "human_label": ""}
+{"no": 188, "id": "1130-1", "comment_text": "pylint: disable=too-many-positional-arguments", "model_label": "non-quantum", "human_label": ""}
+{"no": 189, "id": "1108-3", "comment_text": "fun: The scalar function to minimize.\nx0: The initial point for the minimization.\njac: The gradient of the scalar function fun.\nbounds: Bounds for the variables of fun. This argument might be ignored if the\n\n<string>:9: (ERROR/3) Unexpected indentation.\n\noptimizer does not support bounds.", "model_label": "non-quantum", "human_label": ""}
+{"no": 190, "id": "3-1", "comment_text": "construct minimal environment", "model_label": "non-quantum", "human_label": ""}
+{"no": 191, "id": "1258-4", "comment_text": "Returns:", "model_label": "non-quantum", "human_label": ""}
+{"no": 192, "id": "673-1", "comment_text": "Final resolved number of qubits", "model_label": "quantum", "human_label": ""}
+{"no": 193, "id": "990-2", "comment_text": "All the information needed to create such a result should be stored in the optimizer state\nand will typically contain the best point found, the function value and gradient at that point,\nthe number of function and gradient evaluation and the number of iterations in the optimization.", "model_label": "non-quantum", "human_label": ""}
+{"no": 194, "id": "59-1", "comment_text": "Replacement for torch.nn.", "model_label": "non-quantum", "human_label": ""}
+{"no": 195, "id": "251-20", "comment_text": "Raises:", "model_label": "non-quantum", "human_label": ""}
+{"no": 196, "id": "753-1", "comment_text": "Predict on training data", "model_label": "quantum", "human_label": ""}
+{"no": 197, "id": "647-7", "comment_text": "So simply changing from:\nfrom qiskit.utils import algorithm_globals\nto\nfrom qiskit_algorithm.utils import algorithm_globals", "model_label": "non-quantum", "human_label": ""}
+{"no": 198, "id": "512-1", "comment_text": "Returns the threshold to accept the evidence.", "model_label": "non-quantum", "human_label": ""}
+{"no": 199, "id": "146-1", "comment_text": "This code is part of a Qiskit project.\n\n(C) Copyright IBM 2023, 2026.\n(C) Copyright UKRI-STFC (Hartree Centre) 2024, 2026.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must reta", "model_label": "non-quantum", "human_label": ""}
+{"no": 200, "id": "517-2", "comment_text": "The variational quantum classifier (VQC) is a variational algorithm where the measured\nbitstrings are interpreted as the output of a classifier.", "model_label": "quantum", "human_label": ""}

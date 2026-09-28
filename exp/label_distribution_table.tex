@@ -1,26 +1,32 @@
-% CC4Q generalization experiment: three-axis label distributions
-% (generated 2026-09-29; see exp/generalization_results.md and exp/labeling_summary.json)
-% Requires: \usepackage{booktabs}
+% Auto-generated - label distributions on the 3 new SDKs (model-labeled)
 \begin{table}[t]
-  \centering
-  \caption{Three-axis labeling of the generalization corpora (11,517 SCCUs from
-  three Qiskit-ecosystem repos). Quantum = quantum-related SCCUs (axis~1, all
-  SCCUs). Intent = developer-intent distribution over all SCCUs (axis~3).
-  Category = quantum-category distribution over quantum SCCUs only (axis~2).
-  Values are percentages of the respective row totals.}
-  \label{tab:label-distribution}
-  \setlength{\tabcolsep}{3.5pt}
-  \begin{tabular}{l c r r rrrrr rrrrrr}
-    \toprule
-    & & & & & \multicolumn{5}{c}{Developer intent (all SCCUs, \%)} & \multicolumn{6}{c}{Quantum category (quantum SCCUs, \%)} \\
-    \cmidrule(lr){6-10} \cmidrule(lr){11-16}
-    Repository & Ver. & SCCUs & Quant. & \% & What & Use & Done & Prop. & Why & Oth. & Math & Alg. & Circ. & HW & SW & Oth. \\
-    \midrule
-    qiskit-machine-learning & 0.9.1 & 3{,}140 & 704 & 22.4 & 55.3 & 5.3 & 12.1 & 9.5 & 3.9 & 14.0 & 11.4 & 8.1 & 28.4 & 11.4 & 37.5 & 3.3 \\
-    qiskit-nature           & 0.8   & 4{,}842 & 1{,}379 & 28.5 & 54.5 & 6.4 & 10.1 & 11.6 & 4.4 & 12.9 & 28.9 & 2.9 & 16.4 & 11.7 & 32.9 & 7.3 \\
-    qiskit-algorithms       & 0.4.0 & 3{,}535 & 915 & 25.9 & 55.0 & 4.4 & 12.1 & 9.6 & 5.0 & 13.9 & 11.3 & 11.0 & 29.4 & 8.9 & 33.3 & 6.1 \\
-    \midrule
-    \textbf{Overall} & --- & \textbf{11{,}517} & \textbf{2{,}998} & \textbf{26.0} & 54.9 & 5.5 & 11.3 & 10.4 & 4.4 & 13.5 & 19.4 & 6.6 & 23.2 & 10.7 & 34.1 & 6.0 \\
-    \bottomrule
-  \end{tabular}
+\centering
+\small
+\caption{Labeling results on the three additional SDKs (model-labeled, no human verification). Q = quantum-related proportion.}
+\label{tab:label-dist}
+\begin{tabular}{lccc}
+\toprule
+ & Q-ML & Q-Nature & Q-Algorithms \\
+\midrule
+SCCUs & 3140 & 4842 & 3535 \\
+Q (\%) & 22.4 & 28.5 & 25.9 \\
+\midrule
+\multicolumn{4}{l}{\emph{Developer intent (\%)}}\\
+  What & 55.3 & 54.5 & 55.0 \\
+  How-to-use & 5.3 & 6.4 & 4.4 \\
+  How-it-is-done & 12.1 & 10.1 & 12.1 \\
+  Property & 9.5 & 11.6 & 9.6 \\
+  Why & 3.9 & 4.4 & 5.0 \\
+  Others & 14.0 & 12.9 & 13.9 \\
+\midrule
+\multicolumn{4}{l}{\emph{Quantum category (\%% of quantum SCCUs)}}
+\\
+  Math & 11.4 & 28.9 & 11.3 \\
+  Algorithm & 8.1 & 2.9 & 11.0 \\
+  Circuit & 28.4 & 16.4 & 29.4 \\
+  Hardware & 11.4 & 11.7 & 8.9 \\
+  Software & 37.5 & 32.9 & 33.3 \\
+  Others & 3.3 & 7.3 & 6.1 \\
+\bottomrule
+\end{tabular}
 \end{table}
