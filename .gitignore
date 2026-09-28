@@ -10,5 +10,8 @@ data/input/
 data/output/
 log/
 
+# BERT classifier checkpoints (too large for git; copies of the release models)
+models_checkpoints/
+
 # macOS
 .DS_Store

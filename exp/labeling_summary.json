@@ -1,0 +1,114 @@
+{
+  "device": "cpu",
+  "batch_size": 32,
+  "repos": {
+    "qiskit-machine-learning": {
+      "version": "0.9.1",
+      "sccus": 3140,
+      "quantum_sccus": 704,
+      "quantum_proportion": 0.2242,
+      "intent_counts": {
+        "What": 1735,
+        "Others": 440,
+        "Property": 299,
+        "How-it-is-done": 380,
+        "Why": 121,
+        "How-to-use": 165
+      },
+      "category_counts": {
+        "Quantum software framework": 264,
+        "Quantum circuit model": 200,
+        "Mathematics for quantum information": 80,
+        "Quantum algorithms": 57,
+        "Quantum hardware": 80,
+        "Others": 23
+      },
+      "timings": {
+        "quantum_related": {
+          "load_s": 0.06,
+          "infer_s": 152.15
+        },
+        "quantum_category": {
+          "load_s": 0.05,
+          "infer_s": 62.49
+        },
+        "developer_intent": {
+          "load_s": 0.05,
+          "infer_s": 169.5
+        }
+      }
+    },
+    "qiskit-nature": {
+      "version": "0.8",
+      "sccus": 4842,
+      "quantum_sccus": 1379,
+      "quantum_proportion": 0.2848,
+      "intent_counts": {
+        "What": 2639,
+        "Others": 627,
+        "How-to-use": 312,
+        "How-it-is-done": 491,
+        "Property": 562,
+        "Why": 211
+      },
+      "category_counts": {
+        "Quantum circuit model": 226,
+        "Quantum hardware": 161,
+        "Quantum algorithms": 40,
+        "Others": 100,
+        "Quantum software framework": 454,
+        "Mathematics for quantum information": 398
+      },
+      "timings": {
+        "quantum_related": {
+          "load_s": 0.05,
+          "infer_s": 220.06
+        },
+        "quantum_category": {
+          "load_s": 0.06,
+          "infer_s": 105.53
+        },
+        "developer_intent": {
+          "load_s": 0.06,
+          "infer_s": 235.55
+        }
+      }
+    },
+    "qiskit-algorithms": {
+      "version": "0.4.0",
+      "sccus": 3535,
+      "quantum_sccus": 915,
+      "quantum_proportion": 0.2588,
+      "intent_counts": {
+        "Why": 176,
+        "Property": 340,
+        "Others": 490,
+        "What": 1945,
+        "How-it-is-done": 428,
+        "How-to-use": 156
+      },
+      "category_counts": {
+        "Others": 56,
+        "Quantum software framework": 305,
+        "Quantum circuit model": 269,
+        "Quantum algorithms": 101,
+        "Mathematics for quantum information": 103,
+        "Quantum hardware": 81
+      },
+      "timings": {
+        "quantum_related": {
+          "load_s": 0.04,
+          "infer_s": 181.61
+        },
+        "quantum_category": {
+          "load_s": 0.06,
+          "infer_s": 102.41
+        },
+        "developer_intent": {
+          "load_s": 0.09,
+          "infer_s": 342.88
+        }
+      }
+    }
+  }
+}

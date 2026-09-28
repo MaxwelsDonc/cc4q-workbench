@@ -85,3 +85,91 @@ done
 # Statistics
 python exp/compute_stats.py
 ```
+
+---
+
+# Three-Axis BERT Labeling (generalization corpora)
+
+Date: 2026-09-29. Classifiers: release checkpoints (BERT-base, `models_checkpoints/`, copied unmodified from the TOSEM release), run on CPU (`CC4Q_DEVICE=cpu`; the MPS path hung on this machine with torch 2.14.0), batch size 32, max length 512. torch 2.14.0, transformers 5.17.0. Driver: `exp/run_inference.py`; machine-readable summary: `exp/labeling_summary.json`; per-unit labels: `data/output/<repo>/labeled/sccus_labeled.json`.
+
+Workflow (mirrors the release inference scripts): (1) binary quantum-related classifier on **all** SCCUs; (2) 6-class quantum-category classifier on the quantum-related SCCUs only; (3) 6-class developer-intent classifier on **all** SCCUs.
+
+## Axis 1 — quantum-related SCCUs
+
+| Repository | SCCUs | Quantum SCCUs | Proportion |
+|---|---:|---:|---:|
+| qiskit-machine-learning | 3,140 | 704 | 22.4% |
+| qiskit-nature | 4,842 | 1,379 | 28.5% |
+| qiskit-algorithms | 3,535 | 915 | 25.9% |
+| **Overall** | **11,517** | **2,998** | **26.0%** |
+
+The overall quantum proportion (26.0%) is below the ~34% reported for the original three core SDKs — expected: these ecosystem packages wrap classical ML/optimization/chemistry workflows and reference quantum concepts less densely than the core SDKs. (Original-SDK comparison numbers to be inserted from the TOSEM paper camera-ready.)
+
+## Axis 2 — developer intent (all SCCUs, row %)
+
+| Repository | What | How-to-use | How-it-is-done | Property | Why | Others |
+|---|---:|---:|---:|---:|---:|---:|
+| qiskit-machine-learning | 55.3% | 5.3% | 12.1% | 9.5% | 3.9% | 14.0% |
+| qiskit-nature | 54.5% | 6.4% | 10.1% | 11.6% | 4.4% | 12.9% |
+| qiskit-algorithms | 55.0% | 4.4% | 12.1% | 9.6% | 5.0% | 13.9% |
+
+## Axis 3 — quantum category (quantum SCCUs only, row %)
+
+| Repository | Math for QI | Quantum algorithms | Quantum circuit model | Quantum hardware | Quantum software framework | Others |
+|---|---:|---:|---:|---:|---:|---:|
+| qiskit-machine-learning | 11.4% | 8.1% | 28.4% | 11.4% | 37.5% | 3.3% |
+| qiskit-nature | 28.9% | 2.9% | 16.4% | 11.7% | 32.9% | 7.3% |
+| qiskit-algorithms | 11.3% | 11.0% | 29.4% | 8.9% | 33.3% | 6.1% |
+
+qiskit-nature skews toward *Mathematics for quantum information* (second-quantized operators, tensors) and away from *Quantum algorithms*, consistent with its domain; the other two repos are dominated by *Quantum software framework* and *Quantum circuit model*.
+
+## Inference wall-clock (seconds, prediction only, CPU)
+
+| Classifier | qiskit-machine-learning | qiskit-nature | qiskit-algorithms | Total |
+|---|---:|---:|---:|---:|
+| quantum_related (all SCCUs) | 152.2 | 220.1 | 181.6 | 553.8 |
+| quantum_category (quantum SCCUs) | 62.5 | 105.5 | 102.4 | 270.4 |
+| developer_intent (all SCCUs) | 169.5 | 235.6 | 342.9 | 747.9 |
+| **Per-repo total** | **384.1** | **561.1** | **626.9** | **1,572.1 (~26 min)** |
+
+## Sanity check — 10 random units per repo (seed 42)
+
+| Repo | SCCU text (truncated) | Quantum | Category | Intent |
+|---|---|---|---|---|
+| q-ml | Neural networks may be used, for example, with the ~qiskit_machine_learning.algorithms. | no | – | How-to-use |
+| q-ml | Returns: | no | – | What |
+| q-ml | pylint: disable=arguments-differ Disable Lint warnings caused by different number of parameters… | no | – | Others |
+| q-ml | This code is part of a Qiskit project. (C) Copyright IBM 2022, 2026… | no | – | Others |
+| q-ml | training loop | no | – | What |
+| q-ml | Returns the used feature map. | no | – | What |
+| q-ml | List of truncated fidelities. | yes | Math for QI | What |
+| nature | The terms to be summed are encoded in a dictionary, where each operator product is identified by its key… | yes | Math for QI | How-it-is-done |
+| nature | pylint: disable=broad-except | no | – | Others |
+| nature | No need to multiply the coefficient by -1 due to commutation relations | no | – | Why |
+| nature | Sample a random two-body tensor with real-valued orbitals. | yes | Math for QI | What |
+| nature | FCIDump (qiskit_nature.second_q.formats.fcidump) | no | – | Others |
+| alg | Run the single job with all circuits. | yes | Quantum software framework | What |
+| alg | Some amplitude estimators, such as .AmplitudeEstimation do not support a custom implementation of the is_good_state function… | yes | Quantum software framework | Property |
+| alg | product_formula: A Lie-Trotter-Suzuki product formula. If None provided (default), the ~qiskit.synthesis.LieTrotter… | yes | Quantum software framework | What |
+| alg | scaling_factor: The scaling factor in [0, 1]. | no | – | What |
+| alg | perform optimization | no | – | What |
+| alg | type: ignore[arg-type] | no | – | Others |
+
+Assessment: labels are plausible. Boilerplate (copyright headers, pylint disables) is consistently non-quantum / Others; API-description fragments ("Returns the used feature map.") are What; genuinely quantum units receive sensible categories and intents. Two soft spots, both inherited from the SCCU granularity rather than the classifier: bare docstring headers like "Returns:" get What, and fragment units (".unfold_s8_to_s1.") are noisy input.
+
+## Reproduction (labeling)
+
+```bash
+cd cc4q-workbench && source .venv/bin/activate
+
+# one-time: inference deps (CPU-only torch is fine; ~1.3 GB wheel on macOS)
+pip install torch transformers datasets scikit-learn
+
+# checkpoints: copy the three release model dirs (unmodified) to models_checkpoints/
+#   models_checkpoints/quantum_related   <- .../BERT_QR_classifier/saved_model
+#   models_checkpoints/quantum_category  <- .../BERT_QC_classifier/saved_best_model
+#   models_checkpoints/developer_intent  <- .../BERT_DI_classifier/saved_best_model
+
+# label all three corpora (CPU; set CC4Q_DEVICE to override device selection)
+CC4Q_DEVICE=cpu python exp/run_inference.py
+```
