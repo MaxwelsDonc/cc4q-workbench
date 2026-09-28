@@ -1,0 +1,24 @@
+# Core comment extraction & segmentation pipeline
+libcst==1.8.2
+PyYAML==6.0.2
+loguru==0.7.3
+tqdm>=4.60
+docutils==0.21.2
+Sphinx==8.2.3
+spacy==3.8.7        # then run: python -m spacy download en_core_web_sm
+
+# BERT classifiers (model/**)
+torch>=2.1
+transformers>=4.45
+datasets>=3.0
+scikit-learn>=1.3
+
+# RQ analysis & visualization (rqs/**)
+numpy>=1.24
+pandas>=1.5
+scipy>=1.10
+matplotlib>=3.7
+seaborn>=0.13
+plotly>=5.18
+nltk==3.9.1
+sentence-transformers>=3.0

@@ -1,0 +1,65 @@
+{
+  "combination_distribution": {
+    "module+docstring": {
+      "code_entity": "module",
+      "comment_forms": "docstring",
+      "count": 948,
+      "percentage": 7.4
+    },
+    "module+block": {
+      "code_entity": "module",
+      "comment_forms": "block",
+      "count": 1502,
+      "percentage": 11.73
+    },
+    "class+docstring": {
+      "code_entity": "class",
+      "comment_forms": "docstring",
+      "count": 1040,
+      "percentage": 8.12
+    },
+    "function+block": {
+      "code_entity": "function",
+      "comment_forms": "block",
+      "count": 4184,
+      "percentage": 32.67
+    },
+    "function+docstring": {
+      "code_entity": "function",
+      "comment_forms": "docstring",
+      "count": 4230,
+      "percentage": 33.03
+    },
+    "module+inline": {
+      "code_entity": "module",
+      "comment_forms": "inline",
+      "count": 73,
+      "percentage": 0.57
+    },
+    "function+inline": {
+      "code_entity": "function",
+      "comment_forms": "inline",
+      "count": 647,
+      "percentage": 5.05
+    },
+    "class+block": {
+      "code_entity": "class",
+      "comment_forms": "block",
+      "count": 149,
+      "percentage": 1.16
+    },
+    "class+inline": {
+      "code_entity": "class",
+      "comment_forms": "inline",
+      "count": 34,
+      "percentage": 0.27
+    }
+  },
+  "total_ccps_with_units": 12807,
+  "allocated_ccp_ids_per_sdk": {
+    "qiskit": 9677,
+    "qiskit-aer": 1153,
+    "qiskit-ibm-runtime": 1982
+  },
+  "allocated_ccp_ids_total": 12812
+}

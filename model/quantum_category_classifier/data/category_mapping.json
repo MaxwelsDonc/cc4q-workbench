@@ -1,0 +1,8 @@
+{
+  "Mathematics for quantum information": 0,
+  "Quantum algorithms": 1,
+  "Quantum circuit model": 2,
+  "Quantum hardware": 3,
+  "Quantum software framework": 4,
+  "Others (includes Quantum physical phenomena and Quantum applications in specific domains)": 5
+}

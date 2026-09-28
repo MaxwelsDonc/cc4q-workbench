@@ -1,0 +1,10 @@
+clean_mode: current_only
+project: qiskit
+version: 2.1.0
+language: python
+
+input_dir: examples/test_dir
+output_dir: examples/output
+
+include_dirs:
+  - . 

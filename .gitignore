@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.venv/
+venv/
+
+# Pipeline outputs
+data/input/
+data/output/
+log/
+
+# macOS
+.DS_Store

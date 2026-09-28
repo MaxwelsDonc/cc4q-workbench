@@ -1,0 +1,72 @@
+{
+  "quantum_proportion_distribution": {
+    "module+docstring": {
+      "code_entity": "module",
+      "comment_forms": "docstring",
+      "total_count": 2305,
+      "quantum_count": 915,
+      "quantum_percentage": 39.6963
+    },
+    "module+block": {
+      "code_entity": "module",
+      "comment_forms": "block",
+      "total_count": 1713,
+      "quantum_count": 307,
+      "quantum_percentage": 17.9218
+    },
+    "class+docstring": {
+      "code_entity": "class",
+      "comment_forms": "docstring",
+      "total_count": 3296,
+      "quantum_count": 1604,
+      "quantum_percentage": 48.665
+    },
+    "function+block": {
+      "code_entity": "function",
+      "comment_forms": "block",
+      "total_count": 4796,
+      "quantum_count": 1599,
+      "quantum_percentage": 33.3403
+    },
+    "function+docstring": {
+      "code_entity": "function",
+      "comment_forms": "docstring",
+      "total_count": 14986,
+      "quantum_count": 5089,
+      "quantum_percentage": 33.9584
+    },
+    "module+inline": {
+      "code_entity": "module",
+      "comment_forms": "inline",
+      "total_count": 73,
+      "quantum_count": 5,
+      "quantum_percentage": 6.8493
+    },
+    "function+inline": {
+      "code_entity": "function",
+      "comment_forms": "inline",
+      "total_count": 655,
+      "quantum_count": 66,
+      "quantum_percentage": 10.0763
+    },
+    "class+block": {
+      "code_entity": "class",
+      "comment_forms": "block",
+      "total_count": 216,
+      "quantum_count": 29,
+      "quantum_percentage": 13.4259
+    },
+    "class+inline": {
+      "code_entity": "class",
+      "comment_forms": "inline",
+      "total_count": 36,
+      "quantum_count": 3,
+      "quantum_percentage": 8.3333
+    }
+  },
+  "overall": {
+    "total_count": 28076,
+    "quantum_count": 9617,
+    "quantum_percentage": 34.2535
+  }
+}

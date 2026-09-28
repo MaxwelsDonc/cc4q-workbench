@@ -1,0 +1,606 @@
+{"id": "598-1", "SDK": "qiskit-aer", "comment": "Aer Quantum States.", "label": 1}
+{"id": "135-49", "SDK": "qiskit-aer", "comment": "enable_truncation (bool): If set to True this removes unnecessary\nqubits which do not affect the simulation outcome from the simulated\ncircuits (Default: True).", "label": 1}
+{"id": "98-12", "SDK": "qiskit-aer", "comment": "The simulator can be automatically configured to mimic an IBM Quantum backend using\nthe from_backend method.", "label": 1}
+{"id": "135-61", "SDK": "qiskit-aer", "comment": "batched_shots_gpu_max_qubits (int): This option sets the maximum\nnumber of qubits for enabling the batched_shots_gpu option. If the\nnumber of active circuit qubits is greater than this value batching of\nsimulation shots will not be used. (Default: 16).", "label": 1}
+{"id": "98-62", "SDK": "qiskit-aer", "comment": "fusion_max_qubit (int): Maximum number of qubits for a operation generated\nin a fusion optimization [Default: 5]", "label": 1}
+{"id": "98-42", "SDK": "qiskit-aer", "comment": "statevector_parallel_threshold (int): Sets the threshold that\nthe number of qubits must be greater than to enable OpenMP\nparallelization for matrix multiplication during execution of\nan experiment. If parallel circuit or shot execution is enabled\nthis will only use unallocated CPU cores up to\nmax_parallel_threads. Note that setting this too low can reduce\nperformance (Default: 14).", "label": 1}
+{"id": "135-1", "SDK": "qiskit-aer", "comment": "Noisy quantum circuit simulator backend.", "label": 1}
+{"id": "205-1", "SDK": "qiskit-aer", "comment": "TODO faulty qubit handling might be needed since\nfaulty qubit reporting qubit properties doesn't make sense.", "label": 1}
+{"id": "814-1", "SDK": "qiskit-aer", "comment": "This returns True if both noise models have:\nthe same basis_gates\nthe same noise_qubits\nthe same noise_instructions", "label": 1}
+{"id": "643-1", "SDK": "qiskit-aer", "comment": "Check input is N-qubit matrix", "label": 1}
+{"id": "823-1", "SDK": "qiskit-aer", "comment": "Format input as QuantumError", "label": 1}
+{"id": "234-1", "SDK": "qiskit-aer", "comment": "Check if circuits contain quantum error instructions", "label": 1}
+{"id": "845-1", "SDK": "qiskit-aer", "comment": "Check error matches qubit size", "label": 1}
+{"id": "207-1", "SDK": "qiskit-aer", "comment": "Properties provides gate properties only for subset of qubits\nAssociated qubit set might be defined by the gate config here", "label": 1}
+{"id": "503-2", "SDK": "qiskit-aer", "comment": "Dict keys label measured qubits, whereas the values indicate the\nclassical bit onto which that qubits measurement result is stored.", "label": 1}
+{"id": "1110-1", "SDK": "qiskit-aer", "comment": "Return a single qubit reset quantum error channel.\n\nThe error channel returned is given by the map\n\n.. math::\n\n    E(ρ) = (1 - p_0 - p_1) ρ + \\text{Tr}[ρ] \\left(\n            p_0 |0 \\rangle\\langle 0|\n            + p_1 |1 \\rangle\\langle 1| \\right)\n\nwhere the probability of no reset is given by :math:`1 - p_0 - p_1`.\n\nArgs:\n\n    prob0 (double): reset probability to :math:`|0\\rangle`.\n\n    prob1 (double): reset probability to :math:`|1\\rangle`.\n\nReturns:\n\n    QuantumError: the quantum error object.\n\nRaises:\n\n    NoiseError: If noise parameters are invalid.", "label": 1}
+{"id": "1092-1", "SDK": "qiskit-aer", "comment": "Return the number of qubits.", "label": 1}
+{"id": "273-1", "SDK": "qiskit-aer", "comment": "Return the T1 time of the given qubit.", "label": 1}
+{"id": "695-2", "SDK": "qiskit-aer", "comment": "data (np.array or list or Statevector or AerStatevector or QuantumCircuit or\n\nqiskit.circuit.Instruction):\n\n<string>:5: (WARNING/2) Block quote ends without a blank line; unexpected unindent.\n\nData from which the statevector can be constructed. This can be either a complex\nvector, another statevector or a QuantumCircuit or Instruction\n(Operator is not supported in the current implementation).  If the data is\na circuit or instruction, the statevector is constructed by assuming that all\nqubits are initialized to the zero state.\n\ndims (int or tuple or list): Optional. The subsystem dimension of\n\nthe state (See additional information).\n\nconfigs (kwargs): configurations of AerSimulator. method configuration must\n\nbe statevector or matrix_product_state.", "label": 1}
+{"id": "1066-5", "SDK": "qiskit-aer", "comment": "Example: 1-qubit", "label": 1}
+{"id": "413-1", "SDK": "qiskit-aer", "comment": "Save the current simulator quantum state.", "label": 1}
+{"id": "703-1", "SDK": "qiskit-aer", "comment": "Return a new noise model by applyign a function to all quantum errors.", "label": 1}
+{"id": "426-6", "SDK": "qiskit-aer", "comment": "This instruction is always defined across all qubits in a circuit.", "label": 1}
+{"id": "436-1", "SDK": "qiskit-aer", "comment": "Save the current simulator quantum state as a matrix product state.", "label": 1}
+{"id": "620-1", "SDK": "qiskit-aer", "comment": "State that handles cpp quantum state safely", "label": 1}
+{"id": "419-3", "SDK": "qiskit-aer", "comment": "num_qubits (int): the number of qubits\n\nlabel (str): the key for retrieving saved data from results.\n\npershot (bool): if True save a list of statevectors for each\n\nshot of the simulation rather than a single\nstatevector [Default: False].\n\nconditional (bool): if True save data conditional on the current\n\nclassical register values [Default: False].", "label": 1}
+{"id": "716-2", "SDK": "qiskit-aer", "comment": "The approximate channel is found by minimizing the Hilbert-Schmidt\ndistance between the process matrix of the target channel (T) and\nthe process matrix of the output channel (S = sum_i{p_i S_i}),\ni.e. Tr[(T-S)^dagger (T-S)],\nwhere\n[p_1, p_2, ..., p_n] denote probabilities and\n[S_1, S_2, ..., S_n] denote basis operators (channels).", "label": 1}
+{"id": "472-5", "SDK": "qiskit-aer", "comment": "QuantumCircuit: with attached instruction.", "label": 1}
+{"id": "416-3", "SDK": "qiskit-aer", "comment": "num_qubits (int): the number of qubits\n\nlabel (str): the key for retrieving saved data from results.\n\npershot (bool): if True save a list of statevectors for each\n\nshot of the simulation rather than a single\nstatevector [Default: False].\n\nconditional (bool): if True save data conditional on the current\n\nclassical register values [Default: False].", "label": 1}
+{"id": "283-2", "SDK": "qiskit-aer", "comment": "[sec] of the given qubit.", "label": 1}
+{"id": "273-3", "SDK": "qiskit-aer", "comment": "qubit: Qubit for which to return the T1 time of.", "label": 1}
+{"id": "606-1", "SDK": "qiskit-aer", "comment": "Set the seed for the quantum state RNG.", "label": 1}
+{"id": "1123-8", "SDK": "qiskit-aer", "comment": "param_amp (double): the amplitude damping parameter.\n\nexcited_state_population (double): the population of |0rangle\n\nstate at equilibrium (default: 0).\n\ncanonical_kraus (bool): Convert input Kraus matrices into the\n\ncanonical Kraus representation (default: True)", "label": 1}
+{"id": "703-5", "SDK": "qiskit-aer", "comment": "noise_model: the noise model to be transformed.\nfunc: function for transforming QuantumErrors.", "label": 1}
+{"id": "454-3", "SDK": "qiskit-aer", "comment": "operator (Pauli or SparsePauliOp or Operator): a Hermitian operator.\n\nqubits (list): circuit qubits to apply instruction.\n\nlabel (str): the key for retrieving saved data from results.\n\nunnormalized (bool): If True return save the unnormalized accumulated\n\nor conditional accumulated expectation value\nover all shot [Default: False].\n\npershot (bool): if True save a list of expectation values for each\n\nshot of the simulation rather than the average over\nall shots [Default: False].\n\nconditional (bool): if True save the average or pershot data\n\nconditional on the current classical register\nvalues [Default: False].", "label": 1}
+{"id": "703-3", "SDK": "qiskit-aer", "comment": "This function should have singature func(error: QuantumError) -> QuantumError\nwhere the returned quantum error is defined on the same number of qubits\nas the original error.", "label": 1}
+{"id": "482-5", "SDK": "qiskit-aer", "comment": "QuantumCircuit: with attached instruction.", "label": 1}
+{"id": "1053-2", "SDK": "qiskit-aer", "comment": "Required to enable SuperOp(QuantumError).", "label": 1}
+{"id": "503-5", "SDK": "qiskit-aer", "comment": "Mapping of qubits to classical bits for final measurements.", "label": 1}
+{"id": "1076-1", "SDK": "qiskit-ibm-runtime", "comment": "Fake Osaka backend (127 qubit).", "label": 1}
+{"id": "906-9", "SDK": "qiskit-ibm-runtime", "comment": "Please note that the simulation is done using a noise model generated from system snapshots\nobtained in the past (sometimes a few years ago) and the results are not representative of the\nlatest behaviors of the real quantum system that the fake backend is mimicking. If you want\nto run noisy simulations with the latest backend snapshots, you can use the refresh() method.\n\nfrom qiskit_ibm_runtime import QiskitRuntimeService\nfrom qiskit_ibm_runtime.fake_provider import FakeSherbrooke\n\n# initialize service to access real backends\nservice = QiskitRuntimeService()\n\n# call refresh to retrieve latest backend data\n# note that this overwrites your local qiskit-ibm-runtime files\nbackend = FakeSherbrooke()\nbackend.refresh(service)", "label": 1}
+{"id": "1063-1", "SDK": "qiskit-ibm-runtime", "comment": "Fake Auckland device (27 qubits).", "label": 1}
+{"id": "1251-1", "SDK": "qiskit-ibm-runtime", "comment": "Fake Sydney device (27 qubit).", "label": 1}
+{"id": "1138-1", "SDK": "qiskit-ibm-runtime", "comment": "Fake Yorktown device (5 qubit).", "label": 1}
+{"id": "1071-1", "SDK": "qiskit-ibm-runtime", "comment": "Fake Mumbai device (27 qubit).", "label": 1}
+{"id": "1121-1", "SDK": "qiskit-ibm-runtime", "comment": "Fake Fez backend (156 qubit).", "label": 1}
+{"id": "1209-1", "SDK": "qiskit-ibm-runtime", "comment": "Fake Marrakesh backend (156 qubit).", "label": 1}
+{"id": "1187-1", "SDK": "qiskit-ibm-runtime", "comment": "Fake Washington backend (127 qubit).", "label": 1}
+{"id": "906-6", "SDK": "qiskit-ibm-runtime", "comment": "The system snapshots\ncontain important information about the quantum system such as coupling map, basis gates, qubit\nproperties (T1, T2, error rate, etc.) which are useful for testing the transpiler and performing\nnoisy simulations of the system.", "label": 1}
+{"id": "1041-1", "SDK": "qiskit-ibm-runtime", "comment": "Fake Cusco backend (127 qubit).", "label": 1}
+{"id": "1866-1", "SDK": "qiskit-ibm-runtime", "comment": "Utilities for working with IBM Quantum backends.", "label": 1}
+{"id": "502-3", "SDK": "qiskit-ibm-runtime", "comment": "References:: E. van den Berg, Z. Minev, A. Kandala, K. Temme, Probabilistic error\ncancellation with sparse Pauli–Lindblad models on noisy quantum processors,\nNature Physics volume 19, pages 1116–1121 (2023).\narXiv:2201.09866 [quant-ph]", "label": 1}
+{"id": "1495-8", "SDK": "qiskit-ibm-runtime", "comment": "Measurements and resets on disjoint qubits happen simultaneously and are part of the same block.", "label": 1}
+{"id": "1117-1", "SDK": "qiskit-ibm-runtime", "comment": "A fake 5 qubit backend.", "label": 1}
+{"id": "753-12", "SDK": "qiskit-ibm-runtime", "comment": "References:: E. van den Berg, Z. Minev, A. Kandala, K. Temme, Probabilistic error\ncancellation with sparse Pauli–Lindblad models on noisy quantum processors,\nNature Physics volume 19, pages 1116–1121 (2023).\narXiv:2201.09866 [quant-ph]", "label": 1}
+{"id": "1389-1", "SDK": "qiskit-ibm-runtime", "comment": "A translation stage plugin for targeting Qiskit circuits\nto IBM Quantum systems.", "label": 1}
+{"id": "1473-6", "SDK": "qiskit-ibm-runtime", "comment": "Resets and control-flow currently trigger the end of a \"quantum block\". The period between the end\n\nof the block and the next is nondeterministic\nie., we do not know when the next block will begin (as we could be evaluating a classical\nfunction of nondeterministic length) and therefore the\nnext block starts at a relative t=0.", "label": 1}
+{"id": "1164-4", "SDK": "qiskit-ibm-runtime", "comment": "For a 100-qubit square lattice Ising circuit with 10 Trotter steps,\nfake_nighthawk showed a 600% improvement in circuit depth compared to\na Heron backend.", "label": 1}
+{"id": "857-1", "SDK": "qiskit-ibm-runtime", "comment": "Class that represents an account with channel 'ibm_cloud' or 'ibm_quantum_platform'.", "label": 1}
+{"id": "1185-1", "SDK": "qiskit-ibm-runtime", "comment": "A fake 127 qubit backend.", "label": 1}
+{"id": "1072-1", "SDK": "qiskit-ibm-runtime", "comment": "A fake 27 qubit backend.", "label": 1}
+{"id": "225-1", "SDK": "qiskit-ibm-runtime", "comment": "Backend class interfacing with an IBM Quantum backend.", "label": 1}
+{"id": "1816-5", "SDK": "qiskit-ibm-runtime", "comment": "configuration: Backend configuration as BackendConfiguration\nproperties: Backend property dictionary or BackendProperties\ninclude_control_flow: Set True to include control flow instructions.\ninclude_fractional_gates: Set True to include fractioanl gates.\ncustom_name_mapping: A name mapping must be supplied for the operation\n\n<string>:14: (ERROR/3) Unexpected indentation.\n\nnot included in Qiskit Standard Gate name mapping, otherwise the operation\nwill be dropped in the resulting Target object.\n\n<string>:16: (WARNING/2) Block quote ends without a blank line; unexpected unindent.\n\nadd_delay: If True, adds delay to the instruction set.\nfilter_faulty: If True, this filters the non-operational qubits.", "label": 1}
+{"id": "968-3", "SDK": "qiskit-ibm-runtime", "comment": "A dictionary with job metrics including but not limited to the following:\n\ntimestamps: Timestamps of when the job was created, started running, and finished.\n\nusage: Details regarding job usage, the measurement of the amount of\n\ntime the QPU is locked for your workload.", "label": 1}
+{"id": "260-5", "SDK": "qiskit-ibm-runtime", "comment": "ValueError: If an instruction operating on a faulty qubit or edge is found.", "label": 1}
+{"id": "1510-4", "SDK": "qiskit-ibm-runtime", "comment": "All resets on disjoint qubits will be collected on the same qubits to be run simultaneously.", "label": 1}
+{"id": "1344-3", "SDK": "qiskit-ibm-runtime", "comment": "gate: Name of the gate.\nqubits: The qubit to find the property for.\nname: Optionally used to specify which gate property to return.", "label": 1}
+{"id": "260-1", "SDK": "qiskit-ibm-runtime", "comment": "Check if the input circuit uses faulty qubits or edges.", "label": 1}
+{"id": "928-1", "SDK": "qiskit-ibm-runtime", "comment": "Check if the input circuit uses faulty qubits or edges.", "label": 1}
+{"id": "1350-3", "SDK": "qiskit-ibm-runtime", "comment": "gate: The gate for which to get the error.\nqubits: The specific qubits for the gate.", "label": 1}
+{"id": "258-2", "SDK": "qiskit-ibm-runtime", "comment": "Backend configuration contains fixed information about the backend, such\nas its name, number of qubits, basis gates, coupling map, quantum volume, etc.", "label": 1}
+{"id": "1362-5", "SDK": "qiskit-ibm-runtime", "comment": "Frequency of the given qubit.", "label": 1}
+{"id": "1732-7", "SDK": "qiskit-ibm-runtime", "comment": "ValueError: If num_qubits is smaller than 0.", "label": 1}
+{"id": "1673-1", "SDK": "qiskit-ibm-runtime", "comment": "Don't do anything if there's no single-qubit gate to absorb the inverse", "label": 1}
+{"id": "1493-1", "SDK": "qiskit-ibm-runtime", "comment": "If the measurement qubits overlap, we need to flush the measurement group", "label": 1}
+{"id": "798-1", "SDK": "qiskit-ibm-runtime", "comment": "The coordinates come in the format ``(row, column)`` and place qubit ``0`` in the bottom row.", "label": 1}
+{"id": "1850-1", "SDK": "qiskit-ibm-runtime", "comment": "Map required ops to each operational qubit", "label": 1}
+{"id": "1841-2", "SDK": "qiskit-ibm-runtime", "comment": "However properties objects says the qubits is non-operational", "label": 1}
+{"id": "738-2", "SDK": "qiskit-aer", "comment": ".. currentmodule:: qiskit_aer.jobs\n", "label": 0}
+{"id": "756-1", "SDK": "qiskit-aer", "comment": "Utility functions for Aer job management.", "label": 0}
+{"id": "414-1", "SDK": "qiskit-aer", "comment": "Simulator instruction to save statevector.", "label": 1}
+{"id": "365-6", "SDK": "qiskit-aer", "comment": "Setting a Custom Simulator State", "label": 0}
+{"id": "764-11", "SDK": "qiskit-aer", "comment": "The following are the classes used to represented noise and error terms.", "label": 1}
+{"id": "377-1", "SDK": "qiskit-aer", "comment": "Simulator instruction to set a program counter", "label": 0}
+{"id": "373-1", "SDK": "qiskit-aer", "comment": "Simulator instruction to set a program counter", "label": 0}
+{"id": "442-1", "SDK": "qiskit-aer", "comment": "Simulator instruction to save exact operator expectation value.", "label": 0}
+{"id": "437-1", "SDK": "qiskit-aer", "comment": "Simulator instruction to save a density matrix.", "label": 0}
+{"id": "874-1", "SDK": "qiskit-aer", "comment": "Exception for errors raised by Aer noise module.", "label": 1}
+{"id": "82-1", "SDK": "qiskit-aer", "comment": "Qiskit Aer simulator name mapping for Target object", "label": 1}
+{"id": "738-3", "SDK": "qiskit-aer", "comment": "This module contains classes and functions to manage Aer jobs.", "label": 0}
+{"id": "701-5", "SDK": "qiskit-aer", "comment": "To enable noisy Clifford simulation one can transform the\ngiven noise channel into the closest one, Hilbert-Schmidt wise, that can be\nused in a Clifford simulator.", "label": 1}
+{"id": "499-1", "SDK": "qiskit-aer", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2018, 2021.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "445-1", "SDK": "qiskit-aer", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2018, 2021.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "491-1", "SDK": "qiskit-aer", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2018, 2021.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "713-1", "SDK": "qiskit-aer", "comment": "clifford operators", "label": 1}
+{"id": "704-1", "SDK": "qiskit-aer", "comment": "pylint: disable=import-outside-toplevel", "label": 0}
+{"id": "85-1", "SDK": "qiskit-aer", "comment": "pylint: disable=invalid-name", "label": 0}
+{"id": "766-1", "SDK": "qiskit-aer", "comment": "Noise and Error classes", "label": 0}
+{"id": "97-1", "SDK": "qiskit-aer", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2018, 2019.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "949-1", "SDK": "qiskit-aer", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2018-2024.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "459-1", "SDK": "qiskit-aer", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2018, 2021.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "502-1", "SDK": "qiskit-aer", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2022.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "6-1", "SDK": "qiskit-aer", "comment": "pylint: disable=invalid-name", "label": 0}
+{"id": "135-27", "SDK": "qiskit-aer", "comment": "\"matrix_product_state\": A tensor-network statevector simulator that\nuses a Matrix Product State (MPS) representation for the state. This\ncan be done either with or without truncation of the MPS bond dimensions\ndepending on the simulator options. The default behaviour is no\ntruncation.", "label": 1}
+{"id": "135-40", "SDK": "qiskit-aer", "comment": "target_gpus (list): List of GPU's IDs starting from 0 sets\nthe target GPUs used for the simulation.\nIf this option is not specified, all the available GPUs are used for\nchunks/shots distribution.", "label": 0}
+{"id": "58-13", "SDK": "qiskit-aer", "comment": "device (str): Set the simulation device (Default: \"CPU\").\nUse available_devices to return a list of devices supported\non the current system.", "label": 0}
+{"id": "776-5", "SDK": "qiskit-aer", "comment": "See the\n~qiskit_aer.noise module documentation for additional\ninformation.", "label": 0}
+{"id": "355-14", "SDK": "qiskit-aer", "comment": "method (str): [DEPRECATED] Set the simulation method supported\nmethods are \"statevector\" for CPU simulation, and\n\"statevector_gpu\" for GPU simulation. This option has been\ndeprecated, use the device option to set \"CPU\" or \"GPU\"\nsimulation instead.", "label": 1}
+{"id": "135-89", "SDK": "qiskit-aer", "comment": "mps_lapack (bool): This option indicates to compute the SVD function\nusing OpenBLAS/Lapack interface (Default: False).", "label": 0}
+{"id": "428-1", "SDK": "qiskit-aer", "comment": "Save Unitary", "label": 1}
+{"id": "58-12", "SDK": "qiskit-aer", "comment": "The following configurable backend options are supported", "label": 0}
+{"id": "255-1", "SDK": "qiskit-aer", "comment": "Class representing a gate's properties", "label": 1}
+{"id": "355-21", "SDK": "qiskit-aer", "comment": "max_parallel_threads (int): Sets the maximum number of CPU\ncores used by OpenMP for parallelization. If set to 0 the\nmaximum will be set to the number of CPU cores (Default: 0).", "label": 0}
+{"id": "58-28", "SDK": "qiskit-aer", "comment": "fusion_verbose (bool): Output gates generated in fusion optimization\ninto metadata [Default: False]", "label": 1}
+{"id": "1126-1", "SDK": "qiskit-aer", "comment": "Add duration dependent thermal relaxation noise after instructions.", "label": 1}
+{"id": "135-45", "SDK": "qiskit-aer", "comment": "precision (str): Set the floating point precision for\ncertain simulation methods to either \"single\" or \"double\"\nprecision (default: \"double\").", "label": 0}
+{"id": "378-3", "SDK": "qiskit-aer", "comment": "Conditional is not allowed in Aer controller.", "label": 0}
+{"id": "135-4", "SDK": "qiskit-aer", "comment": "These may be set using the\nappropriate kwargs during initialization.", "label": 0}
+{"id": "98-29", "SDK": "qiskit-aer", "comment": "device (str): Set the simulation device (Default: \"CPU\").\nUse available_devices to return a list of devices supported\non the current system.", "label": 0}
+{"id": "135-44", "SDK": "qiskit-aer", "comment": "device (str): Set the simulation device (Default: \"CPU\").\nUse available_devices to return a list of devices supported\non the current system.", "label": 0}
+{"id": "135-15", "SDK": "qiskit-aer", "comment": "Returning the Final State", "label": 0}
+{"id": "381-1", "SDK": "qiskit-aer", "comment": "Store instruction for Aer to work around transpilation issue\nof qiskit.circuit.", "label": 1}
+{"id": "694-1", "SDK": "qiskit-aer", "comment": "AerStatevector class", "label": 0}
+{"id": "384-1", "SDK": "qiskit-aer", "comment": "Pragma Instruction to save simulator data.", "label": 0}
+{"id": "135-33", "SDK": "qiskit-aer", "comment": "\n\n\n\nMethod\n\nGPU Supported\n\nautomatic\n\nSometimes\n\nstatevector\n\nYes\n\ndensity_matrix\n\nYes\n\nstabilizer\n\nNo\n\nmatrix_product_state\n\nNo\n\nextended_stabilizer\n\nNo\n\nunitary\n\nYes\n\nsuperop\n\nNo\n\ntensor_network\n\nYes(GPU only)", "label": 1}
+{"id": "58-4", "SDK": "qiskit-aer", "comment": "These may be set using the appropriate kwargs\nduring initialization.", "label": 0}
+{"id": "135-8", "SDK": "qiskit-aer", "comment": "They will also override any previously set options.", "label": 0}
+{"id": "91-1", "SDK": "qiskit-aer", "comment": "mcr gate", "label": 1}
+{"id": "1139-1", "SDK": "qiskit-aer", "comment": "Transpiler pass to insert noise into a circuit.", "label": 1}
+{"id": "58-19", "SDK": "qiskit-aer", "comment": "\"initial_unitary\" (matrix_like): Sets a custom initial unitary\nmatrix for the simulation instead of identity (Default: None).", "label": 1}
+{"id": "135-52", "SDK": "qiskit-aer", "comment": "max_parallel_threads (int): Sets the maximum number of CPU\ncores used by OpenMP for parallelization. If set to 0 the\nmaximum will be set to the number of CPU cores (Default: 0).", "label": 0}
+{"id": "178-1", "SDK": "qiskit-aer", "comment": "Aer Backend class.", "label": 0}
+{"id": "1152-1", "SDK": "qiskit-aer", "comment": "Otherwise append the instruction returned by the function", "label": 0}
+{"id": "514-2", "SDK": "qiskit-aer", "comment": "See https://github.com/Qiskit/qiskit/pull/11051", "label": 0}
+{"id": "531-1", "SDK": "qiskit-aer", "comment": "run pubs with the same number of shots at once", "label": 0}
+{"id": "194-1", "SDK": "qiskit-aer", "comment": "make target for AerBackend", "label": 0}
+{"id": "130-1", "SDK": "qiskit-aer", "comment": "Clear options to default", "label": 0}
+{"id": "450-1", "SDK": "qiskit-aer", "comment": "Convert O to SparsePauliOp representation", "label": 1}
+{"id": "111-1", "SDK": "qiskit-aer", "comment": "pylint: disable=import-outside-toplevel\nAvoid cyclic import", "label": 0}
+{"id": "505-1", "SDK": "qiskit-aer", "comment": "Sort so that classical bits are in numeric order low->high.", "label": 0}
+{"id": "244-1", "SDK": "qiskit-aer", "comment": "If setting an existing option to None reset it to default\nthis is for backwards compatibility when setting it to None would\nremove it from the options dict", "label": 0}
+{"id": "105-1", "SDK": "qiskit-aer", "comment": "statevector options", "label": 0}
+{"id": "361-1", "SDK": "qiskit-aer", "comment": "Handle deprecation of method option for device option", "label": 0}
+{"id": "763-1", "SDK": "qiskit-aer", "comment": "Otherwise iterate over instruction names", "label": 0}
+{"id": "71-1", "SDK": "qiskit-aer", "comment": "Pass Iterable magic methods on to the Numpy array.", "label": 0}
+{"id": "905-1", "SDK": "qiskit-aer", "comment": "Get depolarizing error", "label": 1}
+{"id": "780-1", "SDK": "qiskit-aer", "comment": "Store gates with a noise model defined", "label": 1}
+{"id": "762-1", "SDK": "qiskit-aer", "comment": "Optypes store class names as strings", "label": 0}
+{"id": "298-1", "SDK": "qiskit-aer", "comment": "Recompute optype for compiled circuit", "label": 1}
+{"id": "1039-1", "SDK": "qiskit-aer", "comment": "Rescale probabilities if their sum is ok to avoid accumulation of rounding errors", "label": 0}
+{"id": "644-1", "SDK": "qiskit-aer", "comment": "update state", "label": 0}
+{"id": "182-1", "SDK": "qiskit-aer", "comment": "Initialize backend configuration", "label": 0}
+{"id": "1148-1", "SDK": "qiskit-aer", "comment": "Add the noise op returned by the function", "label": 0}
+{"id": "678-1", "SDK": "qiskit-aer", "comment": "update state", "label": 0}
+{"id": "575-1", "SDK": "qiskit-aer", "comment": "added for compatibility with qiskit 1.4 (metadata as attribute)\nand qiskit 2.0 (header as dict)", "label": 0}
+{"id": "121-1", "SDK": "qiskit-aer", "comment": "Compute intersection with noise model basis gates", "label": 1}
+{"id": "1116-1", "SDK": "qiskit-aer", "comment": "If T_2 > T_1 we must express this as a Kraus channel", "label": 1}
+{"id": "81-1", "SDK": "qiskit-aer", "comment": "Explicit override to the default behaviour for Python objects to\nprevent the new `__len__` from messing with it.", "label": 0}
+{"id": "652-1", "SDK": "qiskit-aer", "comment": "update state", "label": 0}
+{"id": "23-1", "SDK": "qiskit-aer", "comment": "Determine if we're at main", "label": 0}
+{"id": "147-1", "SDK": "qiskit-aer", "comment": "statevector options", "label": 0}
+{"id": "751-1", "SDK": "qiskit-aer", "comment": "The order is important here", "label": 0}
+{"id": "825-1", "SDK": "qiskit-aer", "comment": "Add instructions", "label": 0}
+{"id": "1100-1", "SDK": "qiskit-aer", "comment": "Check for identity unitaries", "label": 1}
+{"id": "664-1", "SDK": "qiskit-aer", "comment": "update state", "label": 0}
+{"id": "940-1", "SDK": "qiskit-aer", "comment": "Convert to nanoseconds", "label": 0}
+{"id": "891-1", "SDK": "qiskit-aer", "comment": "If we are specifying custom gate times include\nthem in the custom times dict", "label": 0}
+{"id": "201-2", "SDK": "qiskit-aer", "comment": "The None value behaves differently from an empty dictionary.", "label": 0}
+{"id": "726-1", "SDK": "qiskit-aer", "comment": "create quadratic program", "label": 0}
+{"id": "73-1", "SDK": "qiskit-aer", "comment": "Explicit override to the default behaviour for Python objects to\nprevent the new `__len__` from messing with it.", "label": 0}
+{"id": "931-4", "SDK": "qiskit-aer", "comment": "Returns:", "label": 0}
+{"id": "213-1", "SDK": "qiskit-aer", "comment": "Reset the simulator options to default values.", "label": 0}
+{"id": "934-3", "SDK": "qiskit-aer", "comment": "properties (BackendProperties): device backend properties\n\nWe assume the structure of the class BackendProperties in qiskit-ibm-runtime", "label": 0}
+{"id": "470-5", "SDK": "qiskit-aer", "comment": "ValueError: if the input density matrix is not valid.", "label": 0}
+{"id": "750-4", "SDK": "qiskit-aer", "comment": "Raises:", "label": 0}
+{"id": "706-8", "SDK": "qiskit-aer", "comment": "NoiseError: if the transformation failed.", "label": 0}
+{"id": "482-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "878-1", "SDK": "qiskit-aer", "comment": "Return the message.", "label": 0}
+{"id": "492-4", "SDK": "qiskit-aer", "comment": "Returns:", "label": 0}
+{"id": "716-9", "SDK": "qiskit-aer", "comment": "Returns:", "label": 0}
+{"id": "332-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "1086-7", "SDK": "qiskit-aer", "comment": "NoiseError: if other is not a ReadoutError.", "label": 0}
+{"id": "952-1", "SDK": "qiskit-aer", "comment": "Return unique ID string for error", "label": 0}
+{"id": "321-1", "SDK": "qiskit-aer", "comment": "assemble circuit object mapped to AER::Circuit", "label": 1}
+{"id": "683-1", "SDK": "qiskit-aer", "comment": "apply a reset operation.", "label": 0}
+{"id": "270-1", "SDK": "qiskit-aer", "comment": "Return the duration of the gate in units of seconds.", "label": 1}
+{"id": "320-4", "SDK": "qiskit-aer", "comment": "Returns:", "label": 0}
+{"id": "931-1", "SDK": "qiskit-aer", "comment": "Return gate length values from a devices BackendProperties.", "label": 1}
+{"id": "1017-1", "SDK": "qiskit-aer", "comment": "Convert to a PauliError operator.", "label": 1}
+{"id": "1097-3", "SDK": "qiskit-aer", "comment": "All\nprobabilities must sum to 1 for the input ops to be valid.", "label": 0}
+{"id": "573-1", "SDK": "qiskit-aer", "comment": "Coumpute expectation value.", "label": 0}
+{"id": "53-5", "SDK": "qiskit-aer", "comment": "CircuitHeader: The CircuitHeader from the input dictionary.", "label": 0}
+{"id": "749-1", "SDK": "qiskit-aer", "comment": "Attempt to cancel the job.", "label": 0}
+{"id": "1124-8", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "978-4", "SDK": "qiskit-aer", "comment": "Returns:", "label": 0}
+{"id": "1055-5", "SDK": "qiskit-aer", "comment": "tuple: A pair (circuit, p) for error term at position < size\nwhere p is the probability of the error term, and circuit\nis the list of qobj instructions for the error term.", "label": 1}
+{"id": "497-7", "SDK": "qiskit-aer", "comment": "ValueError: If the state is the incorrect size for the current circuit.\nValueError: if the input matrix is not unitary.", "label": 1}
+{"id": "848-3", "SDK": "qiskit-aer", "comment": "serializable (bool): if True, return a dict containing only types\n\nthat can be serializable by the stdlib json module.", "label": 0}
+{"id": "53-4", "SDK": "qiskit-aer", "comment": "Returns:", "label": 0}
+{"id": "1083-7", "SDK": "qiskit-aer", "comment": "NoiseError: if other is not a ReadoutError or has incompatible\ndimensions.", "label": 1}
+{"id": "403-1", "SDK": "qiskit-aer", "comment": "Instruction to save measurement probabilities vector.", "label": 1}
+{"id": "285-4", "SDK": "qiskit-aer", "comment": "Returns:", "label": 0}
+{"id": "1075-1", "SDK": "qiskit-aer", "comment": "The default absolute tolerance parameter for float comparisons.", "label": 0}
+{"id": "460-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "637-1", "SDK": "qiskit-aer", "comment": "apply a unitary gate.", "label": 1}
+{"id": "685-1", "SDK": "qiskit-aer", "comment": "apply a kraus operation.", "label": 1}
+{"id": "454-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "866-1", "SDK": "qiskit-aer", "comment": "Convert dicitonary keys to comma seperated print string.", "label": 0}
+{"id": "801-6", "SDK": "qiskit-aer", "comment": "Note that the resulting noise model is the same as described in\n~.NoiseModel.from_backend so please refer to it for the details.", "label": 1}
+{"id": "497-4", "SDK": "qiskit-aer", "comment": "Returns:", "label": 0}
+{"id": "716-12", "SDK": "qiskit-aer", "comment": "MissingOptionalLibraryError: if cvxpy is not installed.", "label": 0}
+{"id": "399-3", "SDK": "qiskit-aer", "comment": "params (List[int] or List[str]): the basis states to return amplitudes for.\n\nlabel (str): the key for retrieving saved data from results.\n\nunnormalized (bool): If True return save the unnormalized accumulated\n\nprobabilities over all shots [Default: False].\n\npershot (bool): if True save a list of probability vectors for each\n\nshot of the simulation rather than the a single\namplitude vector [Default: False].\n\nconditional (bool): if True save the probability vector conditional\n\non the current classical register values\n[Default: False].", "label": 1}
+{"id": "907-1", "SDK": "qiskit-aer", "comment": "Construct a depolarizing_error for device.", "label": 1}
+{"id": "65-1", "SDK": "qiskit-aer", "comment": "Return the available simulation methods.", "label": 0}
+{"id": "399-6", "SDK": "qiskit-aer", "comment": "Raises:", "label": 0}
+{"id": "1055-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "487-6", "SDK": "qiskit-aer", "comment": "Raises:", "label": 0}
+{"id": "962-1", "SDK": "qiskit-aer", "comment": "Allow unrolling to a Kraus instruction", "label": 1}
+{"id": "315-1", "SDK": "qiskit-aer", "comment": "inline switch cases with jump and mark instructions", "label": 0}
+{"id": "263-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "1103-4", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "1029-6", "SDK": "qiskit-aer", "comment": "An example noise_ops for a bit-flip error with error probability\np = 0.1 is:", "label": 1}
+{"id": "936-6", "SDK": "qiskit-aer", "comment": "Additional Information:: T_1 and T_2 values are returned in nanosecond\n(ns) units and frequency is returned in gigahertz (GHz) units\nif unit for each value is provided in properties.\nOtherwise, the raw values (in unknown original units) are returned.", "label": 0}
+{"id": "602-4", "SDK": "qiskit-aer", "comment": "AerError: if input data is not valid.", "label": 0}
+{"id": "260-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "1127-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "455-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "841-1", "SDK": "qiskit-aer", "comment": "Add a readout error to the noise model.", "label": 1}
+{"id": "1071-1", "SDK": "qiskit-aer", "comment": "Make a copy of current ReadoutError.", "label": 0}
+{"id": "1119-3", "SDK": "qiskit-aer", "comment": "A0 = sqrt(1 - p1) * [[1, 0], [0, sqrt(1 - a - b)]]\nA1 = sqrt(1 - p1) * [[0, sqrt(a)], [0, 0]]\nA2 = sqrt(1 - p1) * [[0, 0], [0, sqrt(b)]]\nB0 = sqrt(p1) * [[sqrt(1 - a - b), 0], [0, 1]]\nB1 = sqrt(p1) * [[0, 0], [sqrt(a), 0]]\nB2 = sqrt(p1) * [[sqrt(b), 0], [0, 0]]", "label": 0}
+{"id": "385-6", "SDK": "qiskit-aer", "comment": "Additional Information:: The supported subtypes are 'single', 'list', 'c_list', 'average',\n'c_average', 'accum', 'c_accum'.", "label": 0}
+{"id": "118-1", "SDK": "qiskit-aer", "comment": "Return simulator basis gates.", "label": 1}
+{"id": "273-4", "SDK": "qiskit-aer", "comment": "Returns:", "label": 0}
+{"id": "675-1", "SDK": "qiskit-aer", "comment": "apply a mcu operation.", "label": 1}
+{"id": "398-3", "SDK": "qiskit-aer", "comment": "params (List[int] or List[str]): the basis states to return amplitudes for.\n\nlabel (str): the key for retrieving saved data from results.\n\npershot (bool): if True save a list of amplitudes vectors for each\n\nshot of the simulation rather than the a single\namplitude vector [Default: False].\n\nconditional (bool): if True save the amplitudes vector conditional\n\non the current classical register values\n[Default: False].", "label": 1}
+{"id": "513-2", "SDK": "qiskit-aer", "comment": "backend_options: Options passed to AerSimulator.\ntranspile_options: Options passed to transpile.\nrun_options: Options passed to run.\nskip_transpilation: if True, transpilation is skipped.", "label": 1}
+{"id": "46-1", "SDK": "qiskit-aer", "comment": "Format raw simulator result data based on save type.", "label": 0}
+{"id": "254-1", "SDK": "qiskit-aer", "comment": "Return a dictionary format representation of the object.", "label": 0}
+{"id": "887-6", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "853-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "329-6", "SDK": "qiskit-aer", "comment": "Examples:", "label": 0}
+{"id": "287-7", "SDK": "qiskit-aer", "comment": "ValueError: If the units aren't recognized.", "label": 0}
+{"id": "998-1", "SDK": "qiskit-aer", "comment": "Return the Lindblad dissipator generator rates", "label": 1}
+{"id": "1123-7", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "609-5", "SDK": "qiskit-aer", "comment": "AerDensityMatrix: the tensor product state other ⊗ self.", "label": 0}
+{"id": "787-1", "SDK": "qiskit-aer", "comment": "Return basis_gates for compiling to the noise model.", "label": 1}
+{"id": "1084-3", "SDK": "qiskit-aer", "comment": "n (int): the number of times to compose with self (n>0).", "label": 0}
+{"id": "1066-3", "SDK": "qiskit-aer", "comment": "probabilities[m] = [P(0|m), P(1|m), ..., P(2 ** N - 1|m)]", "label": 0}
+{"id": "179-6", "SDK": "qiskit-aer", "comment": "AerError: if there is no name in the configuration", "label": 0}
+{"id": "917-1", "SDK": "qiskit-aer", "comment": "Return excited state population from freq [Hz] and temperature", "label": 1}
+{"id": "931-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "421-3", "SDK": "qiskit-aer", "comment": "label (str): the key for retrieving saved data from results.\n\npershot (bool): if True save a list of statevectors for each\n\nshot of the simulation [Default: False].\n\nconditional (bool): if True save pershot data conditional on the\n\ncurrent classical register values\n[Default: False].", "label": 1}
+{"id": "887-8", "SDK": "qiskit-aer", "comment": "Returns:", "label": 0}
+{"id": "279-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "304-4", "SDK": "qiskit-aer", "comment": "Returns:", "label": 0}
+{"id": "1008-4", "SDK": "qiskit-aer", "comment": "Returns:", "label": 0}
+{"id": "978-1", "SDK": "qiskit-aer", "comment": "Simplify PauliList by combining duplicates and removing zeros.", "label": 1}
+{"id": "1082-2", "SDK": "qiskit-aer", "comment": "Note that for front=True this is equivalent to the\nReadoutError.dot method.", "label": 0}
+{"id": "349-2", "SDK": "qiskit-aer", "comment": "Returns:", "label": 0}
+{"id": "29-1", "SDK": "qiskit-aer", "comment": "Set the error message.", "label": 0}
+{"id": "1029-4", "SDK": "qiskit-aer", "comment": "Any type of input\nwill be converted to the probabilistic mixture of circuit format.", "label": 1}
+{"id": "735-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "841-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "485-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "339-2", "SDK": "qiskit-aer", "comment": "Args:", "label": 0}
+{"id": "1008-1", "SDK": "qiskit-aer", "comment": "Simplify PauliList by combining duplicates and removing zeros.", "label": 1}
+{"id": "387-1", "SDK": "qiskit-aer", "comment": "Special case.", "label": 0}
+{"id": "340-1", "SDK": "qiskit-aer", "comment": "convert to sec", "label": 0}
+{"id": "271-1", "SDK": "qiskit-aer", "comment": "Throw away datetime at index 1", "label": 0}
+{"id": "576-1", "SDK": "qiskit-aer", "comment": "Total shots for counts dict", "label": 1}
+{"id": "274-1", "SDK": "qiskit-aer", "comment": "pylint: disable=invalid-name", "label": 0}
+{"id": "730-1", "SDK": "qiskit-aer", "comment": "pylint: disable=invalid-name", "label": 0}
+{"id": "341-1", "SDK": "qiskit-aer", "comment": "convert to sec", "label": 0}
+{"id": "356-1", "SDK": "qiskit-aer", "comment": "Note that this backend will only ever", "label": 0}
+{"id": "74-1", "SDK": "qiskit-aer", "comment": "Magic methods for the iterable/collection interface that need forwarding,\nbut bypass `__getattr__`.", "label": 0}
+{"id": "691-2", "SDK": "qiskit-ibm-runtime", "comment": "Each adaptor handles a specific endpoint prefix followed by the base URL.", "label": 0}
+{"id": "1908-1", "SDK": "qiskit-ibm-runtime", "comment": "Qiskit runtime job result decoder.", "label": 0}
+{"id": "749-2", "SDK": "qiskit-ibm-runtime", "comment": ".. currentmodule:: qiskit_ibm_runtime.noise_learner\n", "label": 1}
+{"id": "487-1", "SDK": "qiskit-ibm-runtime", "comment": "Executor options.", "label": 0}
+{"id": "1-1", "SDK": "qiskit-ibm-runtime", "comment": "Exceptions related to the IBM Runtime service.", "label": 0}
+{"id": "443-1", "SDK": "qiskit-ibm-runtime", "comment": "Simulator options.", "label": 0}
+{"id": "1199-1", "SDK": "qiskit-ibm-runtime", "comment": "Mock guadalupe backend", "label": 1}
+{"id": "1274-1", "SDK": "qiskit-ibm-runtime", "comment": "Mock cambridge backend", "label": 1}
+{"id": "439-1", "SDK": "qiskit-ibm-runtime", "comment": "Post selection options.", "label": 0}
+{"id": "544-3", "SDK": "qiskit-ibm-runtime", "comment": "Overview", "label": 0}
+{"id": "910-1", "SDK": "qiskit-ibm-runtime", "comment": "Base class for dummy backends.", "label": 1}
+{"id": "544-6", "SDK": "qiskit-ibm-runtime", "comment": "Classes", "label": 0}
+{"id": "35-14", "SDK": "qiskit-ibm-runtime", "comment": "Local testing mode", "label": 0}
+{"id": "35-19", "SDK": "qiskit-ibm-runtime", "comment": "Backend data", "label": 0}
+{"id": "693-1", "SDK": "qiskit-ibm-runtime", "comment": "Base REST adapter.", "label": 0}
+{"id": "906-3", "SDK": "qiskit-ibm-runtime", "comment": "Overview", "label": 0}
+{"id": "1179-1", "SDK": "qiskit-ibm-runtime", "comment": "Mock ourense backend", "label": 1}
+{"id": "1299-4", "SDK": "qiskit-ibm-runtime", "comment": "Classes", "label": 0}
+{"id": "475-2", "SDK": "qiskit-ibm-runtime", "comment": ".. currentmodule:: qiskit_ibm_runtime.options\n", "label": 0}
+{"id": "1101-1", "SDK": "qiskit-ibm-runtime", "comment": "Mock johannesburg backend", "label": 1}
+{"id": "421-1", "SDK": "qiskit-ibm-runtime", "comment": "Primitive options.", "label": 0}
+{"id": "751-1", "SDK": "qiskit-ibm-runtime", "comment": "Noise learner program.", "label": 1}
+{"id": "1177-1", "SDK": "qiskit-ibm-runtime", "comment": "Mock burlington backend", "label": 1}
+{"id": "904-1", "SDK": "qiskit-ibm-runtime", "comment": "Account management functionality related to the IBM Runtime Services.", "label": 0}
+{"id": "1748-1", "SDK": "qiskit-ibm-runtime", "comment": "NoiseLearner result decoder.", "label": 1}
+{"id": "6-1", "SDK": "qiskit-ibm-runtime", "comment": "Errors raised when an unexpected value is received from the server.", "label": 0}
+{"id": "1683-4", "SDK": "qiskit-ibm-runtime", "comment": "The ASAP-scheduled circuit output may become", "label": 1}
+{"id": "912-1", "SDK": "qiskit-ibm-runtime", "comment": "A fake backend class for testing and noisy simulation using real backend\nsnapshots.", "label": 1}
+{"id": "551-3", "SDK": "qiskit-ibm-runtime", "comment": "Execution spans are equality checkable, and they implement a comparison operator based on\nthe tuple (start, stop), so can be sorted.", "label": 0}
+{"id": "1636-5", "SDK": "qiskit-ibm-runtime", "comment": "As a special case, the pass allows a length-1 sequence (e.g. [XGate()]).", "label": 1}
+{"id": "192-4", "SDK": "qiskit-ibm-runtime", "comment": "Subsequent jobs within the session are prioritized by the scheduler.", "label": 0}
+{"id": "1049-5", "SDK": "qiskit-ibm-runtime", "comment": "Pulse calibrations (fractional gates don't support calibration).", "label": 1}
+{"id": "321-6", "SDK": "qiskit-ibm-runtime", "comment": "Output arrays returned by the executor follow the same convention: extrinsic axes match\nthe item's shape, and intrinsic axes are determined by the output type (e.g.,\n(num_shots, creg_size) for classical register data).", "label": 0}
+{"id": "538-2", "SDK": "qiskit-ibm-runtime", "comment": "This type of execution span references pub result data that came from a twirled sampler\nexperiment which was executed by either prepending or appending an axis to parameter values\nto account for twirling.", "label": 1}
+{"id": "1495-4", "SDK": "qiskit-ibm-runtime", "comment": "In its current form this is similar to Qiskit's ALAP scheduler in which instructions\nstart as late as possible.", "label": 0}
+{"id": "1577-4", "SDK": "qiskit-ibm-runtime", "comment": "Once a scheduling analysis pass is run, node_start_time is generated\nin the property_set.", "label": 0}
+{"id": "1717-1", "SDK": "qiskit-ibm-runtime", "comment": "Options for the QASM2 path.", "label": 1}
+{"id": "75-1", "SDK": "qiskit-ibm-runtime", "comment": "Representation of a runtime V2 primitive execution.", "label": 0}
+{"id": "357-7", "SDK": "qiskit-ibm-runtime", "comment": "mode: The execution mode used to make the primitive query. It can be:\n\nA Backend if you are using job mode.\n\nA Session if you are using session execution mode.\n\nA Batch if you are using batch execution mode.\n\nRefer to the\nQiskit Runtime documentation\nfor more information about the execution modes.\n\noptions: The desired options.", "label": 1}
+{"id": "125-9", "SDK": "qiskit-ibm-runtime", "comment": "For more details, check the \"Run jobs in a batch\" page.", "label": 0}
+{"id": "1339-2", "SDK": "qiskit-ibm-runtime", "comment": "This holds backend properties measured by the provider.", "label": 0}
+{"id": "1495-5", "SDK": "qiskit-ibm-runtime", "comment": "The primary differences are that:", "label": 0}
+{"id": "1335-2", "SDK": "qiskit-ibm-runtime", "comment": "Attributes:", "label": 0}
+{"id": "447-2", "SDK": "qiskit-ibm-runtime", "comment": "For best practice in simulating a backend make sure to pass the\nbasis gates and coupling map of that backend.", "label": 1}
+{"id": "1314-2", "SDK": "qiskit-ibm-runtime", "comment": "Attributes:", "label": 0}
+{"id": "1049-3", "SDK": "qiskit-ibm-runtime", "comment": "Fractional gates (rx, rzx) in addition to the standard basis gates.", "label": 1}
+{"id": "192-5", "SDK": "qiskit-ibm-runtime", "comment": "You can open a Qiskit Runtime session using this Session class and submit jobs\nto one or more primitives.", "label": 1}
+{"id": "543-3", "SDK": "qiskit-ibm-runtime", "comment": "Concretely, data_slices is a map from pub slices to tuples\n(twirled_shape, at_front, shape_slice, shots_slice, pub_shots), where everything is as in\n~.TwirledSliceSpan, but additionally:", "label": 0}
+{"id": "1447-2", "SDK": "qiskit-ibm-runtime", "comment": "This is a scheduler designed to work for the unique scheduling constraints of the dynamic circuits\nbackends due to the limitations imposed by hardware.", "label": 0}
+{"id": "507-1", "SDK": "qiskit-ibm-runtime", "comment": "Resilience options for V2 Estimator.", "label": 0}
+{"id": "225-7", "SDK": "qiskit-ibm-runtime", "comment": "BackendStatus> instance.", "label": 0}
+{"id": "592-1", "SDK": "qiskit-ibm-runtime", "comment": "Custom session with retry and handling of specific parameters.", "label": 0}
+{"id": "354-1", "SDK": "qiskit-ibm-runtime", "comment": "The supported learning protocols.", "label": 0}
+{"id": "562-4", "SDK": "qiskit-ibm-runtime", "comment": "It is possible for distinct time windows to overlap.", "label": 0}
+{"id": "1683-1", "SDK": "qiskit-ibm-runtime", "comment": "Padding idle time with Delay instructions.", "label": 0}
+{"id": "1292-1", "SDK": "qiskit-ibm-runtime", "comment": "A fake Paris backend.", "label": 1}
+{"id": "684-1", "SDK": "qiskit-ibm-runtime", "comment": "Rest adapter for session related endpoints.", "label": 0}
+{"id": "1636-7", "SDK": "qiskit-ibm-runtime", "comment": "This can be used, for instance, as a Hahn echo.", "label": 1}
+{"id": "538-3", "SDK": "qiskit-ibm-runtime", "comment": "Concretely, data_slices is a map from pub slices to tuples\n(twirled_shape, at_front, shape_slice, shots_slice) where", "label": 0}
+{"id": "1304-3", "SDK": "qiskit-ibm-runtime", "comment": "name: the gate name as it will be referred to in OpenQASM.\nparameters: variable names for the gate parameters (if any).\nqasm_def: definition of this gate in terms of OpenQASM 2 primitives U\n\n<string>:8: (ERROR/3) Unexpected indentation.\n\nand CX.", "label": 1}
+{"id": "1495-3", "SDK": "qiskit-ibm-runtime", "comment": "This is expected to evolve over time as the\ndynamic circuit backends also change.", "label": 1}
+{"id": "588-2", "SDK": "qiskit-ibm-runtime", "comment": "Retrying of POST requests are allowed only when the status code\nreturned is on the STATUS_FORCELIST.", "label": 0}
+{"id": "1381-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2025.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1384-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2022.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "871-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2021.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1040-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2019, 2023.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1875-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2024\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.\npylint: disable=too-many-return-statements", "label": 0}
+{"id": "1190-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2021, 2023.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1253-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2021, 2023.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "333-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2025.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "712-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2018, 2020.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1210-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2025.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1135-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2020, 2023.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1015-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2020, 2023.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "638-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2021.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1195-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2023.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "275-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2022.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1268-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2019, 2023.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1122-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2025.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "676-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2021.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "37-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2022, 2024.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "95-1", "SDK": "qiskit-ibm-runtime", "comment": "pylint: disable=unused-import,cyclic-import", "label": 0}
+{"id": "104-1", "SDK": "qiskit-ibm-runtime", "comment": "pylint: disable=unused-import,cyclic-import", "label": 0}
+{"id": "1093-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2021, 2023.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1921-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2022.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1171-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2019, 2023.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "773-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2025.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1228-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2022, 2023.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1052-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2021, 2023.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "1057-1", "SDK": "qiskit-ibm-runtime", "comment": "This code is part of Qiskit.\n\n(C) Copyright IBM 2019, 2023.\n\nThis code is licensed under the Apache License, Version 2.0. You may\nobtain a copy of this license in the LICENSE.txt file in the root directory\nof this source tree or at http://www.apache.org/licenses/LICENSE-2.0.\n\nAny modifications or derivative works of this code must retain this\ncopyright notice, and modified files need to carry a notice indicating\nthat they have been altered from the originals.", "label": 0}
+{"id": "587-1", "SDK": "qiskit-ibm-runtime", "comment": "Regex used to match the `/backends` endpoint, capturing the device name as group(2).", "label": 0}
+{"id": "532-6", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "762-1", "SDK": "qiskit-ibm-runtime", "comment": "Return the program ID.", "label": 0}
+{"id": "61-1", "SDK": "qiskit-ibm-runtime", "comment": "Returns the error message from an API response.", "label": 0}
+{"id": "178-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "671-1", "SDK": "qiskit-ibm-runtime", "comment": "Login with token.", "label": 0}
+{"id": "680-5", "SDK": "qiskit-ibm-runtime", "comment": "The backend adapter.", "label": 0}
+{"id": "1876-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "1910-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "166-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "1696-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "1593-1", "SDK": "qiskit-ibm-runtime", "comment": "Extra routine inserted before running the padding pass.", "label": 0}
+{"id": "1963-5", "SDK": "qiskit-ibm-runtime", "comment": "The populated figure.", "label": 0}
+{"id": "56-1", "SDK": "qiskit-ibm-runtime", "comment": "Returns the reason if the job failed.", "label": 0}
+{"id": "1689-7", "SDK": "qiskit-ibm-runtime", "comment": "TypeError: If the input parameter value is not valid.", "label": 0}
+{"id": "1519-1", "SDK": "qiskit-ibm-runtime", "comment": "Iterated nodes ordering by channel, time and preferring that barriers are processed\nfirst.", "label": 0}
+{"id": "591-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "1374-4", "SDK": "qiskit-ibm-runtime", "comment": "Raises:", "label": 0}
+{"id": "380-1", "SDK": "qiskit-ibm-runtime", "comment": "Validates the options of a noise learner job.", "label": 1}
+{"id": "1696-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "894-1", "SDK": "qiskit-ibm-runtime", "comment": "Read account from environment variable.", "label": 0}
+{"id": "1697-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "985-6", "SDK": "qiskit-ibm-runtime", "comment": "Raises:", "label": 0}
+{"id": "58-4", "SDK": "qiskit-ibm-runtime", "comment": "Raises:", "label": 0}
+{"id": "1696-1", "SDK": "qiskit-ibm-runtime", "comment": "Converts seconds in a datetime delta to a duration.", "label": 0}
+{"id": "526-8", "SDK": "qiskit-ibm-runtime", "comment": "Raises:", "label": 0}
+{"id": "1687-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "168-3", "SDK": "qiskit-ibm-runtime", "comment": "program_id: Program ID.\ninputs: Program input parameters. These input values are passed\n\n<string>:7: (ERROR/3) Unexpected indentation.\n\nto the runtime program.\n\n<string>:8: (WARNING/2) Block quote ends without a blank line; unexpected unindent.\n\noptions: Runtime options that control the execution environment.\nresult_decoder: A ResultDecoder subclass used to decode job results.\n\n<string>:10: (ERROR/3) Unexpected indentation.\n\nIf more than one decoder is specified, the first is used for interim results and\nthe second final results. If not specified, a program-specific decoder or the default\nResultDecoder is used.\n\n<string>:13: (WARNING/2) Block quote ends without a blank line; unexpected unindent.\n\nsession_id: Job ID of the first job in a runtime session.\nstart_session: Set to True to explicitly start a runtime session. Defaults to False.", "label": 0}
+{"id": "126-4", "SDK": "qiskit-ibm-runtime", "comment": "Raises:", "label": 0}
+{"id": "1572-1", "SDK": "qiskit-ibm-runtime", "comment": "Determine the amount of the odd cycle correction to apply\nFor devices with short gates with odd lenghts we add an extra 16dt to the measurement", "label": 1}
+{"id": "834-1", "SDK": "qiskit-ibm-runtime", "comment": "Return a path that can be used to draw a slice of a pie chart with plotly.", "label": 0}
+{"id": "722-1", "SDK": "qiskit-ibm-runtime", "comment": "Cancel a job.", "label": 0}
+{"id": "54-6", "SDK": "qiskit-ibm-runtime", "comment": "Raises:", "label": 0}
+{"id": "928-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "1774-9", "SDK": "qiskit-ibm-runtime", "comment": "True if the gate is a fractional gate", "label": 1}
+{"id": "441-1", "SDK": "qiskit-ibm-runtime", "comment": "Convert the input options to program compatible inputs.", "label": 0}
+{"id": "253-4", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "1975-4", "SDK": "qiskit-ibm-runtime", "comment": "Raises:", "label": 0}
+{"id": "454-1", "SDK": "qiskit-ibm-runtime", "comment": "Validate noise_factors.", "label": 0}
+{"id": "786-5", "SDK": "qiskit-ibm-runtime", "comment": "A plotly figure.", "label": 0}
+{"id": "1746-1", "SDK": "qiskit-ibm-runtime", "comment": "The data of this noise learner result.", "label": 1}
+{"id": "286-1", "SDK": "qiskit-ibm-runtime", "comment": "Perform an ideal, noiseless simulation of the estimator task specified by pubs.", "label": 1}
+{"id": "680-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "1429-2", "SDK": "qiskit-ibm-runtime", "comment": "IGate to a\nConvert qiskit.circuit.", "label": 1}
+{"id": "1324-2", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "1812-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "1878-1", "SDK": "qiskit-ibm-runtime", "comment": "The coupling map in this embedding.", "label": 0}
+{"id": "1342-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "134-4", "SDK": "qiskit-ibm-runtime", "comment": "Saving default acccount:\n\nfrom qiskit_ibm_runtime import QiskitRuntimeService\n\nQiskitRuntimeService.save_account(\n    token=\"API_KEY\",\n    instance=\"CRN\",\n    set_as_default = True\n    )\n\nservice = QiskitRuntimeService()", "label": 1}
+{"id": "1888-5", "SDK": "qiskit-ibm-runtime", "comment": "Deserialized data.", "label": 0}
+{"id": "756-2", "SDK": "qiskit-ibm-runtime", "comment": "This function breaks the given list of circuits into a list of unique layers, following\nthe strategy set by the twirling_strategy field specified in the options (see\nNoiseLearnerOptions for more details) and sorting them based on the number of\ntimes they occur in the various circuits.", "label": 1}
+{"id": "78-3", "SDK": "qiskit-ibm-runtime", "comment": "timeout: Number of seconds to wait for job.\ndecoder: A ResultDecoder subclass used to decode job results.", "label": 0}
+{"id": "835-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "186-2", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "1313-1", "SDK": "qiskit-ibm-runtime", "comment": "Return a dictionary format representation of the UChannelLO.", "label": 0}
+{"id": "175-3", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "78-7", "SDK": "qiskit-ibm-runtime", "comment": "RuntimeJobFailureError: If the job failed.\nRuntimeJobMaxTimeoutError: If the job does not complete within given timeout.\nRuntimeInvalidStateError: If the job was cancelled, and attempting to retrieve result.", "label": 0}
+{"id": "1715-1", "SDK": "qiskit-ibm-runtime", "comment": "Remove None values so runtime defaults are used.", "label": 0}
+{"id": "646-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "521-5", "SDK": "qiskit-ibm-runtime", "comment": "Merged dictionary.", "label": 0}
+{"id": "651-3", "SDK": "qiskit-ibm-runtime", "comment": "JSON response of backend status.", "label": 0}
+{"id": "1477-2", "SDK": "qiskit-ibm-runtime", "comment": "Measurement currently triggers the end of a deterministically scheduled block\nof instructions in IBM dynamic circuits hardware.", "label": 1}
+{"id": "1792-5", "SDK": "qiskit-ibm-runtime", "comment": "Name that is a valid Python identifier.", "label": 0}
+{"id": "756-5", "SDK": "qiskit-ibm-runtime", "comment": "circuits: An iterable of circuits to run the noise learner program for. Alternatively,\n\nestimator pub-like (primitive unified bloc) objects can be specified, such as\ntuples (circuit, observables) or (circuit, observables, parameter_values).\nIn this case, the pub-like objects are converted to a list of circuits, and all\nthe other fields (such as observables and parameter_values) are ignored.", "label": 1}
+{"id": "258-7", "SDK": "qiskit-ibm-runtime", "comment": "The configuration for the backend.", "label": 0}
+{"id": "989-3", "SDK": "qiskit-ibm-runtime", "comment": "backend: The backend to run the primitive on.\nprimitive: Name of the primitive.\noptions: Primitive options to use.\ninputs: Primitive inputs.", "label": 0}
+{"id": "1783-3", "SDK": "qiskit-ibm-runtime", "comment": "locator: The value to check.", "label": 0}
+{"id": "1333-3", "SDK": "qiskit-ibm-runtime", "comment": "data (dict): A dictionary representing the Nduv to create.\n\nIt will be in the same format as output by\nto_dict.", "label": 0}
+{"id": "1611-1", "SDK": "qiskit-ibm-runtime", "comment": "Visit a control-flow node to pad.", "label": 0}
+{"id": "888-5", "SDK": "qiskit-ibm-runtime", "comment": "Account information.", "label": 0}
+{"id": "152-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "134-21", "SDK": "qiskit-ibm-runtime", "comment": "An instance of .QiskitRuntimeService or .QiskitRuntimeLocalService if local\nchannel is set.", "label": 1}
+{"id": "1567-1", "SDK": "qiskit-ibm-runtime", "comment": "Patch reset duration by extending duration by measurement patch as temporarily\nrequired by the dynamic circuit backend.", "label": 1}
+{"id": "671-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "1692-1", "SDK": "qiskit-ibm-runtime", "comment": "Convert a local datetime object or string to a UTC string.", "label": 0}
+{"id": "1555-1", "SDK": "qiskit-ibm-runtime", "comment": "Construct a DynamicInstructionDurations object from the backend.\nArgs:", "label": 0}
+{"id": "704-1", "SDK": "qiskit-ibm-runtime", "comment": "Convert a name to a valid Python identifier.", "label": 0}
+{"id": "725-3", "SDK": "qiskit-ibm-runtime", "comment": "job_id: Program job ID.", "label": 0}
+{"id": "734-1", "SDK": "qiskit-ibm-runtime", "comment": "Return the properties of the IBM backend.", "label": 0}
+{"id": "59-1", "SDK": "qiskit-ibm-runtime", "comment": "Set error message if the job failed.", "label": 0}
+{"id": "409-1", "SDK": "qiskit-ibm-runtime", "comment": "Convert a V0.2 model to noise learner v3 results", "label": 1}
+{"id": "1763-5", "SDK": "qiskit-ibm-runtime", "comment": "Message on why the circuit is not an ISA circuit, if applicable.", "label": 1}
+{"id": "1803-2", "SDK": "qiskit-ibm-runtime", "comment": "Data to be filtered out includes hub/group/project information.", "label": 0}
+{"id": "196-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "31-3", "SDK": "qiskit-ibm-runtime", "comment": "mode: The execution mode used to make the primitive query. It can be:\n\nA Backend if you are using job mode.\n\nA Session if you are using session execution mode.\n\nA Batch if you are using batch execution mode.\n\nRefer to the\nQiskit Runtime documentation\nfor more information about the Execution modes.\n\noptions: Estimator options, see EstimatorOptions for detailed description.", "label": 1}
+{"id": "304-3", "SDK": "qiskit-ibm-runtime", "comment": "ws_url: Websocket URL.", "label": 0}
+{"id": "1890-5", "SDK": "qiskit-ibm-runtime", "comment": "Deserialized object.", "label": 0}
+{"id": "741-1", "SDK": "qiskit-ibm-runtime", "comment": "Return the version information.", "label": 0}
+{"id": "1743-1", "SDK": "qiskit-ibm-runtime", "comment": "Return a dictionary containing all the information to re-initialize this object.", "label": 0}
+{"id": "1687-1", "SDK": "qiskit-ibm-runtime", "comment": "Convert a UTC datetime object or string to a local timezone datetime.", "label": 0}
+{"id": "80-1", "SDK": "qiskit-ibm-runtime", "comment": "Cancel the job.", "label": 0}
+{"id": "1695-5", "SDK": "qiskit-ibm-runtime", "comment": "A datetime with the UTC timezone, or None if the input is None.", "label": 0}
+{"id": "1693-5", "SDK": "qiskit-ibm-runtime", "comment": "Converted timestamp, or None if input is None.", "label": 0}
+{"id": "163-3", "SDK": "qiskit-ibm-runtime", "comment": "filename: Name of file from which to delete the account.\nname: Name of the saved account to delete.\nchannel: Channel type of the default account to delete.\n\n<string>:8: (ERROR/3) Unexpected indentation.\n\nIgnored if account name is provided.", "label": 0}
+{"id": "1954-2", "SDK": "qiskit-ibm-runtime", "comment": "The shifts are to distinguish static and dynamic (control-flow) parts of the circuit.", "label": 1}
+{"id": "1496-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "1633-5", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "178-1", "SDK": "qiskit-ibm-runtime", "comment": "Decode job data received from the server.", "label": 0}
+{"id": "257-2", "SDK": "qiskit-ibm-runtime", "comment": "Note:", "label": 0}
+{"id": "1932-4", "SDK": "qiskit-ibm-runtime", "comment": "Return:", "label": 0}
+{"id": "150-3", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "369-1", "SDK": "qiskit-ibm-runtime", "comment": "Decode raw json to result type.", "label": 0}
+{"id": "1760-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "32-1", "SDK": "qiskit-ibm-runtime", "comment": "Submit a request to the estimator primitive.", "label": 0}
+{"id": "1336-1", "SDK": "qiskit-ibm-runtime", "comment": "Initialize a new GateProperties object", "label": 1}
+{"id": "1953-8", "SDK": "qiskit-ibm-runtime", "comment": "A y-axis shifts for trace and annotation.", "label": 0}
+{"id": "1940-3", "SDK": "qiskit-ibm-runtime", "comment": "filter_awgr: If True, remove all readout channels from scheduling data.\nfilter_barriers: If True, remove all barriers from scheduling data.\nincluded_channels: If not None, remove all channels from scheduling data\n\n<string>:8: (ERROR/3) Unexpected indentation.\n\nthat are not in the included_channels list and reorder the plot's\ny-axis according to the included_channels order.\n\n<string>:10: (WARNING/2) Block quote ends without a blank line; unexpected unindent.\n\nmerge_common_instructions: If True, merge instructions of the same type\n\nbased on temporal continuity.", "label": 0}
+{"id": "925-2", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "667-3", "SDK": "qiskit-ibm-runtime", "comment": "job_id: ID of the job.", "label": 0}
+{"id": "1488-2", "SDK": "qiskit-ibm-runtime", "comment": "Reset currently triggers the end of a pulse block in IBM dynamic circuits hardware\nas conditional reset is performed internally using a c_if.", "label": 1}
+{"id": "718-5", "SDK": "qiskit-ibm-runtime", "comment": "JSON response.", "label": 0}
+{"id": "733-5", "SDK": "qiskit-ibm-runtime", "comment": "Backend status.", "label": 0}
+{"id": "61-3", "SDK": "qiskit-ibm-runtime", "comment": "response: Job response from the runtime API.", "label": 0}
+{"id": "66-1", "SDK": "qiskit-ibm-runtime", "comment": "Job creation date in local time.", "label": 0}
+{"id": "675-1", "SDK": "qiskit-ibm-runtime", "comment": "Return an adapter for the job.", "label": 0}
+{"id": "55-1", "SDK": "qiskit-ibm-runtime", "comment": "Return the backend properties for this job.", "label": 0}
+{"id": "1586-1", "SDK": "qiskit-ibm-runtime", "comment": "Setup for initial run.", "label": 0}
+{"id": "860-1", "SDK": "qiskit-ibm-runtime", "comment": "Resolves the corresponding unique Cloud Resource Name (CRN) for the given non-unique service\ninstance name and updates the instance attribute accordingly.", "label": 0}
+{"id": "1790-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "844-1", "SDK": "qiskit-ibm-runtime", "comment": "Retrieve all crns with the IBM Cloud Global Search API.", "label": 0}
+{"id": "1354-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "193-1", "SDK": "qiskit-ibm-runtime", "comment": "Session constructor.", "label": 0}
+{"id": "235-1", "SDK": "qiskit-ibm-runtime", "comment": "Decode.", "label": 0}
+{"id": "1344-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "1331-1", "SDK": "qiskit-ibm-runtime", "comment": "Initialize a new name-date-unit-value object", "label": 0}
+{"id": "555-1", "SDK": "qiskit-ibm-runtime", "comment": "The start time of the span, in UTC.", "label": 0}
+{"id": "328-3", "SDK": "qiskit-ibm-runtime", "comment": "circuit: The circuit of this item.\ncircuit_arguments: A real-valued array of parameter values for the circuit. The last\n\n<string>:7: (ERROR/3) Unexpected indentation.\n\naxis is intrinsic with size equal to the number of circuit parameters. Leading\naxes are extrinsic and define the sweep grid.\n\n<string>:9: (WARNING/2) Block quote ends without a blank line; unexpected unindent.\n\nchunk_size: The maximum number of bound circuits in each shot loop execution, or\n\nNone to use a server-side heuristic to optimize speed. When not executing\nin a session, the server-side heuristic is always used and this value is ignored.", "label": 1}
+{"id": "824-8", "SDK": "qiskit-ibm-runtime", "comment": "ValueError: If result does not contain zero noise extrapolation data.\nValueError: If the length of names is not equal to the length of indices.", "label": 0}
+{"id": "245-2", "SDK": "qiskit-ibm-runtime", "comment": "New fields will be added to indicate new limits.", "label": 0}
+{"id": "1862-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "149-1", "SDK": "qiskit-ibm-runtime", "comment": "Check the version of the remote server in a set of client parameters for all channels.", "label": 0}
+{"id": "1862-1", "SDK": "qiskit-ibm-runtime", "comment": "Decode backend properties.", "label": 0}
+{"id": "441-2", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "1981-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "719-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "1791-5", "SDK": "qiskit-ibm-runtime", "comment": "The location.", "label": 0}
+{"id": "631-1", "SDK": "qiskit-ibm-runtime", "comment": "ClientParameters constructor.", "label": 0}
+{"id": "1532-1", "SDK": "qiskit-ibm-runtime", "comment": "Yield nodes such that they are sorted into groups of blocks that minimize synchronization.", "label": 0}
+{"id": "826-7", "SDK": "qiskit-ibm-runtime", "comment": "Raises:", "label": 0}
+{"id": "1981-1", "SDK": "qiskit-ibm-runtime", "comment": "Validate that if dynamical decoupling options are enabled,\nno circuit in the pubs is dynamic", "label": 1}
+{"id": "168-5", "SDK": "qiskit-ibm-runtime", "comment": "A RuntimeJobV2 instance representing the execution.", "label": 0}
+{"id": "1419-2", "SDK": "qiskit-ibm-runtime", "comment": "Circuit is transformed into following form:", "label": 1}
+{"id": "1764-3", "SDK": "qiskit-ibm-runtime", "comment": "Note: we check for parametrized rzz gates inside control flow operation, although fractional\ngates are actually impossible in combination with dynamic circuits.", "label": 1}
+{"id": "867-1", "SDK": "qiskit-ibm-runtime", "comment": "Assert that the instance name is valid for the given account type.", "label": 0}
+{"id": "832-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "1432-1", "SDK": "qiskit-ibm-runtime", "comment": "Get the duration of a gate in dt.", "label": 1}
+{"id": "199-1", "SDK": "qiskit-ibm-runtime", "comment": "Cancel all pending jobs in a session.", "label": 0}
+{"id": "253-8", "SDK": "qiskit-ibm-runtime", "comment": "Raises:", "label": 0}
+{"id": "269-1", "SDK": "qiskit-ibm-runtime", "comment": "Return a retired backend from its name.", "label": 0}
+{"id": "940-1", "SDK": "qiskit-ibm-runtime", "comment": "Build noise model from BackendV2.", "label": 1}
+{"id": "226-3", "SDK": "qiskit-ibm-runtime", "comment": "configuration: Backend configuration.\nservice: Instance of QiskitRuntimeService.\napi_client: IBM client used to communicate with the server.\ncalibration_id: An optional calibration id to use for this backend", "label": 0}
+{"id": "348-3", "SDK": "qiskit-ibm-runtime", "comment": "instruction: The instruction to learn the noise of.", "label": 0}
+{"id": "1354-6", "SDK": "qiskit-ibm-runtime", "comment": "Raises:", "label": 0}
+{"id": "824-3", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "681-1", "SDK": "qiskit-ibm-runtime", "comment": "Return a list of IBM backends.", "label": 1}
+{"id": "703-4", "SDK": "qiskit-ibm-runtime", "comment": "data: Dictionary to be converted.\nmapper: Mapper of selected field names to rename.", "label": 0}
+{"id": "158-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "1816-7", "SDK": "qiskit-ibm-runtime", "comment": "A Target instance.", "label": 0}
+{"id": "180-1", "SDK": "qiskit-ibm-runtime", "comment": "Return the least busy available backend.", "label": 0}
+{"id": "287-1", "SDK": "qiskit-ibm-runtime", "comment": "Perform a noisy simulation of the estimator task specified by pubs.", "label": 1}
+{"id": "711-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "829-3", "SDK": "qiskit-ibm-runtime", "comment": "ValueError: If the indices and names are different lengths.", "label": 0}
+{"id": "1764-1", "SDK": "qiskit-ibm-runtime", "comment": "For rzz gates:\n- Verify that numeric angles are in the range [0, pi/2]\n- Collect parameterized angles", "label": 1}
+{"id": "303-2", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "1356-4", "SDK": "qiskit-ibm-runtime", "comment": "Returns:", "label": 0}
+{"id": "756-3", "SDK": "qiskit-ibm-runtime", "comment": "Then, it runs the noise learning experiment\nfor as many layers as specified by the max_layers_to_learn field in the options,\nprioritizing layers that occur more frequently.", "label": 1}
+{"id": "739-2", "SDK": "qiskit-ibm-runtime", "comment": "Args:", "label": 0}
+{"id": "824-6", "SDK": "qiskit-ibm-runtime", "comment": "A plotly figure.", "label": 0}
+{"id": "1766-5", "SDK": "qiskit-ibm-runtime", "comment": "An empty string if all angles are valid, otherwise an error message.", "label": 0}
+{"id": "1932-3", "SDK": "qiskit-ibm-runtime", "comment": "raw_data: A list of instruction schedules as strings.", "label": 0}
+{"id": "428-1", "SDK": "qiskit-ibm-runtime", "comment": "Convert the input options to program compatible inputs.", "label": 0}
+{"id": "247-2", "SDK": "qiskit-ibm-runtime", "comment": "Target object for the backend.", "label": 0}
+{"id": "1699-1", "SDK": "qiskit-ibm-runtime", "comment": "Convert duration specified as hours minutes seconds to seconds.", "label": 0}
+{"id": "634-1", "SDK": "qiskit-ibm-runtime", "comment": "Returns the Runtime API base url.", "label": 0}
+{"id": "585-1", "SDK": "qiskit-ibm-runtime", "comment": "Return the client version.", "label": 0}
+{"id": "1940-1", "SDK": "qiskit-ibm-runtime", "comment": "Preprocess and filter the parsed circuit schedule data for visualization.", "label": 1}
+{"id": "736-3", "SDK": "qiskit-ibm-runtime", "comment": "API Response.", "label": 0}
+{"id": "1837-1", "SDK": "qiskit-ibm-runtime", "comment": "type: ignore[arg-type, union-attr]", "label": 0}
+{"id": "1500-1", "SDK": "qiskit-ibm-runtime", "comment": "pylint: disable=invalid-name", "label": 0}
+{"id": "922-1", "SDK": "qiskit-ibm-runtime", "comment": "type: ignore", "label": 0}
+{"id": "967-1", "SDK": "qiskit-ibm-runtime", "comment": "type: ignore[no-untyped-def]", "label": 0}
+{"id": "1485-1", "SDK": "qiskit-ibm-runtime", "comment": "pylint: disable=invalid-name", "label": 0}
+{"id": "1844-1", "SDK": "qiskit-ibm-runtime", "comment": "type: ignore[arg-type]", "label": 0}
+{"id": "90-1", "SDK": "qiskit-ibm-runtime", "comment": "pylint: disable=arguments-differ", "label": 0}
+{"id": "109-1", "SDK": "qiskit-ibm-runtime", "comment": "type: ignore[arg-type]", "label": 0}
+{"id": "1369-1", "SDK": "qiskit-ibm-runtime", "comment": "type: ignore[index, call-overload]", "label": 0}
+{"id": "1544-1", "SDK": "qiskit-ibm-runtime", "comment": "Did we encounter a block trigger in this iteration?", "label": 0}
+{"id": "1537-1", "SDK": "qiskit-ibm-runtime", "comment": "Setup the next iteration nodes", "label": 0}
+{"id": "252-1", "SDK": "qiskit-ibm-runtime", "comment": "pylint: disable=unexpected-keyword-arg", "label": 0}
+{"id": "24-1", "SDK": "qiskit-ibm-runtime", "comment": "pylint: disable=unused-argument", "label": 0}
+{"id": "923-1", "SDK": "qiskit-ibm-runtime", "comment": "type: ignore", "label": 0}
+{"id": "233-1", "SDK": "qiskit-ibm-runtime", "comment": "TODO: this is a work-around for the dispatch while we use 'execute'", "label": 0}
+{"id": "363-1", "SDK": "qiskit-ibm-runtime", "comment": "TODO: this is a work-around for the dispatch", "label": 0}
+{"id": "182-1", "SDK": "qiskit-ibm-runtime", "comment": "pylint: disable=broad-except", "label": 0}
+{"id": "1894-1", "SDK": "qiskit-ibm-runtime", "comment": "pylint: disable=arguments-differ", "label": 0}
+{"id": "1785-1", "SDK": "qiskit-ibm-runtime", "comment": "pylint: disable=unused-argument", "label": 0}
+{"id": "1758-1", "SDK": "qiskit-ibm-runtime", "comment": "pylint: disable=import-error", "label": 0}
+{"id": "118-1", "SDK": "qiskit-ibm-runtime", "comment": "pylint: disable=cyclic-import", "label": 0}
+{"id": "221-1", "SDK": "qiskit-ibm-runtime", "comment": "pylint: disable=unused-import,cyclic-import", "label": 0}
+{"id": "470-1", "SDK": "qiskit-ibm-runtime", "comment": "type: ignore[arg-type]", "label": 0}
+{"id": "1423-1", "SDK": "qiskit-ibm-runtime", "comment": "project only to the parameters that have to be checked", "label": 0}
+{"id": "777-1", "SDK": "qiskit-ibm-runtime", "comment": "Setup the figure", "label": 0}
+{"id": "528-1", "SDK": "qiskit-ibm-runtime", "comment": "Add new keys.", "label": 0}
+{"id": "1664-10", "SDK": "qiskit-ibm-runtime", "comment": "The distributed slack should be multiple of 16.", "label": 0}
+{"id": "1321-1", "SDK": "qiskit-ibm-runtime", "comment": "convert lo range from GHz to Hz", "label": 0}
+{"id": "788-1", "SDK": "qiskit-ibm-runtime", "comment": "make sure there are always at least as many names as span sets", "label": 0}
+{"id": "167-1", "SDK": "qiskit-ibm-runtime", "comment": "TODO suggest backends that support frac gates in error message\nvia service.backends(use_fractional_gates=True)", "label": 1}
+{"id": "1903-1", "SDK": "qiskit-ibm-runtime", "comment": "Standalone instructions are encoded as the sole instruction in a QPY serialized circuit\nto deserialize load qpy circuit and return first instruction object in that circuit.", "label": 1}
+{"id": "1771-1", "SDK": "qiskit-ibm-runtime", "comment": "project only to the parameters that have to be checked", "label": 0}
+{"id": "800-1", "SDK": "qiskit-ibm-runtime", "comment": "The highest rate", "label": 0}
+{"id": "1664-8", "SDK": "qiskit-ibm-runtime", "comment": "unconstrained sequence: 44dt-X1-88dt-Y2-88dt-X3-88dt-Y4-44dt\nconstrained sequence  : 32dt-X1-80dt-Y2-80dt-X3-80dt-Y4-32dt + extra slack 48 dt", "label": 0}
+{"id": "1645-1", "SDK": "qiskit-ibm-runtime", "comment": "Use 2.0 as a sane default", "label": 0}
+{"id": "779-1", "SDK": "qiskit-ibm-runtime", "comment": "Populate the figure with traces", "label": 0}
+{"id": "1458-1", "SDK": "qiskit-ibm-runtime", "comment": "Pop the previous block dag off the stack restoring it", "label": 0}
+{"id": "1680-3", "SDK": "qiskit-ibm-runtime", "comment": "The number of delays to be inserted is equal to the number of gates.", "label": 1}
+{"id": "527-1", "SDK": "qiskit-ibm-runtime", "comment": "Update values of existing keys", "label": 0}
+{"id": "652-1", "SDK": "qiskit-ibm-runtime", "comment": "Adjust fields according to the specs (BackendStatus).", "label": 0}
+{"id": "1319-1", "SDK": "qiskit-ibm-runtime", "comment": "register_map must have at least 1 entry", "label": 0}
+{"id": "523-1", "SDK": "qiskit-ibm-runtime", "comment": "Clear the matched dict", "label": 0}
+{"id": "1412-1", "SDK": "qiskit-ibm-runtime", "comment": "In the first quadrant.", "label": 0}
+{"id": "1627-1", "SDK": "qiskit-ibm-runtime", "comment": "Now set the current block index.", "label": 0}
+{"id": "1782-1", "SDK": "qiskit-ibm-runtime", "comment": "resolve CRN value based on the provided service name", "label": 0}
+{"id": "1786-1", "SDK": "qiskit-ibm-runtime", "comment": "URL won't be modified if it contains \"experimental\"", "label": 0}
+{"id": "1465-1", "SDK": "qiskit-ibm-runtime", "comment": "As we cannot currently schedule through conditionals model\nas zero duration to avoid padding.", "label": 0}
+{"id": "866-1", "SDK": "qiskit-ibm-runtime", "comment": "The catalog does not allow querying archived entries, returning 403.", "label": 0}
+{"id": "732-1", "SDK": "qiskit-ibm-runtime", "comment": "Don't store configuration in registry by name if calibration_id is set\nsince it is unique to the calibration id, query it fresh with the id set", "label": 0}
+{"id": "1670-1", "SDK": "qiskit-ibm-runtime", "comment": "Special case of using a single gate for DD", "label": 1}
+{"id": "259-1", "SDK": "qiskit-ibm-runtime", "comment": "For backward compatibility only, can be removed later.", "label": 0}
+{"id": "1602-1", "SDK": "qiskit-ibm-runtime", "comment": "add DD if node is a named barrier", "label": 0}
+{"id": "1460-4", "SDK": "qiskit-ibm-runtime", "comment": "For processing we are currently\nrequired to convert each circuit block to a dag which is inefficient\nand causes node relationships stored in analysis to be lost between\npasses as we are constantly recreating the block dags.", "label": 1}
+{"id": "1821-1", "SDK": "qiskit-ibm-runtime", "comment": "Parse global configuration properties", "label": 0}
+{"id": "1800-1", "SDK": "qiskit-ibm-runtime", "comment": "Setup the stream handler, for logging to console, with the given format.", "label": 0}
+{"id": "138-1", "SDK": "qiskit-ibm-runtime", "comment": "On staging there some invalid instances returned that 403 when retrieving backends", "label": 0}
+{"id": "343-1", "SDK": "qiskit-ibm-runtime", "comment": "Build options dict starting with execution options", "label": 0}
+{"id": "1596-1", "SDK": "qiskit-ibm-runtime", "comment": "As we cannot currently schedule through conditionals model\nas zero duration to avoid padding.", "label": 0}
+{"id": "1556-1", "SDK": "qiskit-ibm-runtime", "comment": "Get durations from target if BackendV2", "label": 0}
+{"id": "1452-1", "SDK": "qiskit-ibm-runtime", "comment": "Track as we build to avoid extra pass", "label": 0}
+{"id": "986-1", "SDK": "qiskit-ibm-runtime", "comment": "pylint: disable=import-outside-toplevel", "label": 0}
+{"id": "902-1", "SDK": "qiskit-ibm-runtime", "comment": "create parent directories", "label": 0}
+{"id": "1470-1", "SDK": "qiskit-ibm-runtime", "comment": "Otherwise just trigger a measurement flush", "label": 1}
+{"id": "434-1", "SDK": "qiskit-ibm-runtime", "comment": "Options not really related to primitives.", "label": 0}

@@ -1,0 +1,362 @@
+{
+  "quantum-algorithm": {
+    "QFT": {
+      "mifs_score": 0.027102597822636437,
+      "top": 1
+    },
+    "quantum": {
+      "mifs_score": 0.003298697076107252,
+      "top": 2
+    },
+    "hadamard": {
+      "mifs_score": 0.0018369946880532823,
+      "top": 3
+    },
+    "QAOA": {
+      "mifs_score": 0.001114633353294702,
+      "top": 4
+    },
+    "VQE": {
+      "mifs_score": 0.0004519734842494556,
+      "top": 5
+    },
+    "Solovay Kitaev": {
+      "mifs_score": 0.0002706828210036464,
+      "top": 6
+    },
+    "Bravyi Maslov": {
+      "mifs_score": 0.00021677213006386105,
+      "top": 7
+    },
+    "state vector": {
+      "mifs_score": 7.48790441788837e-05,
+      "top": 8
+    },
+    "triviality": {
+      "mifs_score": 1.3443105900181514e-05,
+      "top": 9
+    }
+  },
+  "quantum-hardware": {
+    "coupling": {
+      "mifs_score": 0.04475082720655703,
+      "top": 1
+    },
+    "connectivity": {
+      "mifs_score": 0.011690712309679623,
+      "top": 2
+    },
+    "delay": {
+      "mifs_score": 0.005006684355998747,
+      "top": 3
+    },
+    "swap": {
+      "mifs_score": 0.00298151407096717,
+      "top": 4
+    },
+    "clifford": {
+      "mifs_score": 0.0009086066479699741,
+      "top": 5
+    },
+    "quantum bit": {
+      "mifs_score": 6.20365912102266e-05,
+      "top": 6
+    },
+    "QPY": {
+      "mifs_score": 5.177881955283753e-05,
+      "top": 7
+    },
+    "quantum channel": {
+      "mifs_score": 1.8019488181445767e-05,
+      "top": 8
+    }
+  },
+  "quantum-circuit-model": {
+    "Pauli": {
+      "mifs_score": 0.021382233434130406,
+      "top": 1
+    },
+    "gate": {
+      "mifs_score": 0.011638075650939743,
+      "top": 2
+    },
+    "coupling": {
+      "mifs_score": 0.0080568060989396,
+      "top": 3
+    },
+    "statevector": {
+      "mifs_score": 0.006103573419214865,
+      "top": 4
+    },
+    "QPY": {
+      "mifs_score": 0.0015628525566013267,
+      "top": 5
+    },
+    "QFT": {
+      "mifs_score": 0.001503596649809691,
+      "top": 6
+    },
+    "observable": {
+      "mifs_score": 0.0010288979343649205,
+      "top": 7
+    },
+    "quantum channel": {
+      "mifs_score": 0.0006754140099411526,
+      "top": 8
+    },
+    "qubit network": {
+      "mifs_score": 0.0002955287355456801,
+      "top": 9
+    },
+    "Choi representation": {
+      "mifs_score": 0.00023761813576516776,
+      "top": 10
+    },
+    "Shor": {
+      "mifs_score": 0.00016004293185570588,
+      "top": 11
+    },
+    "QASM": {
+      "mifs_score": 0.00011773723384488503,
+      "top": 12
+    },
+    "synchronously": {
+      "mifs_score": 0.00011769755243835191,
+      "top": 13
+    },
+    "Hermitian": {
+      "mifs_score": 0.00011294211359881586,
+      "top": 14
+    },
+    "Solovay Kitaev": {
+      "mifs_score": 0.000106505666494332,
+      "top": 15
+    },
+    "occupation": {
+      "mifs_score": 0.00010435417300466479,
+      "top": 16
+    },
+    "speedup": {
+      "mifs_score": 5.3197714428142655e-05,
+      "top": 17
+    },
+    "bra": {
+      "mifs_score": 5.318779535230823e-05,
+      "top": 18
+    },
+    "VQE": {
+      "mifs_score": 5.31778762764738e-05,
+      "top": 19
+    },
+    "hinton diagram": {
+      "mifs_score": 5.316795720063937e-05,
+      "top": 20
+    },
+    "Bravyi Maslov": {
+      "mifs_score": 5.242327780249578e-05,
+      "top": 21
+    },
+    "QAOA": {
+      "mifs_score": 4.170616274113185e-05,
+      "top": 22
+    },
+    "state vector": {
+      "mifs_score": 7.632174401238498e-06,
+      "top": 23
+    },
+    "delay operation": {
+      "mifs_score": 7.0383433406474535e-06,
+      "top": 24
+    }
+  },
+  "quantum-software-stack": {
+    "qubit": {
+      "mifs_score": 0.00945549552643831,
+      "top": 1
+    },
+    "QPY": {
+      "mifs_score": 0.006608311333862171,
+      "top": 2
+    },
+    "Pauli": {
+      "mifs_score": 0.004616218047365686,
+      "top": 3
+    },
+    "matrix": {
+      "mifs_score": 0.0018647971152920785,
+      "top": 4
+    },
+    "qreg": {
+      "mifs_score": 0.00022031525223881676,
+      "top": 5
+    },
+    "Bravyi Maslov": {
+      "mifs_score": 0.00018378524346586672,
+      "top": 6
+    },
+    "speedup": {
+      "mifs_score": 0.00015673326689632892,
+      "top": 7
+    },
+    "qudit": {
+      "mifs_score": 0.00013463302818489628,
+      "top": 8
+    },
+    "occupation": {
+      "mifs_score": 4.601956289752975e-05,
+      "top": 9
+    },
+    "QAOA": {
+      "mifs_score": 2.8890359290117002e-05,
+      "top": 10
+    },
+    "Chi representation": {
+      "mifs_score": 1.718235872754432e-05,
+      "top": 11
+    },
+    "QASM": {
+      "mifs_score": 1.1394382174572967e-05,
+      "top": 12
+    },
+    "Solovay Kitaev": {
+      "mifs_score": 1.1354700768039856e-05,
+      "top": 13
+    },
+    "KAK": {
+      "mifs_score": 6.454031605054866e-06,
+      "top": 14
+    },
+    "state vector": {
+      "mifs_score": 5.978914958489984e-06,
+      "top": 15
+    },
+    "VQE": {
+      "mifs_score": 5.528021483593474e-06,
+      "top": 16
+    },
+    "diamond norm": {
+      "mifs_score": 5.518102407759048e-06,
+      "top": 17
+    }
+  },
+  "mathematics-for-quantum": {
+    "Pauli": {
+      "mifs_score": 0.06716890173309095,
+      "top": 1
+    },
+    "matrix": {
+      "mifs_score": 0.01993704690586708,
+      "top": 2
+    },
+    "statevector": {
+      "mifs_score": 0.013183353879782112,
+      "top": 3
+    },
+    "clifford": {
+      "mifs_score": 0.00582971422120597,
+      "top": 4
+    },
+    "quantum channel": {
+      "mifs_score": 0.004047361005825832,
+      "top": 5
+    },
+    "Choi representation": {
+      "mifs_score": 0.0026247647201061985,
+      "top": 6
+    },
+    "qudit": {
+      "mifs_score": 0.001117775681372072,
+      "top": 7
+    },
+    "DAG": {
+      "mifs_score": 0.0006283536541778728,
+      "top": 8
+    },
+    "state vector": {
+      "mifs_score": 0.0005404604684911868,
+      "top": 9
+    },
+    "purity": {
+      "mifs_score": 0.0003098175995241235,
+      "top": 10
+    },
+    "Grover": {
+      "mifs_score": 0.0002729886010807138,
+      "top": 11
+    },
+    "bra": {
+      "mifs_score": 0.000219012838346315,
+      "top": 12
+    },
+    "Shor": {
+      "mifs_score": 0.00019972547925991186,
+      "top": 13
+    },
+    "Solovay Kitaev": {
+      "mifs_score": 4.7870552568842646e-05,
+      "top": 14
+    },
+    "delay operation": {
+      "mifs_score": 4.2790483238842796e-05,
+      "top": 15
+    },
+    "latency": {
+      "mifs_score": 3.5358116364118397e-05,
+      "top": 16
+    },
+    "quantum bit": {
+      "mifs_score": 3.511001183966436e-05,
+      "top": 17
+    },
+    "QAOA": {
+      "mifs_score": 3.4861907315210435e-05,
+      "top": 18
+    },
+    "decoherence": {
+      "mifs_score": 2.7688796288770988e-05,
+      "top": 19
+    },
+    "QASM": {
+      "mifs_score": 1.3762779891311275e-05,
+      "top": 20
+    },
+    "speedup": {
+      "mifs_score": 6.8609919518139785e-06,
+      "top": 21
+    },
+    "VQE": {
+      "mifs_score": 6.851072875979549e-06,
+      "top": 22
+    }
+  },
+  "quantum-others": {
+    "entangled": {
+      "mifs_score": 0.019385099297549762,
+      "top": 1
+    },
+    "evolution": {
+      "mifs_score": 0.0038923689643814057,
+      "top": 2
+    },
+    "measure": {
+      "mifs_score": 0.0028444007326706424,
+      "top": 3
+    },
+    "Bloch": {
+      "mifs_score": 0.001963778714514849,
+      "top": 4
+    },
+    "trace": {
+      "mifs_score": 0.0005655477060956056,
+      "top": 5
+    },
+    "transpose": {
+      "mifs_score": 0.00025018280452131035,
+      "top": 6
+    },
+    "Hermitian": {
+      "mifs_score": 3.1794216244823345e-05,
+      "top": 7
+    }
+  }
+}

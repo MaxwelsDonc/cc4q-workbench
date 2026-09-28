@@ -1,0 +1,6 @@
+output_dir: data/input
+
+repos:
+  # - https://github.com/Qiskit/qiskit
+  - https://github.com/Qiskit/qiskit-aer
+  - https://github.com/Qiskit/qiskit-ibm-runtime

@@ -1,0 +1,26 @@
+{
+  "quantum-software-stack": {
+    "freqs": 2821,
+    "prop": 0.29333471976707914
+  },
+  "mathematics-for-quantum": {
+    "freqs": 1369,
+    "prop": 0.14235208484974524
+  },
+  "quantum-hardware": {
+    "freqs": 971,
+    "prop": 0.10096703753769366
+  },
+  "quantum-circuit-model": {
+    "freqs": 4054,
+    "prop": 0.4215451804096912
+  },
+  "quantum-algorithm": {
+    "freqs": 230,
+    "prop": 0.023915982115004678
+  },
+  "quantum-others": {
+    "freqs": 172,
+    "prop": 0.017884995320786107
+  }
+}

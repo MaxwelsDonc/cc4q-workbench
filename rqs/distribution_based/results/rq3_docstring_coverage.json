@@ -1,0 +1,17 @@
+{
+  "module": {
+    "docstring_count": 610,
+    "entity_count": 681,
+    "docstring_coverage": 0.8957
+  },
+  "class": {
+    "docstring_count": 744,
+    "entity_count": 781,
+    "docstring_coverage": 0.9526
+  },
+  "function": {
+    "docstring_count": 3283,
+    "entity_count": 4733,
+    "docstring_coverage": 0.6936
+  }
+}

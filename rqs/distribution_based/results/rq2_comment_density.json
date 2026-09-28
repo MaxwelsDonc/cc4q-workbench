@@ -1,0 +1,22 @@
+{
+  "module": {
+    "comment_line_count": 27178,
+    "code_line_count": 202875,
+    "comment_density": 0.134
+  },
+  "class": {
+    "comment_line_count": 15492,
+    "code_line_count": 112420,
+    "comment_density": 0.1378
+  },
+  "function": {
+    "comment_line_count": 45646,
+    "code_line_count": 118554,
+    "comment_density": 0.385
+  },
+  "total": {
+    "comment_line_count": 88316,
+    "code_line_count": 433849,
+    "comment_density": 0.2036
+  }
+}

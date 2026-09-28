@@ -1,0 +1,50 @@
+{
+  "how-it-is-done": {
+    "quantum-others": 0.030243065747456783,
+    "quantum-circuit-model": 0.00239926645295026,
+    "quantum-hardware": 0.04634966975347468,
+    "quantum-software-stack": -0.048738400862397155,
+    "mathematics-for-quantum": 0.0026880819878331128,
+    "quantum-algorithm": 0.013701591924229605
+  },
+  "developer-others": {
+    "quantum-others": -0.026658072193557814,
+    "quantum-circuit-model": 0.1407619154940368,
+    "quantum-hardware": -0.09388476554569883,
+    "quantum-software-stack": -0.14870811953184968,
+    "mathematics-for-quantum": 0.04861143947465135,
+    "quantum-algorithm": 0.08528219963263783
+  },
+  "why": {
+    "quantum-others": -0.02814215047251621,
+    "quantum-circuit-model": -0.05665499532247663,
+    "quantum-hardware": 0.0500315651771143,
+    "quantum-software-stack": 0.04594489395217126,
+    "mathematics-for-quantum": -0.013216509378669075,
+    "quantum-algorithm": 0.002175143138754803
+  },
+  "how-to-use": {
+    "quantum-others": 0.009355393515551449,
+    "quantum-circuit-model": -0.14393049170223943,
+    "quantum-hardware": -0.05284346103062058,
+    "quantum-software-stack": 0.24868820186847598,
+    "mathematics-for-quantum": -0.08294270699092153,
+    "quantum-algorithm": 0.009886648110783098
+  },
+  "what": {
+    "quantum-others": 0.0021087633753921232,
+    "quantum-circuit-model": 0.036080033439055664,
+    "quantum-hardware": 0.01889054749196662,
+    "quantum-software-stack": -0.06710593181598704,
+    "mathematics-for-quantum": 0.039367982222742834,
+    "quantum-algorithm": -0.04575233336891941
+  },
+  "property": {
+    "quantum-others": -0.0028790404944110844,
+    "quantum-circuit-model": -0.008775438401583454,
+    "quantum-hardware": 0.006684950584524795,
+    "quantum-software-stack": 0.031578127623253405,
+    "mathematics-for-quantum": -0.021239863628152493,
+    "quantum-algorithm": -0.027848626439624095
+  }
+}
