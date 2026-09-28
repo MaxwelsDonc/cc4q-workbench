@@ -1,0 +1,7 @@
+# Generalization experiment: new Qiskit-ecosystem repos (not part of the original validation set)
+output_dir: data/input
+
+repos:
+  - https://github.com/qiskit-community/qiskit-machine-learning  # pinned tag: 0.9.1
+  - https://github.com/qiskit-community/qiskit-nature            # pinned tag: 0.8
+  - https://github.com/qiskit-community/qiskit-algorithms        # pinned tag: 0.4.0

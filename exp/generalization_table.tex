@@ -1,0 +1,24 @@
+% CC4Q generalization experiment: corpus statistics for three new
+% Qiskit-ecosystem repositories (generated 2026-09-29; see exp/generalization_results.md)
+% Requires: \usepackage{booktabs}
+\begin{table}[t]
+  \centering
+  \caption{Corpus statistics for the generalization study. CCPs are code--comment
+  pairs extracted by stage~02; SCCUs are sentence-level comment units produced by
+  stage~03. Comment-type and code-entity counts are breakdowns of CCPs.}
+  \label{tab:generalization}
+  \setlength{\tabcolsep}{4pt}
+  \begin{tabular}{l c rrr rrr rrr}
+    \toprule
+    & & & & & \multicolumn{3}{c}{Comment type} & \multicolumn{3}{c}{Code entity} \\
+    \cmidrule(lr){6-8} \cmidrule(lr){9-11}
+    Repository & Version & .py files & CCPs & SCCUs & Doc. & Blk. & Inl. & Mod. & Cls. & Fun. \\
+    \midrule
+    qiskit-machine-learning & 0.9.1 & 123 & 1{,}663 & 3{,}140 & 740 & 779 & 144 & 270 & 201 & 1{,}192 \\
+    qiskit-nature           & 0.8   & 175 & 2{,}037 & 4{,}842 & 1{,}077 & 801 & 159 & 401 & 211 & 1{,}425 \\
+    qiskit-algorithms       & 0.4.0 & 152 & 1{,}802 & 3{,}535 & 899 & 715 & 188 & 318 & 213 & 1{,}271 \\
+    \midrule
+    \textbf{Total} & --- & \textbf{450} & \textbf{5{,}502} & \textbf{11{,}517} & \textbf{2{,}716} & \textbf{2{,}295} & \textbf{491} & \textbf{989} & \textbf{625} & \textbf{3{,}888} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
