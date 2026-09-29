@@ -65,8 +65,13 @@ def report(name, pairs):
 def main():
     ann = load_annotations()
     key = {str(r["no"]): r["model_label"] for r in load("exp/spotcheck_answer_key.jsonl")}
+    assisted_ids = set()
+    sugg_path = os.path.join(ROOT, "exp", "prefill_suggestions.jsonl")
+    if os.path.exists(sugg_path):
+        assisted_ids = {str(r["no"]) for r in load("exp/prefill_suggestions.jsonl")}
 
-    pairs_by_repo = defaultdict(list)
+    blind = defaultdict(list)
+    assisted = defaultdict(list)
     skipped = 0
     excluded = 0
     for r in ann:
@@ -77,22 +82,31 @@ def main():
         if str(r["no"]) in CONTAMINATED:
             excluded += 1
             continue
-        pairs_by_repo[r["repo"]].append((h, key[str(r["no"])]))
+        bucket = assisted if str(r["no"]) in assisted_ids else blind
+        bucket[r["repo"]].append((h, key[str(r["no"])]))
 
     if skipped:
         print(f"skipped {skipped} unlabeled entries")
     if excluded:
         print(f"excluded {excluded} calibration items (model label was seen)")
     print()
-    all_pairs = []
-    for repo, pairs in sorted(pairs_by_repo.items()):
-        report(repo, pairs)
-        all_pairs.extend(pairs)
-    if not all_pairs:
+
+    def report_group(title, by_repo):
+        all_pairs = []
+        for repo, pairs in sorted(by_repo.items()):
+            report(repo, pairs)
+            all_pairs.extend(pairs)
+        if all_pairs:
+            report(f"{title} OVERALL", all_pairs)
+        return all_pairs
+
+    blind_all = report_group("BLIND", blind)
+    if assisted:
+        print()
+        report_group("ASSISTED (LLM pre-label + human confirm)", assisted)
+    if not blind_all and not assisted:
         print("no labeled entries yet - fill the human_label column in "
               "exp/spotcheck_annotation.csv first")
-        return
-    report("OVERALL", all_pairs)
 
 
 if __name__ == "__main__":
