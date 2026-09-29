@@ -8,7 +8,7 @@ boot()
 
 import dashboard  # noqa: E402
 import data_io  # noqa: E402
-from model_cache import get_models  # noqa: E402
+from model_cache import checkpoints_missing, get_models, missing_checkpoints_warning  # noqa: E402
 from ui import footer  # noqa: E402
 
 STAGE_NUM = {"Cloning": 1, "Extracting": 2, "Segmenting": 3, "Labeling": 4}
@@ -85,8 +85,11 @@ def render():
             placeholder="https://github.com/owner/repo",
             label_visibility="collapsed",
         )
+        no_models = bool(checkpoints_missing())
         run_live = st.button("Analyze repository", type="primary",
-                             disabled=not url.strip())
+                             disabled=not url.strip() or no_models)
+        if no_models:
+            missing_checkpoints_warning()
         if run_live and url.strip():
             _render_live(url)
 

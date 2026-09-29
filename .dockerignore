@@ -1,0 +1,22 @@
+# VCS / editor
+.git
+.gitignore
+.DS_Store
+**/__pycache__
+**/*.pyc
+
+# Local environments
+.venv
+venv
+
+# Large artifacts: fetched at container start or mounted in
+models_checkpoints
+
+# Pipeline I/O (not needed by the demo; demo reads only demo/data/)
+data/input
+data/output
+log
+scripts/log
+
+# Local Streamlit state
+.streamlit/secrets.toml

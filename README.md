@@ -20,6 +20,7 @@ scripts/                        pipeline: download repos → extract pairs → s
 parser_core/ segment_core/ utils/ config/   pipeline libraries & configurations
 examples/                       tiny sample sources for a quick run
 model/                            three BERT classifiers: training code, data, label mappings
+demo/                           CC4Q Workbench: interactive Streamlit demo (see below)
 rqs/                            analysis scripts, results, tables and figures
 doc/                            labeling guideline
 ```
@@ -37,6 +38,61 @@ python scripts/03_segment_comments.py config/examples.yaml
 ```
 
 Outputs are written to `examples/output/`.
+
+## Web demo (CC4Q Workbench)
+
+`demo/` contains a four-page Streamlit app: a Home page, a live **Analyze
+Code** page (paste a snippet, get every comment labeled on the three axes),
+an **Analyze Repository** page (precomputed dashboards for six Qiskit-ecosystem
+SDKs, live analysis of any GitHub repo under 200 Python files, and an
+infrastructure-vs-application compare mode), and an **Explore Corpus** page
+(filters + download over 17.5k labeled units). The app reads its precomputed
+content from the committed `demo/data/`.
+
+```bash
+pip install -r demo/requirements-demo.txt
+streamlit run demo/app.py
+```
+
+The Analyze pages need the fine-tuned checkpoints in `models_checkpoints/`
+(too large for git). Fetch them once from the
+[v0.1.0 release](https://github.com/MaxwelsDonc/cc4q-workbench/releases/tag/v0.1.0)
+(~1.2 GB, SHA256-verified):
+
+```bash
+python scripts/download_models.py            # download + verify + extract
+python scripts/download_models.py --check    # verify only
+```
+
+Without them the app still starts — the Analyze pages show the download
+command, and every precomputed dashboard works.
+
+## Run with Docker
+
+The all-in-one image bundles the demo UI, the full pipeline, and the
+precomputed demo corpus; models are fetched at container start.
+
+```bash
+docker build -t cc4q-workbench .
+docker run -p 8501:8501 cc4q-workbench        # open http://localhost:8501
+```
+
+How the models get in:
+
+- By default the entrypoint runs `python scripts/download_models.py`
+  (best-effort). If the download fails — e.g. no network, or the release is
+  still private — the container still starts and the demo shows the download
+  instructions on the Analyze pages.
+- Skip it with `-e CC4Q_SKIP_MODEL_DOWNLOAD=1`, or mount checkpoints you
+  already have:
+  `docker run -p 8501:8501 -v "$PWD/models_checkpoints:/app/models_checkpoints" cc4q-workbench`
+
+The same image runs the pipeline CLI (the entrypoint is only a wrapper):
+
+```bash
+docker run --entrypoint python cc4q-workbench \
+    scripts/02_extract_code_comment_pairs.py config/examples.yaml
+```
 
 ## Using the dataset
 

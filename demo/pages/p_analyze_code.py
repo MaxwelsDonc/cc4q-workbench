@@ -7,7 +7,7 @@ from bootstrap import boot
 boot()
 
 import cc4q_analysis as analysis  # noqa: E402
-from model_cache import get_models  # noqa: E402
+from model_cache import checkpoints_missing, get_models, missing_checkpoints_warning  # noqa: E402
 from ui import footer, metric_card, unit_card  # noqa: E402
 
 
@@ -45,15 +45,20 @@ def render():
     )
 
     left, right = st.columns([1, 1], vertical_alignment="top")
+    no_models = bool(checkpoints_missing())
 
     with left:
         code = st.text_area("Python source", value=analysis.QISKIT_SNIPPET,
                             height=380, label_visibility="collapsed")
         st.caption("Prefilled: a minimal Qiskit Bell-state circuit.")
-        run = st.button("Analyze", type="primary", use_container_width=True)
+        run = st.button("Analyze", type="primary", use_container_width=True,
+                        disabled=no_models)
 
     with right:
         st.markdown("**Results**")
+        if no_models:
+            missing_checkpoints_warning()
+            return
         if not run:
             st.info("Click **Analyze** to label every comment unit in the "
                     "snippet. Classifiers load lazily on first run (CPU).")
