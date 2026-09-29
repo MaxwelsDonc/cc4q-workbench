@@ -47,7 +47,6 @@ def build_bell_state(backend):
 
     The circuit applies a Hadamard gate on the first qubit
     followed by a CNOT gate, which entangles the two qubits.
-    The resulting state is (|00> + |11>) / sqrt(2).
 
     Args:
         backend: The backend used to fix the coupling map.
@@ -100,7 +99,9 @@ def _segment_record(record):
         units = segment_inline_comment(text)
     else:  # block
         units = segment_block_comment(text)
-    return [{"text": u, "comment_type": ctype} for u in units if u.strip()]
+    return [{"text": u, "comment_type": ctype,
+             "entity_type": record.get("code_entity_type", "—")}
+            for u in units if u.strip()]
 
 
 def extract_units(source_code):
@@ -129,23 +130,45 @@ def raw_text_units(raw_text):
             if line.strip().lstrip("#").strip()]
 
 
-def classify_units(units, models):
-    """Run the three-axis classifiers over SCCU dicts (mutates and returns)."""
-    texts = [u["text"] for u in units]
+def predict_labels(texts, models):
+    """Run the three-axis classifiers over raw texts.
+
+    Returns (quantum_related[bool], developer_intent[str],
+    quantum_category[str|None]) per text.
+    """
     qr = _predict(*models["quantum_related"], texts)
     di = _predict(*models["developer_intent"], texts)
     quantum_idx = [i for i, v in enumerate(qr) if v == 1]
-    categories = [None] * len(units)
+    categories = [None] * len(texts)
     if quantum_idx:
         cat_preds = _predict(*models["quantum_category"],
                              [texts[i] for i in quantum_idx])
         for i, p in zip(quantum_idx, cat_preds):
             categories[i] = CATEGORY_MAPPING[p]
+    return ([bool(v) for v in qr],
+            [INTENT_MAPPING[v] for v in di],
+            categories)
+
+
+def classify_units(units, models):
+    """Run the three-axis classifiers over SCCU dicts (mutates and returns)."""
+    qr, di, categories = predict_labels([u["text"] for u in units], models)
     for unit, qr_v, di_v, cat in zip(units, qr, di, categories):
-        unit["quantum_related"] = bool(qr_v)
-        unit["developer_intent"] = INTENT_MAPPING[di_v]
+        unit["quantum_related"] = qr_v
+        unit["developer_intent"] = di_v
         unit["quantum_category"] = cat
     return units
+
+
+def classify_sccu_records(records, models):
+    """Label pipeline-style SCCU records (``comment_text`` key), in place."""
+    qr, di, categories = predict_labels([r["comment_text"] for r in records],
+                                        models)
+    for rec, qr_v, di_v, cat in zip(records, qr, di, categories):
+        rec["quantum_related"] = 1 if qr_v else 0
+        rec["developer_intent"] = di_v
+        rec["quantum_category"] = cat
+    return records
 
 
 def analyze_code(source_code, models=None):

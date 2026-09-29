@@ -1,0 +1,8 @@
+# CC4Q Workbench demo theme — picked up automatically when
+# `streamlit run demo/app.py` is launched from the workbench root.
+[theme]
+primaryColor = "#6C3FC5"
+backgroundColor = "#F7F6FC"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#22174A"
+font = "sans serif"
