@@ -1,5 +1,5 @@
 ﻿no,repo,entity,comment_text,human_label
-1,qiskit-nature,class,"sum(VibrationalOp({label: 1}, num_modals=[1, 1, 1]) for label in [""+_0_0"", ""-_1_0"", ""+_2_0 -_2_0""])",
+1,qiskit-nature,class,"sum(VibrationalOp({label: 1}, num_modals=[1, 1, 1]) for label in [""+_0_0"", ""-_1_0"", ""+_2_0 -_2_0""])",quantum
 2,qiskit-nature,function,"hamiltonian: the hamiltonian to be transformed.
 density_total: the total electronic density.
 density_active: the active electronic density.
@@ -13,11 +13,11 @@ computed from the original hamiltonian and total electronic density.
 
 <string>:15: (WARNING/2) Block quote ends without a blank line; unexpected unindent.
 
-reference_inact",
-3,qiskit-machine-learning,function,Sampling Input States,
-4,qiskit-algorithms,function,Condition that indicates the optimization process should come to an end.,
-5,qiskit-algorithms,function,Raises:,
-6,qiskit-nature,module,The spin-adapted paired-UCC ansatz.,
+reference_inact",quantum
+3,qiskit-machine-learning,function,Sampling Input States,non-quantum
+4,qiskit-algorithms,function,Condition that indicates the optimization process should come to an end.,non-quantum
+5,qiskit-algorithms,function,Raises:,non-quantum
+6,qiskit-nature,module,The spin-adapted paired-UCC ansatz.,quantum
 7,qiskit-nature,function,"eri: the 1-dimensional array of the 8-fold symmetric 2-body electronic integrals stored
 
 in chemist order. The length of this 1D matrix must be M * (M + 1) / 2
@@ -25,11 +25,11 @@ where M = N * (N + 1) / 2 and N is the number of orbitals.
 
 <string>:6: (WARNING/2) Definition list ends without a blank line; unexpected unindent.
 
-validate: when set to False, the requirements of eri are not validated.",
-8,qiskit-nature,function,The list of generated excitation operators.,
-9,qiskit-nature,function,Args:,
-10,qiskit-nature,module,Excitation generator utilities (qiskit_nature.second_q.circuit.library.ansatzes.utils),
-11,qiskit-machine-learning,class,pylint: disable=invalid-name,
+validate: when set to False, the requirements of eri are not validated.",quantum
+8,qiskit-nature,function,The list of generated excitation operators.,quantum
+9,qiskit-nature,function,Args:,non-quantum
+10,qiskit-nature,module,Excitation generator utilities (qiskit_nature.second_q.circuit.library.ansatzes.utils),quantum
+11,qiskit-machine-learning,class,pylint: disable=invalid-name,non-quantum
 12,qiskit-machine-learning,function,"The num_qubits argument and automatic qubit alignment (padding or resizing of
 feature_map and ansatz circuits) are deprecated as of version 0.9.1 and
 will be removed after a 6-month deprecation period.
@@ -40,15 +40,15 @@ relying on automatic circuit alignment will raise an error.
 
 To ensure forward compatibility, remove the num_qubits argument (or set it to
 None) and construct feature_map and ansatz with matching numbers of qubits
-before calling this funct",
+before calling this funct",quantum
 13,qiskit-algorithms,function,"Since x and p \in [0,1] it suffices to check not all integers
-but only -1, 0 and 1",
+but only -1, 0 and 1",non-quantum
 14,qiskit-nature,function,"uniform_interaction: the value to use for all edge weights.
-uniform_onsite_potential: the value to use for all single-vertex loop weights.",
-15,qiskit-algorithms,module,ODE solvers that implement the SciPy ODE Solver interface.,
+uniform_onsite_potential: the value to use for all single-vertex loop weights.",quantum
+15,qiskit-algorithms,module,ODE solvers that implement the SciPy ODE Solver interface.,non-quantum
 16,qiskit-algorithms,function,"ValueError: If the Hamiltonian is time dependent.
-ValueError: If the initial state is None.",
-17,qiskit-machine-learning,function,Args:,
+ValueError: If the initial state is None.",quantum
+17,qiskit-machine-learning,function,Args:,non-quantum
 18,qiskit-algorithms,class,"The Quantum Phase Estimation-based Amplitude Estimation algorithm.
 
 This class implements the original Quantum Amplitude Estimation (QAE) algorithm, introduced by
@@ -63,28 +63,28 @@ grid
 More evaluation qubits produce a finer sampling grid, therefore the accuracy of the algorithm
 increases with :math:`m`.
 
-Using a maximum likelihood post processing, this gr",
-19,qiskit-algorithms,module,The quantum approximate optimization algorithm.,
+Using a maximum likelihood post processing, this gr",quantum
+19,qiskit-algorithms,module,The quantum approximate optimization algorithm.,quantum
 20,qiskit-nature,function,"The first num_particles[0]
 orbitals in the output are fine, but the next num_particles[1] orbitals have to be
-reordered to start at index num_spatial_orbitals",
+reordered to start at index num_spatial_orbitals",quantum
 21,qiskit-nature,function,"In the fermionic case the default filter ensures that the number of particles is being
-preserved.",
-22,qiskit-algorithms,function,Args:,
-23,qiskit-machine-learning,function,Save the current iteration parameters to a file called adam_params.csv.,
-24,qiskit-algorithms,function,Args:,
-25,qiskit-nature,function,The number of modals.,
+preserved.",quantum
+22,qiskit-algorithms,function,Args:,non-quantum
+23,qiskit-machine-learning,function,Save the current iteration parameters to a file called adam_params.csv.,non-quantum
+24,qiskit-algorithms,function,Args:,non-quantum
+25,qiskit-nature,function,The number of modals.,quantum
 26,qiskit-nature,function,"MP2InitialPoint for more
-information on the required properties.",
-27,qiskit-machine-learning,function,ValueError: If any register in the circuit is not mapped to exactly one qubit.,
-28,qiskit-algorithms,function,evolution_problem: The definition of the evolution problem.,
-29,qiskit-nature,function,perform insertion sorting,
-30,qiskit-nature,module,Circuit (qiskit_nature.second_q.circuit),
-31,qiskit-nature,function,Returns the solver.,
-32,qiskit-machine-learning,class,"NLopt global optimizer, derivative-free.",
-33,qiskit-algorithms,module,Gradient circuits and Enum,
+information on the required properties.",quantum
+27,qiskit-machine-learning,function,ValueError: If any register in the circuit is not mapped to exactly one qubit.,quantum
+28,qiskit-algorithms,function,evolution_problem: The definition of the evolution problem.,non-quantum
+29,qiskit-nature,function,perform insertion sorting,non-quantum
+30,qiskit-nature,module,Circuit (qiskit_nature.second_q.circuit),quantum
+31,qiskit-nature,function,Returns the solver.,non-quantum
+32,qiskit-machine-learning,class,"NLopt global optimizer, derivative-free.",non-quantum
+33,qiskit-algorithms,module,Gradient circuits and Enum,quantum
 34,qiskit-nature,function,"Given the detected Z2Symmetries, it can determine the correct sector of the tapered
-operators so the correct one can be returned",
+operators so the correct one can be returned",quantum
 35,qiskit-nature,class,"some_big_data = {
     ""+_0 -_0"": 1.0,
     ""+_1 -_1"": -1.0,
@@ -95,14 +95,14 @@ op = FermionicOp(
     some_big_data,
     num_spin_orbitals=2,
     copy=False,
-)",
-36,qiskit-nature,class,Sum,
-37,qiskit-machine-learning,function,convert to dense,
-38,qiskit-algorithms,function,type: ignore[arg-type],
-39,qiskit-nature,function,Runs the driver to produce a result given the supplied job control file.,
-40,qiskit-nature,class,This can be done as follows:,
-41,qiskit-algorithms,module,DIviding RECTangles Locally-biased optimizer.,
-42,qiskit-algorithms,module,This module implements the abstract base class for algorithm results.,
+)",quantum
+36,qiskit-nature,class,Sum,non-quantum
+37,qiskit-machine-learning,function,convert to dense,non-quantum
+38,qiskit-algorithms,function,type: ignore[arg-type],non-quantum
+39,qiskit-nature,function,Runs the driver to produce a result given the supplied job control file.,non-quantum
+40,qiskit-nature,class,This can be done as follows:,non-quantum
+41,qiskit-algorithms,module,DIviding RECTangles Locally-biased optimizer.,non-quantum
+42,qiskit-algorithms,module,This module implements the abstract base class for algorithm results.,non-quantum
 43,qiskit-algorithms,function,"circuits: Input circuit(s).
 parameter_binds: A dictionary with {Parameter: float} pairs determining the values to
 
@@ -112,31 +112,31 @@ which the free parameters in the circuit(s) are bound.
 
 <string>:11: (WARNING/2) Block quote ends without a blank line; unexpected unindent.
 
-inplace: If True, bind the values in place, otherwise return circuit copies.",
-44,qiskit-machine-learning,module,Helper function(s) to hash circuits and speed up pass managers.,
+inplace: If True, bind the values in place, otherwise return circuit copies.",quantum
+44,qiskit-machine-learning,module,Helper function(s) to hash circuits and speed up pass managers.,quantum
 45,qiskit-algorithms,module,"Optimizers
 
 Classical optimizers designed for use by quantum variational algorithms.
 
-",
-46,qiskit-nature,function,The bitstring representing the state of the VSCF state as array of bools.,
-47,qiskit-nature,function,A .FCIDump instance.,
-48,qiskit-algorithms,function,batch evaluate the points (if possible),
-49,qiskit-nature,class,An example using labels with powers would be:,
-50,qiskit-algorithms,function,Returns:,
-51,qiskit-nature,function,Return whether a tensor has the required symmetries to represent two-electron terms.,
-52,qiskit-nature,function,problem: the problem to be transformed.,
-53,qiskit-algorithms,function,Returns a circuit implementing the gradient of the input gate.,
-54,qiskit-nature,class,For more information see also [1].,
-55,qiskit-algorithms,function,May still be None,
+",quantum
+46,qiskit-nature,function,The bitstring representing the state of the VSCF state as array of bools.,quantum
+47,qiskit-nature,function,A .FCIDump instance.,non-quantum
+48,qiskit-algorithms,function,batch evaluate the points (if possible),non-quantum
+49,qiskit-nature,class,An example using labels with powers would be:,non-quantum
+50,qiskit-algorithms,function,Returns:,non-quantum
+51,qiskit-nature,function,Return whether a tensor has the required symmetries to represent two-electron terms.,non-quantum
+52,qiskit-nature,function,problem: the problem to be transformed.,non-quantum
+53,qiskit-algorithms,function,Returns a circuit implementing the gradient of the input gate.,quantum
+54,qiskit-nature,class,For more information see also [1].,non-quantum
+55,qiskit-algorithms,function,May still be None,non-quantum
 56,qiskit-algorithms,function,"Dictionaries containing the a grid-points with respective probabilities and
 
-y measurements with respective probabilities, in this order.",
-57,qiskit-nature,function,Args:,
-58,qiskit-nature,function,Return a dictionary of positions for visualization of a two-dimensional lattice without: boundaries.,
-59,qiskit-machine-learning,function,Cache the circuits for the linear combination of unitaries.,
-60,qiskit-nature,function,method: the SCF method type.,
-61,qiskit-nature,class,An object is considered interpretable if it implements an interpret method.,
+y measurements with respective probabilities, in this order.",quantum
+57,qiskit-nature,function,Args:,non-quantum
+58,qiskit-nature,function,Return a dictionary of positions for visualization of a two-dimensional lattice without: boundaries.,non-quantum
+59,qiskit-machine-learning,function,Cache the circuits for the linear combination of unitaries.,quantum
+60,qiskit-nature,function,method: the SCF method type.,non-quantum
+61,qiskit-nature,class,An object is considered interpretable if it implements an interpret method.,non-quantum
 62,qiskit-machine-learning,module,"This code is part of a Qiskit project.
 
 (C) Copyright IBM 2025, 2026.
@@ -148,10 +148,10 @@ of this source tree or at http://www.apache.org/licenses/LICENSE-2.0.
 
 Any modifications or derivative works of this code must retain this
 copyright notice, and modified files need to carry a notice indicating
-that they have been altered from the originals.",
-63,qiskit-nature,function,ValueError: if eri is not 2-dimensional.,
+that they have been altered from the originals.",non-quantum
+63,qiskit-nature,function,ValueError: if eri is not 2-dimensional.,non-quantum
 64,qiskit-algorithms,function,"Check that the number of qubits of operator and ansatz match and that the ansatz is
-parameterized.",
+parameterized.",quantum
 65,qiskit-nature,function,"Builds all possible excitation operators with the given number of excitations for the
 specified number of particles distributed in the number of orbitals.",
 66,qiskit-machine-learning,function,Prepare circuits for the gradient of the specified parameters.,

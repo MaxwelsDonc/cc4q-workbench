@@ -18,6 +18,10 @@ from collections import defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Items whose model labels were revealed to the annotator during calibration;
+# excluded from the blind-verification statistics.
+CONTAMINATED = {"1", "8", "16", "25", "62"}
+
 
 def load_annotations():
     csv_path = os.path.join(ROOT, "exp", "spotcheck_annotation.csv")
@@ -60,19 +64,26 @@ def report(name, pairs):
 
 def main():
     ann = load_annotations()
-    key = {r["no"]: r["model_label"] for r in load("exp/spotcheck_answer_key.jsonl")}
+    key = {str(r["no"]): r["model_label"] for r in load("exp/spotcheck_answer_key.jsonl")}
 
     pairs_by_repo = defaultdict(list)
     skipped = 0
+    excluded = 0
     for r in ann:
         h = r.get("human_label", "").strip().lower()
         if h not in ("quantum", "non-quantum"):
             skipped += 1
             continue
-        pairs_by_repo[r["repo"]].append((h, key[r["no"]]))
+        if str(r["no"]) in CONTAMINATED:
+            excluded += 1
+            continue
+        pairs_by_repo[r["repo"]].append((h, key[str(r["no"])]))
 
     if skipped:
-        print(f"skipped {skipped} unlabeled entries\n")
+        print(f"skipped {skipped} unlabeled entries")
+    if excluded:
+        print(f"excluded {excluded} calibration items (model label was seen)")
+    print()
     all_pairs = []
     for repo, pairs in sorted(pairs_by_repo.items()):
         report(repo, pairs)
