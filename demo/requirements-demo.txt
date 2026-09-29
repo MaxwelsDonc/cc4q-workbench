@@ -1,0 +1,2 @@
+# Extra dependencies for demo/ beyond the workbench requirements.txt
+streamlit>=1.30
