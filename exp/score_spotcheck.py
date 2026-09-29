@@ -3,19 +3,30 @@
 Usage (from the workbench root):
     python exp/score_spotcheck.py
 
-Reads exp/spotcheck_annotation.jsonl (the `human_label` field must be filled
-with "quantum" or "non-quantum"; blank entries are skipped) and
-exp/spotcheck_answer_key.jsonl, then prints per-repo and overall agreement,
-precision/recall for the quantum axis, and a Wilson 95% CI for the pooled
-agreement estimate.
+Reads exp/spotcheck_annotation.csv (preferred; fill the `human_label` column
+with "quantum" or "non-quantum" in Excel/Numbers — blank rows are skipped) or
+exp/spotcheck_annotation.jsonl, plus exp/spotcheck_answer_key.jsonl, then
+prints per-repo and overall agreement, precision/recall for the quantum axis,
+and a Wilson 95% CI for the pooled agreement estimate.
 """
 
+import csv
 import json
 import math
 import os
 from collections import defaultdict
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def load_annotations():
+    csv_path = os.path.join(ROOT, "exp", "spotcheck_annotation.csv")
+    jsonl_path = os.path.join(ROOT, "exp", "spotcheck_annotation.jsonl")
+    if os.path.exists(csv_path):
+        with open(csv_path, encoding="utf-8-sig", newline="") as f:
+            return list(csv.DictReader(f))
+    with open(jsonl_path, encoding="utf-8") as f:
+        return [json.loads(line) for line in f if line.strip()]
 
 
 def load(path):
@@ -48,7 +59,7 @@ def report(name, pairs):
 
 
 def main():
-    ann = load("exp/spotcheck_annotation.jsonl")
+    ann = load_annotations()
     key = {r["no"]: r["model_label"] for r in load("exp/spotcheck_answer_key.jsonl")}
 
     pairs_by_repo = defaultdict(list)
@@ -66,6 +77,10 @@ def main():
     for repo, pairs in sorted(pairs_by_repo.items()):
         report(repo, pairs)
         all_pairs.extend(pairs)
+    if not all_pairs:
+        print("no labeled entries yet - fill the human_label column in "
+              "exp/spotcheck_annotation.csv first")
+        return
     report("OVERALL", all_pairs)
 
 
