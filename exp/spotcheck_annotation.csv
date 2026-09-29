@@ -153,39 +153,39 @@ that they have been altered from the originals.",non-quantum
 64,qiskit-algorithms,function,"Check that the number of qubits of operator and ansatz match and that the ansatz is
 parameterized.",quantum
 65,qiskit-nature,function,"Builds all possible excitation operators with the given number of excitations for the
-specified number of particles distributed in the number of orbitals.",
-66,qiskit-machine-learning,function,Prepare circuits for the gradient of the specified parameters.,
+specified number of particles distributed in the number of orbitals.",quantum
+66,qiskit-machine-learning,function,Prepare circuits for the gradient of the specified parameters.,quantum
 67,qiskit-machine-learning,function,"point: An initial point.
-circuit: A parameterized quantum circuit.",
+circuit: A parameterized quantum circuit.",quantum
 68,qiskit-machine-learning,module,".. currentmodule:: qiskit_machine_learning.utils
-",
+",non-quantum
 69,qiskit-machine-learning,class,"The
 Bayesian network must be based on binary random variables (0/1) and represented by a quantum
-circuit.",
+circuit.",quantum
 70,qiskit-nature,function,"If Z2 Symmetry tapering was done
-it may be that one or more excitation operators do not commute with the symmetry.",
-71,qiskit-nature,function,Draw the lattice with no edges between the boundaries.,
-72,qiskit-machine-learning,function,pylint: disable=invalid-name,
+it may be that one or more excitation operators do not commute with the symmetry.",quantum
+71,qiskit-nature,function,Draw the lattice with no edges between the boundaries.,non-quantum
+72,qiskit-machine-learning,function,pylint: disable=invalid-name,non-quantum
 73,qiskit-nature,function,"The first of IndexType.CHEMIST, IndexType.PHYSICIST, and
 IndexType.INTERMEDIATE, in that order, to pass the tests is returned. If
 two_body_tensor has accidental symmetries, it may in fact satisfy more than one set of
 symmetry tests. For example, if all elements have the same value, then the symmetries for all
-three index orders are satisfied.",
+three index orders are satisfied.",quantum
 74,qiskit-nature,function,"qubit_idx: the register index of the qubit on which the operator is acting.
 register_length: the length of the qubit register.n
 qubit_operator: the operator to be mapped. Possible values are:
 - '00', which corresponds to '|0><0|' or 'I+'
 - '11', which corresponds to '|1><1|' or 'I-'
 - '01', which corresponds to '|0><1|' or 'S+'
-- '10', which corresponds to '|1><0|' or 'S-'",
+- '10', which corresponds to '|1><0|' or 'S-'",quantum
 75,qiskit-nature,function,"There, the template is processed
-using the Python string formatter in two steps:",
-76,qiskit-algorithms,function,The Fisher information confidence interval.,
-77,qiskit-nature,function,the size.,
-78,qiskit-nature,function,Returns the charge.,
-79,qiskit-nature,function,Scalar multiplication of a PolynomialTensor with a scalar.,
-80,qiskit-machine-learning,function,type: ignore[arg-type],
-81,qiskit-machine-learning,function,type: ignore,
+using the Python string formatter in two steps:",non-quantum
+76,qiskit-algorithms,function,The Fisher information confidence interval.,non-quantum
+77,qiskit-nature,function,the size.,non-quantum
+78,qiskit-nature,function,Returns the charge.,non-quantum
+79,qiskit-nature,function,Scalar multiplication of a PolynomialTensor with a scalar.,non-quantum
+80,qiskit-machine-learning,function,type: ignore[arg-type],non-quantum
+81,qiskit-machine-learning,function,type: ignore,non-quantum
 82,qiskit-machine-learning,function,"maxfun: Maximum number of function evaluations.
 maxiter: Maximum number of iterations.
 ftol: The iteration stops when
@@ -201,60 +201,60 @@ iprint: Controls the frequency of output. iprint < 0 means no output;
 iprint = 0 print only one line at the last iteration; 0 < iprint < 99
 print also f and |text{proj} g| every iprint iterations;
 iprint = 99 print details of every iteration except n-vectors; iprint = 100
-print also the c",
-83,qiskit-machine-learning,function,construct circuit,
-84,qiskit-nature,function,Constructs an empty tensor.,
+print also the c",non-quantum
+83,qiskit-machine-learning,function,construct circuit,quantum
+84,qiskit-nature,function,Constructs an empty tensor.,non-quantum
 85,qiskit-algorithms,class,"Evolves an initial state |Psirangle for a time t
-under a Hamiltonian H, as provided in the evolution_problem.",
-86,qiskit-machine-learning,function,Args:,
-87,qiskit-machine-learning,module,Quantum neural networks (qiskit_machine_learning.neural_networks),
+under a Hamiltonian H, as provided in the evolution_problem.",quantum
+86,qiskit-machine-learning,function,Args:,non-quantum
+87,qiskit-machine-learning,module,Quantum neural networks (qiskit_machine_learning.neural_networks),quantum
 88,qiskit-machine-learning,function,"SamplerV2: get per-parameter-set counts
-Prefer pub.data.get_counts(i); fall back to alternatives if not available.",
-89,qiskit-machine-learning,function,Get dual coefficients,
-90,qiskit-nature,class,Square lattice.,
-91,qiskit-machine-learning,module,Axial Next-Nearest-Neighbor Ising (ANNNI) Hamiltonian and phase sampler.,
-92,qiskit-machine-learning,function,same as above,
-93,qiskit-machine-learning,function,Notes:,
-94,qiskit-machine-learning,function,"if learning rate is an array, check it is sufficiently long.",
+Prefer pub.data.get_counts(i); fall back to alternatives if not available.",quantum
+89,qiskit-machine-learning,function,Get dual coefficients,non-quantum
+90,qiskit-nature,class,Square lattice.,non-quantum
+91,qiskit-machine-learning,module,Axial Next-Nearest-Neighbor Ising (ANNNI) Hamiltonian and phase sampler.,non-quantum
+92,qiskit-machine-learning,function,same as above,non-quantum
+93,qiskit-machine-learning,function,Notes:,non-quantum
+94,qiskit-machine-learning,function,"if learning rate is an array, check it is sufficiently long.",non-quantum
 95,qiskit-nature,function,"`
 where R is a real orthogonal matrix and C has the form
-`",
-96,qiskit-algorithms,function,Get the sampler.,
+`",non-quantum
+96,qiskit-algorithms,function,Get the sampler.,non-quantum
 97,qiskit-nature,function,"We can now obtain the alpha excitations by complementing the previously generated list
-of single excitations with the non-spin-preserving excitations.",
+of single excitations with the non-spin-preserving excitations.",quantum
 98,qiskit-algorithms,function,"When using a noiseless, shot-based simulator to read a single phase that can
 be represented exactly by num_evaluation_qubits, all the weight will
-be concentrated on a single phase.",
-99,qiskit-algorithms,function,Set the oracle.,
-100,qiskit-algorithms,function,Args:,
-101,qiskit-nature,module,Gaussian Log Driver,
-102,qiskit-nature,function,"If include singles, then beta_occ=alpha_occ",
-103,qiskit-algorithms,function,Check whether an is_good_state function is set.,
+be concentrated on a single phase.",quantum
+99,qiskit-algorithms,function,Set the oracle.,non-quantum
+100,qiskit-algorithms,function,Args:,non-quantum
+101,qiskit-nature,module,Gaussian Log Driver,non-quantum
+102,qiskit-nature,function,"If include singles, then beta_occ=alpha_occ",non-quantum
+103,qiskit-algorithms,function,Check whether an is_good_state function is set.,non-quantum
 104,qiskit-algorithms,function,"The options dictionary may be used internally by a given optimizer to
 pass additional optional values for the underlying optimizer/optimization
-function used.",
-105,qiskit-nature,function,Args:,
-106,qiskit-machine-learning,function,Map the query qubits to the classical bits and measure them,
+function used.",non-quantum
+105,qiskit-nature,function,Args:,non-quantum
+106,qiskit-machine-learning,function,Map the query qubits to the classical bits and measure them,non-quantum
 107,qiskit-nature,function,"integrals: a mapping of matrix index tuples to coefficients. This is effectively a
 
 sparse representation of the coefficients. Each key in the mapping should be a tuple
 of integers of the form (mode, modal_1, modal_2, ...). That means that each key
 is expected to have its length be a multiple of three. See also the documentation of
-qiskit_nature.second_q.problems.VibrationalBasis.map for more details.",
+qiskit_nature.second_q.problems.VibrationalBasis.map for more details.",quantum
 108,qiskit-nature,function,"norb: the number of orbitals indicating the dimension of the integral container to be
 
-returned.",
-109,qiskit-nature,class,"sum(SpinOp({label: 1}, num_spins=3) for label in [""X_0"", ""Z_1"", ""X_2 Z_2""])",
-110,qiskit-nature,function,raw_result: the raw result from which to build the new one.,
-111,qiskit-machine-learning,function,"output shape may be derived later, so check it only if it is not None",
-112,qiskit-algorithms,function,Calculate the observed Fisher information,
+returned.",quantum
+109,qiskit-nature,class,"sum(SpinOp({label: 1}, num_spins=3) for label in [""X_0"", ""Z_1"", ""X_2 Z_2""])",quantum
+110,qiskit-nature,function,raw_result: the raw result from which to build the new one.,non-quantum
+111,qiskit-machine-learning,function,"output shape may be derived later, so check it only if it is not None",non-quantum
+112,qiskit-algorithms,function,Calculate the observed Fisher information,non-quantum
 113,qiskit-machine-learning,function,"Important: when quantum_kernel == ""precomputed"" we intentionally store the string
-and configure SVR accordingly.",
-114,qiskit-nature,class,Mapper of Fermionic Operator to Qubit Operator,
-115,qiskit-machine-learning,function,CE can be interpreted as a measure of correlation between the different qubits.,
-116,qiskit-algorithms,module,"number of function evaluations, parameters, loss, stepsize, accepted",
+and configure SVR accordingly.",quantum
+114,qiskit-nature,class,Mapper of Fermionic Operator to Qubit Operator,quantum
+115,qiskit-machine-learning,function,CE can be interpreted as a measure of correlation between the different qubits.,quantum
+116,qiskit-algorithms,module,"number of function evaluations, parameters, loss, stepsize, accepted",non-quantum
 117,qiskit-algorithms,function,"Compute the original gradient from the gradient of the gradient circuit
-by using the chain rule.",
+by using the chain rule.",quantum
 118,qiskit-nature,function,"num_spatial_orbitals: The number of spatial orbitals.
 num_particles: The tuple of the number of alpha- and beta-spin particles.
 qubit_mapper: The ~qiskit_nature.second_q.mappers.QubitMapper instance which
@@ -266,26 +266,26 @@ takes care of mapping to a qubit operator.
 <string>:7: (WARNING/2) Block quote ends without a blank line; unexpected unindent.
 
 reps: The number of times to repeat the evolved operators.
-initial_state: A QuantumCircuit object to prepend to the circuit.",
-119,qiskit-algorithms,function,return support level dictionary,
-120,qiskit-machine-learning,function,Returns the underlying observables of this QNN.,
-121,qiskit-nature,class,Iteration,
+initial_state: A QuantumCircuit object to prepend to the circuit.",quantum
+119,qiskit-algorithms,function,return support level dictionary,non-quantum
+120,qiskit-machine-learning,function,Returns the underlying observables of this QNN.,quantum
+121,qiskit-nature,class,Iteration,non-quantum
 122,qiskit-algorithms,class,"Nelder-Mead
 is robust in many applications, especially when the first and second derivatives of the
-objective function are not known.",
-123,qiskit-algorithms,function,The data containing the gradient evaluation.,
-124,qiskit-algorithms,function,"The computed Fisher information, or np.inf if statevector simulation was used.",
-125,qiskit-machine-learning,function,Sample coupling parameters uniformly from the interior of each phase.,
-126,qiskit-nature,class,Dipole moment results.,
-127,qiskit-machine-learning,function,The order of priority is: options in run method > gradient's,
-128,qiskit-nature,function,plot the y coords to form heavy hex shape,
+objective function are not known.",non-quantum
+123,qiskit-algorithms,function,The data containing the gradient evaluation.,non-quantum
+124,qiskit-algorithms,function,"The computed Fisher information, or np.inf if statevector simulation was used.",non-quantum
+125,qiskit-machine-learning,function,Sample coupling parameters uniformly from the interior of each phase.,quantum
+126,qiskit-nature,class,Dipole moment results.,quantum
+127,qiskit-machine-learning,function,The order of priority is: options in run method > gradient's,non-quantum
+128,qiskit-nature,function,plot the y coords to form heavy hex shape,quantum
 129,qiskit-machine-learning,function,"**kwargs: Arbitrary keyword arguments to pass to SVR constructor within
 
 <string>:3: (WARNING/2) Inline strong start-string without end-string.
 
-MSRLoss evaluation.",
-130,qiskit-nature,function,"Tuple of the form (Qubit operator, Auxiliary operators).",
-131,qiskit-algorithms,function,Returns:,
+MSRLoss evaluation.",non-quantum
+130,qiskit-nature,function,"Tuple of the form (Qubit operator, Auxiliary operators).",quantum
+131,qiskit-algorithms,function,Returns:,non-quantum
 132,qiskit-machine-learning,function,fidelities: Sequence of raw fidelity results.,
 133,qiskit-nature,function,the rest of the FCIDump will hold lines of the form,
 134,qiskit-nature,function,"sparse_type: the type to use for the conversion to sparse matrices. Note, that this will

@@ -20,7 +20,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Items whose model labels were revealed to the annotator during calibration;
 # excluded from the blind-verification statistics.
-CONTAMINATED = {"1", "8", "16", "25", "62"}
+CONTAMINATED = {"1", "8", "16", "25", "62", "132"}
 
 
 def load_annotations():
