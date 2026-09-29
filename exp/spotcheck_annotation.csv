@@ -286,53 +286,53 @@ objective function are not known.",non-quantum
 MSRLoss evaluation.",non-quantum
 130,qiskit-nature,function,"Tuple of the form (Qubit operator, Auxiliary operators).",quantum
 131,qiskit-algorithms,function,Returns:,non-quantum
-132,qiskit-machine-learning,function,fidelities: Sequence of raw fidelity results.,
-133,qiskit-nature,function,the rest of the FCIDump will hold lines of the form,
+132,qiskit-machine-learning,function,fidelities: Sequence of raw fidelity results.,quantum
+133,qiskit-nature,function,the rest of the FCIDump will hold lines of the form,quantum
 134,qiskit-nature,function,"sparse_type: the type to use for the conversion to sparse matrices. Note, that this will
 
 only be applied to matrices which were previously dense tensors. Sparse arrays of
-another type will not be explicitly converted.",
-135,qiskit-machine-learning,function,A tuple containing the sampling points and the directions.,
-136,qiskit-algorithms,function,Returns:,
-137,qiskit-algorithms,function,Raises:,
-138,qiskit-nature,function,Returns a VibrationalStructureProblem output as produced by the driver.,
-139,qiskit-algorithms,function,Raises:,
+another type will not be explicitly converted.",non-quantum
+135,qiskit-machine-learning,function,A tuple containing the sampling points and the directions.,non-quantum
+136,qiskit-algorithms,function,Returns:,non-quantum
+137,qiskit-algorithms,function,Raises:,non-quantum
+138,qiskit-nature,function,Returns a VibrationalStructureProblem output as produced by the driver.,quantum
+139,qiskit-algorithms,function,Raises:,non-quantum
 140,qiskit-algorithms,function,"we explicitly cast the type here because mypy appears to be unable to understand the
-above few lines where we ensure that values are 2d",
-141,qiskit-machine-learning,function,The fidelity default + estimator + run options.,
+above few lines where we ensure that values are 2d",non-quantum
+141,qiskit-machine-learning,function,The fidelity default + estimator + run options.,quantum
 142,qiskit-algorithms,function,"operator: Diagonal qubit operator.
 aux_operators: Optional list of auxiliary operators to be evaluated with the
 
 <string>:7: (ERROR/3) Unexpected indentation.
 
-final state.",
-143,qiskit-nature,function,The qubit operator corresponding to the problem-Hamiltonian in the qubit space.,
-144,qiskit-nature,function,return the lookup table for the transformed XYZI operators,
+final state.",quantum
+143,qiskit-nature,function,The qubit operator corresponding to the problem-Hamiltonian in the qubit space.,quantum
+144,qiskit-nature,function,return the lookup table for the transformed XYZI operators,quantum
 145,qiskit-algorithms,function,"If a transpiler has been
-provided, the ansatz will be automatically transpiled upon being set.",
+provided, the ansatz will be automatically transpiled upon being set.",quantum
 146,qiskit-algorithms,function,"Check that the number of qubits of operator and ansatz match and that the ansatz is
-parameterized.",
-147,qiskit-nature,function,See qiskit_nature.second_q.hamiltonians.,
-148,qiskit-algorithms,function,This only works if objective_qubits is a list of integers.,
-149,qiskit-algorithms,function,Yield a constant series.,
-150,qiskit-nature,function,Constructs a VibrationalIntegrals instance from the provided coefficients.,
+parameterized.",quantum
+147,qiskit-nature,function,See qiskit_nature.second_q.hamiltonians.,quantum
+148,qiskit-algorithms,function,This only works if objective_qubits is a list of integers.,quantum
+149,qiskit-algorithms,function,Yield a constant series.,non-quantum
+150,qiskit-nature,function,Constructs a VibrationalIntegrals instance from the provided coefficients.,non-quantum
 151,qiskit-nature,function,"Identity operators
-are ignored.",
-152,qiskit-algorithms,function,Set the total number of gradient evaluations.,
-153,qiskit-algorithms,function,Run the amplitude estimation algorithm on provided estimation problem.,
+are ignored.",non-quantum
+152,qiskit-algorithms,function,Set the total number of gradient evaluations.,non-quantum
+153,qiskit-algorithms,function,Run the amplitude estimation algorithm on provided estimation problem.,non-quantum
 154,qiskit-nature,function,"num_spatial_orbitals: the number of spatial orbitals in the system.
 overlap: the overlap-matrix between the $alpha$- and $beta$-spin orbitals. When this
 
 <string>:5: (ERROR/3) Unexpected indentation.
 
-is None, the overlap-matrix is assumed to be identity.",
-155,qiskit-nature,function,Raises:,
-156,qiskit-algorithms,module,The Variational Quantum Deflation Algorithm for computing higher energy states.,
-157,qiskit-nature,class,"VibrationalOp({""+_1_0"": 1}, num_modals=[2, 2]) + VibrationalOp({""+_0_0"": 1}, num_modals=[2, 2])",
-158,qiskit-nature,function,shift the second excitation into the beta-spin orbital index range,
+is None, the overlap-matrix is assumed to be identity.",quantum
+155,qiskit-nature,function,Raises:,non-quantum
+156,qiskit-algorithms,module,The Variational Quantum Deflation Algorithm for computing higher energy states.,quantum
+157,qiskit-nature,class,"VibrationalOp({""+_1_0"": 1}, num_modals=[2, 2]) + VibrationalOp({""+_0_0"": 1}, num_modals=[2, 2])",quantum
+158,qiskit-nature,function,shift the second excitation into the beta-spin orbital index range,quantum
 159,qiskit-nature,function,"Convert the rank-four tensor two_body_tensor representing two-body integrals from chemists'
-index order to physicists' index order: i,j,k,l -> i,k,l,j",
-160,qiskit-nature,module,You may also need the following to specify which auxiliary operators to evaluate with qEOM:,
+index order to physicists' index order: i,j,k,l -> i,k,l,j",quantum
+160,qiskit-nature,module,You may also need the following to specify which auxiliary operators to evaluate with qEOM:,quantum
 161,qiskit-machine-learning,function,Performs quantum inference for the query variables given the evidence.,
 162,qiskit-algorithms,function,Validate the arguments of the run method.,
 163,qiskit-nature,function,"we can find the actual list of excitations by doing the following:
