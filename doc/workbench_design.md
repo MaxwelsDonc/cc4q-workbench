@@ -21,8 +21,10 @@ quantum-specific comment taxonomy.
 
 1. **Quantum-centric.** The quantum axis (binary quantum-relatedness + the
    six-category quantum-knowledge taxonomy) is the protagonist of every page.
-   Developer intent labels exist in the corpus schema and are shown on unit
-   cards, but no analysis is built around intent.
+   The pipeline still labels every unit on three axes (quantum-relatedness,
+   quantum category, developer intent), but the UI shows only the two
+   quantum axes: developer intent lives exclusively in the data layer
+   (units JSONL, manifest, downloads) and is never rendered.
 2. **One workflow, three verbs.** Every page and every paper scenario maps to
    *Build → Inspect → Profile*:
    - **Build**: repo → labeled corpus (pipeline).
@@ -51,7 +53,7 @@ Four pages, reachable via the top navigation (`st.navigation`):
 
 - Hero band (purple gradient): name, one-liner, buttons to GitHub repo,
   companion paper (citation text), demo video (placeholder URL until recorded).
-- Three metric cards: **6 SDKs** · **39,593 SCCUs** · **3 label axes**.
+- Three metric cards: **6 SDKs** · **39,593 SCCUs** · **2 quantum label axes**.
 - Workflow strip: three cards *Build* / *Inspect* / *Profile*, each with a
   one-line description and a `st.page_link` to the relevant page.
 - Footer: Beihang University, MIT license note, artifact links.
@@ -67,9 +69,9 @@ Four pages, reachable via the top navigation (`st.navigation`):
   - One card per SCCU. Badge hierarchy (visual weight in this order):
     1. **quantum badge** — solid purple `✓ quantum` / gray outline
        `✗ non-quantum` (largest);
-    2. **quantum category badge** — colored chip (quantum units only);
-    3. **intent badge** — small gray text chip (present, de-emphasized).
+    2. **quantum category badge** — colored chip (quantum units only).
   - Card caption: `DOCSTRING · FUNCTION` style entity/type info.
+  - Developer intent is not shown anywhere on this page (data layer only).
 - Model loading: lazy via `st.cache_resource` on first Analyze click; spinner
   text "Loading classifiers (first run takes a few seconds)". CPU only.
 - Edge states: empty input → info message; non-parseable Python → warning +
@@ -123,7 +125,7 @@ paper
 
 - Default view: **quantum units only** (toggle to include non-quantum).
 - Filter bar order: quantum category → entity level → comment form → SDK →
-  keyword search; intent filter lives in a collapsed "more filters" expander.
+  keyword search. No developer-intent filter (intent is data-layer only, §2).
 - Paginated dataframe (rows-per-page selector), download-filtered-JSONL
   button.
 
@@ -198,8 +200,9 @@ missing checkpoints disable Analyze buttons with instructions, never crash.
    (spot-check one SDK).
 5. Compare mode visually reproduces the infra-vs-application gap
    (Quantum % 34.3 vs 26.0 aggregate).
-6. No developer-intent charts anywhere; intent appears only as a card badge
-   and a collapsed Explore filter.
+6. No developer-intent UI anywhere — no intent charts, badges, filters, or
+   table columns; intent appears only in the data layer (units JSONL,
+   manifest, downloads). The third classifier still runs at inference time.
 
 ## 9. Out of Scope (v1.0)
 

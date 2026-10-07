@@ -25,7 +25,6 @@ def _results(units, fallback):
             comment_type=u["comment_type"],
             entity_type=u.get("entity_type", "—"),
             quantum=u.get("quantum_related"),
-            intent=u.get("developer_intent", "—"),
             category=u.get("quantum_category"),
         )
 
@@ -33,9 +32,10 @@ def _results(units, fallback):
 def render():
     st.header("Analyze Code")
     st.write(
-        "Paste a Python snippet. CC4Q extracts its comments, splits them into "
-        "sentence-level units (SCCUs), and labels each unit on three axes — "
-        "quantum-relatedness, developer intent, and quantum category."
+        "Paste a Python snippet. CC4Q extracts its comments and splits them "
+        "into sentence-level units (SCCUs). The pipeline labels each unit on "
+        "three axes — quantum-relatedness, quantum category, and developer "
+        "intent — and this view foregrounds the two quantum axes."
     )
 
     left, right = st.columns([1, 1], vertical_alignment="top")

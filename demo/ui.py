@@ -14,15 +14,8 @@ SPACE = "#0B1026"
 SPACE_2 = "#161D3F"
 INK = "#1B1B2B"
 
-INTENT_COLORS = {
-    "What": "#3E63DD",
-    "How-to-use": "#0E9F6E",
-    "How-it-is-done": "#D97706",
-    "Property": "#0EA5E9",
-    "Why": "#DB2777",
-    "Others": "#6B7280",
-}
-# Fixed colorblind-aware palette (design doc §6).
+# Fixed colorblind-aware category palette (design doc §6). Developer-intent
+# colors are not needed: intent stays in the data layer, out of the UI.
 CATEGORY_COLORS = {
     "Mathematics for quantum information": "#1f77b4",
     "Quantum algorithms": "#d62728",
@@ -99,9 +92,6 @@ def apply_theme():
         .cc4q-chip.nonquantum {
             background: white; color: #757575; border: 1.5px dashed #9E9E9E;
         }
-        .cc4q-intent {
-            color: #9A93BE; font-size: 0.76rem; font-weight: 500;
-        }
         .cc4q-summary {
             background: linear-gradient(90deg, #F2EDFC 0%, #E9E2FA 100%);
             border: 1px solid #DCD2F3; border-radius: 12px;
@@ -137,9 +127,10 @@ def _chip(text, color=None, solid=False, dim=False):
     return f'<span class="{cls}" style="{style}">{html.escape(text)}</span>'
 
 
-def unit_card(text, comment_type, entity_type, quantum, intent, category):
-    """Render one labeled comment unit as a card with badge hierarchy:
-    1. quantum badge (largest), 2. category chip, 3. intent (small gray)."""
+def unit_card(text, comment_type, entity_type, quantum, category):
+    """Render one labeled comment unit as a card: big quantum badge,
+    quantum-category chip (quantum units only), entity/type caption.
+    Developer intent stays in the data layer, not in the UI."""
     if quantum:
         chips = (f'<span class="cc4q-chip solid big" '
                  f'style="background:{PRIMARY};border-color:{PRIMARY};">'
@@ -150,7 +141,6 @@ def unit_card(text, comment_type, entity_type, quantum, intent, category):
     if quantum and category:
         color = CATEGORY_COLORS.get(category, PRIMARY)
         chips += _chip(category, color=color)
-    chips += f'<span class="cc4q-intent">intent · {html.escape(intent)}</span>'
     meta = f'<span class="cc4q-entity">{html.escape(comment_type)} · {html.escape(entity_type)}</span>'
     st.markdown(
         f'<div class="cc4q-unit-card"><div class="text">{html.escape(text)}</div>'

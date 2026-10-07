@@ -40,10 +40,11 @@ def render():
 
     st.markdown(
         "CC4Q Workbench turns any Python-based quantum SDK repository into a "
-        "labeled code-comment corpus (CCPs → SCCUs with three-axis labels), "
-        "then provides quantum-centric analyses of that corpus. The quantum "
-        "axis — binary quantum-relatedness plus the six-category "
-        "quantum-knowledge taxonomy — is the protagonist of every page."
+        "labeled code-comment corpus (CCPs → SCCUs). The pipeline labels every "
+        "unit on three axes — quantum-relatedness, quantum category, and "
+        "developer intent — and the workbench UI foregrounds the two quantum "
+        "axes: the binary quantum call and the six-category quantum-knowledge "
+        "taxonomy are the protagonists of every page."
     )
 
     cols = st.columns(3)
@@ -52,7 +53,7 @@ def render():
     with cols[1]:
         metric_card("39,593", "Labeled SCCUs")
     with cols[2]:
-        metric_card("3", "Label axes per unit")
+        metric_card("2", "Quantum label axes per unit")
 
     st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
     st.subheader("One workflow, three verbs")

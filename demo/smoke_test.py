@@ -16,8 +16,8 @@ Acceptance criteria covered:
   4. Density values in §2 match a direct recomputation on the cloned repos
   5. Compare aggregates reproduce the infra-vs-application gap
      (Quantum % 34.3 vs 26.0)
-  6. No developer-intent charts anywhere (dashboard.py must not mention
-     intent); intent survives only as card badge + collapsed Explore filter
+  6. Developer intent is absent from the UI entirely (cards, filters, table
+     columns) but present in the data layer (units JSONL, manifest, downloads)
 """
 
 import os
@@ -209,6 +209,17 @@ def test_precomputed_data():
                & all_df["quantum_category"].notna()]
     check("(d) quantum units have categories", len(q) > 0)
 
+    # intent stays in the DATA layer: units schema + manifest distributions
+    check("(d-data) intent column present in units",
+          "developer_intent" in all_df.columns
+          and all_df["developer_intent"].notna().all())
+    intent_total = sum(sum(manifest["repos"][s]["intent_counts"].values())
+                       for s in repos)
+    full_sccus = sum(manifest["repos"][s]["sccus"] for s in repos)
+    check("(d-data) manifest intent_counts populated",
+          intent_total == full_sccus,
+          f"intent_total={intent_total} full_sccus={full_sccus}")
+
 
 def test_app_rendering():
     from streamlit.testing.v1 import AppTest
@@ -222,6 +233,8 @@ def test_app_rendering():
     all_md = "\n".join(m.value or "" for m in at.markdown)
     check("home workflow strip renders",
           all(k in all_md for k in ("Build", "Inspect", "Profile")))
+    check("home metric card foregrounds quantum axes",
+          any("Quantum label axes per unit" in (m.value or "") for m in at.markdown))
     check("home honesty note (379 / 85.0%)",
           any("379" in (i.value or "") and "85.0%" in (i.value or "")
               for i in at.info))
@@ -236,6 +249,9 @@ def test_app_rendering():
               and any("✓ quantum" in (m.value or "") for m in at.markdown))
         check("analyze-code: summary strip + quantum badges", ok,
               str(at.exception))
+        rendered = "\n".join(m.value or "" for m in at.markdown)
+        check("analyze-code: no intent badge in UI",
+              "intent ·" not in rendered.lower())
 
     # Page 3: Analyze Repository — §1-§3 sections + compare.
     at.switch_page("pages/p_analyze_repo.py").run()
@@ -285,6 +301,12 @@ def test_app_rendering():
         n_after = int(caption_after.split()[0].replace(",", ""))
         check("explore: toggle adds non-quantum rows", n_after > n_before,
               f"{n_before} -> {n_after}")
+        check("explore: no intent filter or column in UI",
+              all(getattr(sb, "label", "") != "Developer intent"
+                  for sb in at.selectbox)
+              and len(at.expander) == 1  # only the main "Filters" expander
+              and (not at.dataframe
+                   or "developer_intent" not in list(at.dataframe[0].value.columns)))
         if at.text_input:
             at.text_input[0].set_value("entangle").run()
             ok = (not at.exception and len(at.dataframe) > 0

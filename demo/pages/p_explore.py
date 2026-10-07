@@ -33,10 +33,8 @@ def _filter_frame(df):
             keyword = st.text_input("Keyword search (comment text)",
                                     placeholder="e.g. entangle, backend, VQE")
 
-    with st.expander("More filters"):
-        intents = st.multiselect("Developer intent", data_io.INTENT_ORDER,
-                                 default=[])
-
+    # developer intent stays in the data layer (units JSONL, downloads) —
+    # it is not an Explore filter (design doc §2, quantum-centric)
     out = df if include_nonquantum else df[df["quantum_related"]]
     if cats:
         out = out[out["quantum_category"].isin(cats)]
@@ -49,8 +47,6 @@ def _filter_frame(df):
     if keyword.strip():
         out = out[out["comment_text"].str.contains(keyword.strip(),
                                                     case=False, na=False)]
-    if intents:
-        out = out[out["developer_intent"].isin(intents)]
     return out
 
 
@@ -71,8 +67,7 @@ def _display(out):
                f"{min(start + page_size, total):,}.")
     st.dataframe(
         chunk[["sdk", "file", "comment_type", "code_entity_type",
-               "comment_text", "quantum_related", "developer_intent",
-               "quantum_category"]],
+               "comment_text", "quantum_related", "quantum_category"]],
         width="stretch",
         hide_index=True,
         column_config={
@@ -83,7 +78,6 @@ def _display(out):
             "comment_text": st.column_config.TextColumn("Comment text",
                                                         width="large"),
             "quantum_related": st.column_config.CheckboxColumn("Quantum?"),
-            "developer_intent": "Intent",
             "quantum_category": "Quantum category",
         },
     )
