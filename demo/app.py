@@ -26,14 +26,13 @@ b1, b2 = st.columns([3, 2])
 with b1:
     st.markdown(
         '<div class="cc4q-brand"><span class="name">⚛ CC4Q Workbench</span>'
-        '<span class="tag">From quantum code to labeled comment corpora: '
-        'build, inspect, profile.</span></div>',
+        '</div>',
         unsafe_allow_html=True,
     )
 with b2:
     st.markdown(
         '<div class="cc4q-brand" style="justify-content:flex-end">'
-        '<span class="cc4q-topnav-note">CPU inference · no data leaves '
+        '<span class="cc4q-topnav-note">Local inference · no data leaves '
         'your machine</span></div>',
         unsafe_allow_html=True,
     )

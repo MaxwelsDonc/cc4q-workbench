@@ -29,7 +29,22 @@ from segment_core.python_segment.inline_comment_segmenter import segment_inline_
 from utils.id_utils import id_generator
 
 CKPT_DIR = os.path.join(PROJECT_ROOT, "models_checkpoints")
-DEVICE = "cpu"  # MPS hangs on this machine; CPU only.
+
+
+def get_device():
+    """Resolve the inference device.
+
+    Priority: CC4Q_DEVICE env override (cpu/cuda/mps) > CUDA if available >
+    CPU. MPS is never selected automatically: it hangs with torch 2.14 on
+    the development machine — opt in explicitly via CC4Q_DEVICE=mps.
+    """
+    forced = os.environ.get("CC4Q_DEVICE", "").strip().lower()
+    if forced:
+        return forced
+    return "cuda" if torch.cuda.is_available() else "cpu"
+
+
+DEVICE = get_device()
 BATCH_SIZE = 32
 MAX_LENGTH = 512
 
@@ -64,7 +79,8 @@ def build_bell_state(backend):
 
 
 def load_models():
-    """Load the three BERT classifiers (CPU, eval mode). Called lazily."""
+    """Load the three BERT classifiers (eval mode) on the resolved device.
+    Called lazily."""
     models = {}
     for name in ("quantum_related", "quantum_category", "developer_intent"):
         model_dir = os.path.join(CKPT_DIR, name)

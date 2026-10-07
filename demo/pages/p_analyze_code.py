@@ -49,6 +49,7 @@ def render():
                                 "(skip code parsing; classify each non-empty line)")
         run = st.button("Analyze", type="primary", use_container_width=True,
                         disabled=no_models)
+        st.caption(f"running on: {analysis.DEVICE}")
 
     with right:
         st.markdown("**Results**")
@@ -57,7 +58,7 @@ def render():
             return
         if not run:
             st.info("Click **Analyze** to label every comment unit in the "
-                    "snippet. Classifiers load lazily on first run (CPU).")
+                    "snippet. Classifiers load lazily on first run.")
             return
 
         with st.spinner("Loading classifiers (first run takes a few seconds)"):
