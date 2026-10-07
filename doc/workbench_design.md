@@ -159,13 +159,30 @@ developer_intent (6)`.
 
 ## 6. Visual Design
 
-- Primary color: quantum purple `#6C3FC5`; background accents: dark space
-  blue; non-quantum gray `#9E9E9E`.
-- Category chip palette (fixed, colorblind-aware): Mathematics `#1f77b4`,
+Kimi-style minimal product language (kimi.com aesthetics), light mode only:
+
+- **Surfaces**: white / very light neutral — app background `#FBFBFC`,
+  cards `#FFFFFF` with a 1px `#E5E7EB` hairline border, border-radius 12px,
+  no shadows. Generous whitespace.
+- **Text**: near-black `#1A1A1A` primary, muted gray `#6B7280` secondary.
+  Headings weight 700 (h1/h2) / 650 (h3); Streamlit default sans font.
+- **Primary buttons**: Kimi signature black — `#1A1A1A` background, white
+  text, ~10px radius, no shadow; hover `#000000`. Secondary/outline buttons:
+  white background, dark text, 1px `#E5E7EB` border.
+- **Accent**: quantum purple `#6C3FC5` is used *sparingly* — only quantum
+  badges/chips, the summary strip, small highlights (hero accent line,
+  unit-card left border), and the quantum charts (residence heatmap, radar).
+  All other UI chrome (links, tabs, checkboxes, toggle, §1 corpus bars) is
+  neutral black/gray.
+- **Hero (Home)**: clean typography — large black title, gray subtitle, a
+  thin purple accent line; no gradient bands.
+- **Category chip palette (fixed, colorblind-aware)**: Mathematics `#1f77b4`,
   Algorithms `#d62728`, Circuit model `#6C3FC5`, Hardware `#2ca02c`,
   Software stack `#ff7f0e`, Others `#7f7f7f`.
-- Charts: plotly only (no `st.bar_chart`); consistent axis titles; English UI
-  throughout.
+- **Charts**: plotly only (no `st.bar_chart`); consistent axis titles; English UI
+  throughout; neutral gridlines `#ECECEF`.
+- **Navigation**: top navigation bar (`st.navigation(position="top")`), no
+  sidebar; brand "⚛ CC4Q Workbench" top-left with the one-liner.
 - Theme delivery is dual, so the palette holds no matter where the app is
   launched from: `.streamlit/config.toml` at the repo root (picked up when
   `streamlit run` is invoked from the repo root) **plus** CSS-variable and

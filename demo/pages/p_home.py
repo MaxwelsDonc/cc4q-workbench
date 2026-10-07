@@ -19,32 +19,34 @@ def render():
     st.markdown(
         """
         <div class="cc4q-hero">
-            <h1>⚛ CC4Q Workbench</h1>
-            <p>From quantum code to labeled comment corpora:
-               build, inspect, profile.</p>
+            <h1>From quantum code to labeled<br>comment corpora.</h1>
+            <div class="accent-line"></div>
+            <p>Build, inspect, profile — CC4Q Workbench turns any
+               Python-based quantum SDK repository into a labeled
+               code-comment corpus and profiles its quantum knowledge.</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
-    b1, b2, b3 = st.columns([1, 1, 3])
+    b1, b2, b3, b4 = st.columns([1, 1, 1, 3])
     with b1:
-        st.link_button("GitHub repository", GITHUB_URL, type="primary",
+        st.link_button("GitHub repository", GITHUB_URL, type="secondary",
                        use_container_width=True)
     with b2:
         st.link_button("▶ Demo video (placeholder)", DEMO_VIDEO_URL,
-                       use_container_width=True)
+                       type="secondary", use_container_width=True)
     with b3:
-        with st.popover("Companion paper — citation"):
+        with st.popover("Companion paper — citation", use_container_width=True):
             st.markdown(PAPER_CITATION)
 
+    st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
     st.markdown(
-        "CC4Q Workbench turns any Python-based quantum SDK repository into a "
-        "labeled code-comment corpus (CCPs → SCCUs). The pipeline labels every "
-        "unit on three axes — quantum-relatedness, quantum category, and "
-        "developer intent — and the workbench UI foregrounds the two quantum "
-        "axes: the binary quantum call and the six-category quantum-knowledge "
-        "taxonomy are the protagonists of every page."
+        "The pipeline labels every unit on three axes — quantum-relatedness, "
+        "quantum category, and developer intent — and the workbench UI "
+        "foregrounds the two quantum axes: the binary quantum call and the "
+        "six-category quantum-knowledge taxonomy are the protagonists of "
+        "every page."
     )
 
     cols = st.columns(3)
@@ -79,14 +81,6 @@ def render():
             )
             st.page_link(target, label=f"Open {page_name} →",
                          use_container_width=True)
-
-    st.info(
-        "**Honest output.** Corpora produced by the release classifiers are "
-        "always marked as model-labeled. A human spot-check of **379 SCCUs** "
-        "agreed with the model labels **85.0%** of the time; the three "
-        "original SDKs ship a human-validated gold corpus.",
-        icon="✅",
-    )
 
     footer()
 

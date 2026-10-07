@@ -228,21 +228,21 @@ def test_app_rendering():
     at.run()
     check("app boots to Home", not at.exception, str(at.exception))
     hero = next((m.value for m in at.markdown
-                 if "build, inspect, profile" in (m.value or "")), None)
-    check("home hero renders new one-liner", hero is not None)
+                 if "From quantum code to labeled" in (m.value or "")), None)
+    check("home hero renders clean typography hero", hero is not None)
     all_md = "\n".join(m.value or "" for m in at.markdown)
     check("home workflow strip renders",
           all(k in all_md for k in ("Build", "Inspect", "Profile")))
     check("home metric card foregrounds quantum axes",
           any("Quantum label axes per unit" in (m.value or "") for m in at.markdown))
-    check("home honesty note (379 / 85.0%)",
-          any("379" in (i.value or "") and "85.0%" in (i.value or "")
-              for i in at.info))
+    check("home: no honesty info block",
+          not any("Honest output" in (i.value or "") for i in at.info))
     theme_css = "\n".join(m.value or "" for m in at.markdown
                           if "<style>" in (m.value or ""))
-    check("theme: primary-button purple override present",
-          "--primary-color: #6C3FC5" in theme_css
-          and "background-color: #6C3FC5" in theme_css)
+    check("theme: Kimi black primary-button + outline secondary rules",
+          "background-color: #1A1A1A" in theme_css
+          and "border: 1px solid #E5E7EB" in theme_css
+          and "--cc4q-quantum: #6C3FC5" in theme_css)
 
     # Page 2: Analyze Code — click Analyze and verify summary strip + cards.
     at.switch_page("pages/p_analyze_code.py").run()

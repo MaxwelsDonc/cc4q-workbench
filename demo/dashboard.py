@@ -14,7 +14,7 @@ from data_io import (
 )
 from ui import CATEGORY_COLORS, PRIMARY, metric_card, plotly_layout
 
-CTYPE_COLORS = {"docstring": PRIMARY, "block": "#9F7AEA", "inline": "#4E2D94"}
+CTYPE_COLORS = {"docstring": "#1F2937", "block": "#6B7280", "inline": "#9CA3AF"}
 PALETTE = [PRIMARY, "#2ca02c"]
 
 
@@ -67,13 +67,13 @@ def _radar_figure(pairs, title):
         legend=dict(orientation="h", y=-0.12),
         margin=dict(l=60, r=60, t=48, b=30),
         paper_bgcolor="rgba(0,0,0,0)",
-        font=dict(color="#4A4370", size=12),
-        title_font=dict(color="#2E2060", size=15),
+        font=dict(color="#6B7280", size=12),
+        title_font=dict(color="#1A1A1A", size=15),
         polar=dict(
             bgcolor="rgba(0,0,0,0)",
             radialaxis=dict(visible=True, tickformat=".0%",
-                            gridcolor="#E8E4F5", range=[0, None]),
-            angularaxis=dict(gridcolor="#E8E4F5"),
+                            gridcolor="#ECECEF", range=[0, None]),
+            angularaxis=dict(gridcolor="#ECECEF"),
         ),
     )
     return fig

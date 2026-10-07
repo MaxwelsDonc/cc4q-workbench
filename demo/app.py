@@ -16,10 +16,27 @@ st.set_page_config(
     page_title="CC4Q Workbench",
     page_icon="⚛",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 apply_theme()
+
+# Brand block, top-left, above the navigation bar.
+b1, b2 = st.columns([3, 2])
+with b1:
+    st.markdown(
+        '<div class="cc4q-brand"><span class="name">⚛ CC4Q Workbench</span>'
+        '<span class="tag">From quantum code to labeled comment corpora: '
+        'build, inspect, profile.</span></div>',
+        unsafe_allow_html=True,
+    )
+with b2:
+    st.markdown(
+        '<div class="cc4q-brand" style="justify-content:flex-end">'
+        '<span class="cc4q-topnav-note">CPU inference · no data leaves '
+        'your machine</span></div>',
+        unsafe_allow_html=True,
+    )
 
 pages = st.navigation([
     st.Page("pages/p_home.py", title="Home", icon="🏠", url_path="home",
@@ -30,13 +47,6 @@ pages = st.navigation([
             url_path="analyze-repository"),
     st.Page("pages/p_explore.py", title="Explore Corpus", icon="🔎",
             url_path="explore-corpus"),
-])
-
-with st.sidebar:
-    st.markdown("### ⚛ CC4Q Workbench")
-    st.caption("From quantum code to labeled comment corpora: "
-               "build, inspect, profile.\n\n"
-               "CPU inference · three fine-tuned BERT classifiers · "
-               "no data leaves your machine.")
+], position="top")
 
 pages.run()
