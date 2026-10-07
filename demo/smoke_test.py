@@ -222,19 +222,21 @@ def test_precomputed_data():
 
 
 def test_packaging():
-    """Docker variants: GPU file exists and never forces CPU."""
-    gpu = os.path.join(PROJECT_ROOT, "Dockerfile.gpu")
-    check("(pkg) Dockerfile.gpu exists", os.path.isfile(gpu))
-    if os.path.isfile(gpu):
-        with open(gpu) as f:
+    """Single unified Dockerfile: TORCH_CHANNEL build-arg, no forced device."""
+    dockerfile = os.path.join(PROJECT_ROOT, "Dockerfile")
+    check("(pkg) Dockerfile exists", os.path.isfile(dockerfile))
+    check("(pkg) no separate Dockerfile.gpu",
+          not os.path.isfile(os.path.join(PROJECT_ROOT, "Dockerfile.gpu")))
+    if os.path.isfile(dockerfile):
+        with open(dockerfile) as f:
             src = f.read()
-        check("(pkg) Dockerfile.gpu does not force CC4Q_DEVICE via ENV",
-              "ENV CC4Q_DEVICE" not in src.upper())
-        check("(pkg) Dockerfile.gpu uses a CUDA base",
-              any(line.upper().startswith("FROM NVIDIA/CUDA:")
-                  for line in src.splitlines()))
-    cpu = os.path.join(PROJECT_ROOT, "Dockerfile")
-    check("(pkg) Dockerfile (CPU) exists", os.path.isfile(cpu))
+        upper = src.upper()
+        check("(pkg) Dockerfile has TORCH_CHANNEL build-arg",
+              "ARG TORCH_CHANNEL" in upper)
+        check("(pkg) Dockerfile does not force CC4Q_DEVICE via ENV",
+              "ENV CC4Q_DEVICE" not in upper)
+        check("(pkg) Dockerfile installs torch from the pytorch index",
+              "download.pytorch.org/whl/" in src)
 
 
 def test_app_rendering():

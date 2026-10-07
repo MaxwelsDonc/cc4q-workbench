@@ -1,25 +1,39 @@
-# CC4Q Workbench — all-in-one image (demo UI + full pipeline CLI).
+# CC4Q Workbench — all-in-one image (demo UI + full pipeline CLI), CPU or GPU.
 #
-#   docker build -t cc4q-workbench .
-#   docker run -p 8501:8501 cc4q-workbench
+#   CPU (default, small image):
+#     docker build -t cc4q-workbench .
+#     docker run -p 8501:8501 cc4q-workbench
 #
-# The image does NOT contain the model checkpoints; the entrypoint fetches
-# them from the GitHub release (best-effort). To skip that, run with
-#   -e CC4Q_SKIP_MODEL_DOWNLOAD=1
-# or pre-mount them:
-#   docker run -p 8501:8501 -v "$PWD/models_checkpoints:/app/models_checkpoints" cc4q-workbench
+#   GPU (CUDA wheels; needs an NVIDIA driver + nvidia-container-toolkit on
+#   the host, and runs on CPU-only hosts too — just larger):
+#     docker build --build-arg TORCH_CHANNEL=gpu -t cc4q-workbench:gpu .
+#     docker run --gpus all -p 8501:8501 cc4q-workbench:gpu
+#
+# No CC4Q_DEVICE is baked in: the app auto-detects CUDA at runtime
+# (escape hatch: -e CC4Q_DEVICE=cpu). Models are fetched at container start.
 
 FROM python:3.11-slim
 
 WORKDIR /app
 
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    CC4Q_DEVICE=cpu
+# TORCH_CHANNEL=cpu (default) -> torch CPU wheels, ~2.5 GB image.
+# TORCH_CHANNEL=gpu           -> torch 2.14.0+cu126 wheels; the bundled
+#                                nvidia-*-cu12 runtime libraries make the
+#                                image GPU-capable, ~7 GB.
+ARG TORCH_CHANNEL=cpu
 
-# CPU-only torch first (avoids multi-GB CUDA wheels), then everything else.
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+# git: live repo analysis clones with `git clone --depth 1`.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN pip install --no-cache-dir --upgrade pip \
-    && pip install --no-cache-dir torch --index-url https://download.pytorch.org/whl/cpu
+    && pip install --no-cache-dir \
+        --index-url "https://download.pytorch.org/whl/${TORCH_CHANNEL}" \
+        "torch==2.14.0"
 
 COPY requirements.txt demo/requirements-demo.txt ./
 RUN pip install --no-cache-dir -r requirements.txt -r requirements-demo.txt \

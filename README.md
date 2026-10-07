@@ -96,30 +96,37 @@ docker run --entrypoint python cc4q-workbench \
 
 ### GPU support
 
-The default `Dockerfile` is CPU-only. A CUDA variant, `Dockerfile.gpu`
-(ubuntu22.04 + CUDA 12.6 runtime, torch 2.14.0 cu126 wheels), builds an
-image that uses the GPU automatically — the app detects CUDA at runtime and
-no `CC4Q_DEVICE` is baked in:
+One `Dockerfile` serves both CPU and GPU via a build argument:
 
 ```bash
-# host needs an NVIDIA driver + nvidia-container-toolkit
-docker build -f Dockerfile.gpu -t cc4q-workbench:gpu .
+# CPU (default): torch CPU wheels, ~2.5 GB image
+docker build -t cc4q-workbench .
+
+# GPU: torch 2.14.0+cu126 wheels (CUDA runtime libs are bundled in the
+# wheel, so no CUDA base image is needed), ~7 GB image
+docker build --build-arg TORCH_CHANNEL=gpu -t cc4q-workbench:gpu .
 docker run --gpus all -p 8501:8501 cc4q-workbench:gpu
 ```
 
-Force CPU inside the GPU image with `-e CC4Q_DEVICE=cpu` if ever needed.
-Without Docker, a CUDA host just needs the matching torch wheels and the
-app picks up the GPU on its own:
+The GPU build needs an NVIDIA driver + nvidia-container-toolkit on the
+host, but also runs fine on CPU-only hosts. No `CC4Q_DEVICE` is baked into
+either image — the app auto-detects CUDA at startup (the Analyze Code page
+shows `running on: cuda`); force CPU with `-e CC4Q_DEVICE=cpu` if ever
+needed. Note that CPU inference is already fast enough for the demo
+(a snippet analysis takes seconds), so the GPU build mainly matters for
+batch/live labeling of larger repositories. Without Docker, a CUDA host
+just needs the matching torch wheels and the app picks up the GPU on its
+own:
 
 ```bash
 pip install torch --index-url https://download.pytorch.org/whl/cu126
-streamlit run demo/app.py        # "running on: cuda" on the Analyze Code page
+streamlit run demo/app.py
 ```
 
-> **Note:** we develop on Apple Silicon, so the GPU variant has not been
-> built or run by us yet — the base image tag and the torch cu126 wheels are
-> verified to exist, but the image itself is untested. Feedback (and pull
-> requests) from CUDA hosts are very welcome.
+> **Note:** we develop on Apple Silicon, so the GPU build has not been
+> built or run by us yet — the wheel indexes and base image are verified to
+> exist, but the GPU image itself is untested. Feedback (and pull requests)
+> from CUDA hosts are very welcome.
 
 ## Using the dataset
 
