@@ -1,6 +1,10 @@
 output_dir: data/input
 
+# Pinned versions matching the companion paper's corpus.
 repos:
-  # - https://github.com/Qiskit/qiskit
-  - https://github.com/Qiskit/qiskit-aer
-  - https://github.com/Qiskit/qiskit-ibm-runtime
+  - url: https://github.com/Qiskit/qiskit
+    ref: "2.1.0"
+  - url: https://github.com/Qiskit/qiskit-aer
+    ref: "0.17.2"
+  - url: https://github.com/Qiskit/qiskit-ibm-runtime
+    ref: "0.45.1"

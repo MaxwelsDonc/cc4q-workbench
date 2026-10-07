@@ -123,7 +123,9 @@ Each line is one comment unit with the following fields:
 ## Reproducing the full pipeline
 
 The upstream source code is not redistributed; download the pinned versions
-with the helper script, then run the extraction steps:
+with the helper script, then run the extraction steps. Each entry in
+`config/repo_list.yaml` carries a `ref` field pinning the exact release tag;
+the script clones that tag and verifies existing checkouts against it.
 
 ```bash
 python scripts/01_download_repos.py

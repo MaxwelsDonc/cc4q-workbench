@@ -2,6 +2,9 @@
 output_dir: data/input
 
 repos:
-  - https://github.com/qiskit-community/qiskit-machine-learning  # pinned tag: 0.9.1
-  - https://github.com/qiskit-community/qiskit-nature            # pinned tag: 0.8
-  - https://github.com/qiskit-community/qiskit-algorithms        # pinned tag: 0.4.0
+  - url: https://github.com/qiskit-community/qiskit-machine-learning
+    ref: "0.9.1"
+  - url: https://github.com/qiskit-community/qiskit-nature
+    ref: "0.8"
+  - url: https://github.com/qiskit-community/qiskit-algorithms
+    ref: "0.4.0"
