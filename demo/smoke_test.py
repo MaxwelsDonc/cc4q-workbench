@@ -221,6 +221,22 @@ def test_precomputed_data():
           f"intent_total={intent_total} full_sccus={full_sccus}")
 
 
+def test_packaging():
+    """Docker variants: GPU file exists and never forces CPU."""
+    gpu = os.path.join(PROJECT_ROOT, "Dockerfile.gpu")
+    check("(pkg) Dockerfile.gpu exists", os.path.isfile(gpu))
+    if os.path.isfile(gpu):
+        with open(gpu) as f:
+            src = f.read()
+        check("(pkg) Dockerfile.gpu does not force CC4Q_DEVICE via ENV",
+              "ENV CC4Q_DEVICE" not in src.upper())
+        check("(pkg) Dockerfile.gpu uses a CUDA base",
+              any(line.upper().startswith("FROM NVIDIA/CUDA:")
+                  for line in src.splitlines()))
+    cpu = os.path.join(PROJECT_ROOT, "Dockerfile")
+    check("(pkg) Dockerfile (CPU) exists", os.path.isfile(cpu))
+
+
 def test_app_rendering():
     from streamlit.testing.v1 import AppTest
 
@@ -325,6 +341,7 @@ def main():
 
     test_snippet_pipeline(with_models)
     test_precomputed_data()
+    test_packaging()
     if with_app:
         test_app_rendering()
 

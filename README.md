@@ -94,6 +94,33 @@ docker run --entrypoint python cc4q-workbench \
     scripts/02_extract_code_comment_pairs.py config/examples.yaml
 ```
 
+### GPU support
+
+The default `Dockerfile` is CPU-only. A CUDA variant, `Dockerfile.gpu`
+(ubuntu22.04 + CUDA 12.6 runtime, torch 2.14.0 cu126 wheels), builds an
+image that uses the GPU automatically — the app detects CUDA at runtime and
+no `CC4Q_DEVICE` is baked in:
+
+```bash
+# host needs an NVIDIA driver + nvidia-container-toolkit
+docker build -f Dockerfile.gpu -t cc4q-workbench:gpu .
+docker run --gpus all -p 8501:8501 cc4q-workbench:gpu
+```
+
+Force CPU inside the GPU image with `-e CC4Q_DEVICE=cpu` if ever needed.
+Without Docker, a CUDA host just needs the matching torch wheels and the
+app picks up the GPU on its own:
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/cu126
+streamlit run demo/app.py        # "running on: cuda" on the Analyze Code page
+```
+
+> **Note:** we develop on Apple Silicon, so the GPU variant has not been
+> built or run by us yet — the base image tag and the torch cu126 wheels are
+> verified to exist, but the image itself is untested. Feedback (and pull
+> requests) from CUDA hosts are very welcome.
+
 ## Using the dataset
 
 ```python
