@@ -28,8 +28,53 @@ NON_QUANTUM_GRAY = "#9E9E9E"
 
 
 def apply_theme():
+    """Apply the quantum-purple theme.
+
+    Two mechanisms on purpose: `.streamlit/config.toml` covers launches from
+    the repo root, and the CSS-variable overrides below cover launches from
+    any other working directory (Streamlit only discovers project config
+    relative to the CWD it is invoked from — without this, primary buttons
+    fall back to the default red #FF4B4B).
+    """
     st.markdown(
         """
+        <style>
+        /* Hard-theme overrides: apply regardless of config discovery. */
+        :root {
+            --primary-color: #6C3FC5;
+            --primary-color-light: color-mix(in srgb, #6C3FC5 65%, white);
+            --primary-color-dark: #4E2D94;
+        }
+        /* Primary buttons, links, tabs, focus rings, widget accents */
+        .stApp { background: #F7F6FC; }
+        .stButton > button[kind="primary"],
+        .stButton > button[data-testid="baseButton-primary"] {
+            background-color: #6C3FC5; border-color: #6C3FC5; color: #FFFFFF;
+        }
+        .stButton > button[kind="primary"]:hover,
+        .stButton > button[data-testid="baseButton-primary"]:hover {
+            background-color: #4E2D94; border-color: #4E2D94; color: #FFFFFF;
+        }
+        .stApp a { color: #6C3FC5; }
+        .stApp a:hover { color: #4E2D94; }
+        .stTabs [data-baseweb="tab-list"] [aria-selected="true"] {
+            color: #6C3FC5;
+        }
+        .stTabs [data-baseweb="tab-highlight"] { background-color: #6C3FC5; }
+        .stCheckbox [data-checked="true"] svg { fill: #6C3FC5; }
+        .stCheckbox [data-checked="true"] div[role="checkbox"] {
+            background-color: #6C3FC5; border-color: #6C3FC5;
+        }
+        .stToggle [role="switch"][aria-checked="true"] {
+            background-color: #6C3FC5;
+        }
+        .stSelectbox [data-baseweb="select"] span[data-baseweb="select"] { }
+        .stMultiSelect [data-baseweb="tag"] {
+            background-color: #EFE9FB; color: #4E2D94;
+        }
+        .stStatusWidget > div { border-left-color: #6C3FC5; }
+        :focus-visible { outline-color: #6C3FC5; }
+        </style>
         <style>
         :root {
             --cc4q-primary: #6C3FC5;
@@ -43,7 +88,18 @@ def apply_theme():
         }
         section[data-testid="stSidebar"] * { color: #E6E1F7; }
         section[data-testid="stSidebar"] .stMarkdown a { color: #C4B0F5; }
-        h1, h2, h3 { color: #22174A; letter-spacing: -0.01em; }
+        section[data-testid="stSidebar"] [data-testid="stNavSectionHeader"],
+        section[data-testid="stSidebar"] [data-testid="stNavItem"] {
+            color: #E6E1F7;
+        }
+        section[data-testid="stSidebar"] [data-testid="stNavItem"][aria-current="page"] {
+            background-color: rgba(108, 63, 197, 0.35);
+            border-radius: 8px;
+        }
+        h1, h2, h3 {
+            color: #22174A; letter-spacing: -0.01em; font-weight: 700;
+        }
+        h3 { font-weight: 650; }
         div[data-testid="stMetric"] {
             background: white; border: 1px solid #E4DEF6; border-radius: 14px;
             padding: 14px 16px;
@@ -55,8 +111,8 @@ def apply_theme():
             border-radius: 20px; padding: 44px 48px; color: white;
             margin-bottom: 28px;
         }
-        .cc4q-hero h1 { color: white; font-size: 2.4rem; margin: 0 0 8px 0; }
-        .cc4q-hero p { color: #D9D2F2; font-size: 1.12rem; margin: 0; }
+        .cc4q-hero h1 { color: white; font-size: 2.4rem; margin: 0 0 8px 0; font-weight: 800; }
+        .cc4q-hero p { color: #EDE8FB; font-size: 1.12rem; margin: 0; }
         .cc4q-card {
             background: white; border: 1px solid #E4DEF6; border-radius: 16px;
             padding: 20px 22px; height: 100%;
@@ -67,6 +123,11 @@ def apply_theme():
             background: white; border: 1px solid #E4DEF6; border-radius: 16px;
             padding: 22px 24px; text-align: center; height: 100%;
             box-shadow: 0 1px 3px rgba(76, 42, 133, 0.07);
+            transition: box-shadow 0.15s ease-in-out, transform 0.15s ease-in-out;
+        }
+        .cc4q-metric-card:hover {
+            box-shadow: 0 4px 14px rgba(76, 42, 133, 0.16);
+            transform: translateY(-1px);
         }
         .cc4q-metric-card .value {
             font-size: 2.1rem; font-weight: 700; color: #6C3FC5; line-height: 1.1;

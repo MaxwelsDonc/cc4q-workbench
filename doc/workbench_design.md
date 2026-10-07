@@ -166,7 +166,12 @@ developer_intent (6)`.
   Software stack `#ff7f0e`, Others `#7f7f7f`.
 - Charts: plotly only (no `st.bar_chart`); consistent axis titles; English UI
   throughout.
-- `.streamlit/config.toml` holds the theme.
+- Theme delivery is dual, so the palette holds no matter where the app is
+  launched from: `.streamlit/config.toml` at the repo root (picked up when
+  `streamlit run` is invoked from the repo root) **plus** CSS-variable and
+  component overrides injected by `demo/ui.py` (covers launches from any
+  other working directory, where Streamlit does not discover the project
+  config and would otherwise fall back to the default red #FF4B4B).
 
 ## 7. Technical Architecture
 

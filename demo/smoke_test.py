@@ -238,6 +238,11 @@ def test_app_rendering():
     check("home honesty note (379 / 85.0%)",
           any("379" in (i.value or "") and "85.0%" in (i.value or "")
               for i in at.info))
+    theme_css = "\n".join(m.value or "" for m in at.markdown
+                          if "<style>" in (m.value or ""))
+    check("theme: primary-button purple override present",
+          "--primary-color: #6C3FC5" in theme_css
+          and "background-color: #6C3FC5" in theme_css)
 
     # Page 2: Analyze Code — click Analyze and verify summary strip + cards.
     at.switch_page("pages/p_analyze_code.py").run()

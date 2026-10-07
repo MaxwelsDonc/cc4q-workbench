@@ -34,7 +34,8 @@ pages = st.navigation([
 
 with st.sidebar:
     st.markdown("### ⚛ CC4Q Workbench")
-    st.caption("Comment Classification for Quantum software.\n\n"
+    st.caption("From quantum code to labeled comment corpora: "
+               "build, inspect, profile.\n\n"
                "CPU inference · three fine-tuned BERT classifiers · "
                "no data leaves your machine.")
 
