@@ -1,28 +1,33 @@
-# CC4Q — A Dataset of Code Comments in Quantum Software Development Kits
+# CC4Q Workbench — Building and Analyzing Quantum Code Comment Corpora
 
-Data, models, and analysis scripts for the paper:
+**Turn any Python-based quantum SDK repository into a labeled code-comment
+corpus, then inspect and profile its quantum knowledge.**
+
+CC4Q Workbench is the tool companion of the paper:
 
 > **Code Comments for Quantum Software Development Kits: An Empirical Study on Qiskit**
 > (accepted for publication)
 
-The dataset contains **28,076 annotated code-comment units** collected from
-three popular Qiskit-family libraries (`qiskit` 2.1.0, `qiskit-aer` 0.17.2,
-`qiskit-ibm-runtime` 0.45.1). Each unit is labeled with whether it is
-quantum-specific, its developer-intent category, and (for quantum-specific
-units) its quantum-knowledge category. This archive also ships the comment
-extraction/segmentation pipeline, the three BERT classifiers used for
-model-assisted annotation, and the scripts behind the paper's empirical
-analyses.
+It packages the full methodology as a reusable tool: a corpus-construction
+pipeline (repository → code-comment pairs → sentence-level comment units),
+three released fine-tuned BERT classifiers (quantum-relatedness, developer
+intent, quantum-knowledge category), and a four-page web workbench for
+snippet labeling, repository dashboards, cross-SDK comparison, and corpus
+exploration. The companion study's **gold corpus** (28,076 human-validated
+units from `qiskit` 2.1.0, `qiskit-aer` 0.17.2, `qiskit-ibm-runtime` 0.45.1)
+is archived separately (see the companion paper's artifact link; the corpus
+is too large for git). The validation evidence for the three additional SDKs
+analyzed in the tool paper lives in `exp/`.
 
 ```
-data/final_data/                the annotated dataset (JSONL, one unit per line)
+demo/                           CC4Q Workbench: interactive Streamlit app (see below)
 scripts/                        pipeline: download repos → extract pairs → segment units
 parser_core/ segment_core/ utils/ config/   pipeline libraries & configurations
 examples/                       tiny sample sources for a quick run
-model/                            three BERT classifiers: training code, data, label mappings
-demo/                           CC4Q Workbench: interactive Streamlit demo (see below)
-rqs/                            analysis scripts, results, tables and figures
-doc/                            labeling guideline
+model/                          three BERT classifiers: training code, data, label mappings
+rqs/                            companion study: analysis scripts, results, tables, figures
+exp/                            tool-paper validation: new-SDK corpora stats + label verification
+doc/                            labeling guideline + workbench design document
 ```
 
 ## Quick start
