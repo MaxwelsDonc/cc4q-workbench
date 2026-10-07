@@ -122,7 +122,7 @@ def _quantum_residence(units):
     return {c: dict(sorted(e.items())) for c, e in sorted(table.items())}
 
 
-def _stats(sdk, version, units, sampled, comment_density=None):
+def _stats(sdk, version, units, sampled, comment_density=None, python_files=None):
     """Aggregate stats + distributions over a list of lean units."""
     n = len(units)
     n_quantum = sum(1 for u in units if u["quantum_related"])
@@ -138,6 +138,7 @@ def _stats(sdk, version, units, sampled, comment_density=None):
         "version": version,
         "source": "cc4q-pipeline" if not sampled else "tosem-release",
         "sampled": sampled,
+        "python_files": python_files,
         "files": len({u["file"] for u in units}),
         "ccps": n if sampled else None,  # filled by caller for new SDKs
         "sccus": n,
@@ -190,6 +191,15 @@ def density_for(sdk):
     return compute_comment_density(path, include_dirs)
 
 
+def python_file_count(sdk):
+    """All .py files in the pipeline scope of the pinned checkout."""
+    from repo_metrics import iter_py_files
+
+    _, _, include_dirs = REPO_SOURCES[sdk]
+    path = ensure_clone(sdk)
+    return sum(1 for _ in iter_py_files(path, include_dirs))
+
+
 def build_new_sdk(sdk):
     version = REPO_SOURCES[sdk][1]
     labeled = os.path.join(PROJECT_ROOT, "data", "output", sdk, "labeled",
@@ -200,7 +210,8 @@ def build_new_sdk(sdk):
         raw = json.load(f)
     units = [_lean_unit(u, sdk, version) for u in raw]
     stats = _stats(sdk, version, units, sampled=False,
-                   comment_density=density_for(sdk))
+                   comment_density=density_for(sdk),
+                   python_files=python_file_count(sdk))
     if os.path.exists(ccp_file):
         with open(ccp_file, "r", encoding="utf-8") as f:
             stats["ccps"] = len(json.load(f))
@@ -237,6 +248,7 @@ def build_original_sdks():
     files = {s: set() for s in target_sdks}
     n_total = Counter()
     n_quantum = Counter()
+    max_pair_id = Counter()
     intent_counts = {s: Counter() for s in target_sdks}
     category_counts = {s: Counter() for s in target_sdks}
     ctype_by_entity = {s: {} for s in target_sdks}
@@ -255,6 +267,15 @@ def build_original_sdks():
             unit = _canon_original(record)
             versions.setdefault(sdk, record.get("version", ""))
             n_total[sdk] += 1
+            # SCCU ids are "<pair_id>-<segment_index>"; pair ids are numbered
+            # contiguously per SDK, so the max id is the true CCP count
+            # (a few pairs leave no surviving SCCU after cleaning — the
+            # companion paper totals 9,677 + 1,153 + 1,982 = 12,812 CCPs).
+            try:
+                pair_id = int(str(record.get("id", "")).split("-", 1)[0])
+                max_pair_id[sdk] = max(max_pair_id[sdk], pair_id)
+            except ValueError:
+                pass
             if unit["quantum_related"]:
                 n_quantum[sdk] += 1
             files[sdk].add(unit["file"])
@@ -286,8 +307,9 @@ def build_original_sdks():
             "sampled": True,
             "sample_size": SAMPLE_SIZE,
             "sample_seed": SAMPLE_SEED,
+            "python_files": python_file_count(sdk),
             "files": len(files[sdk]),
-            "ccps": n,
+            "ccps": max_pair_id[sdk],
             "sccus": n,
             "quantum_sccus": n_quantum[sdk],
             "quantum_proportion": round(n_quantum[sdk] / n, 4) if n else 0.0,

@@ -88,12 +88,33 @@ def test_precomputed_data():
         frames[sdk] = df
         if stats.get("sampled"):
             ok = (len(df) == stats.get("sample_size", 2000)
-                  and stats["sccus"] == stats["ccps"] > stats.get("sample_size", 0))
+                  and stats["sccus"] > stats.get("sample_size", 0))
         else:
             ok = (stats["sccus"] > 0 and stats["quantum_sccus"] > 0
                   and len(df) == stats["sccus"])
         check(f"(b) {sdk}: stats/units consistent", ok,
               f"sccus={stats['sccus']} rows={len(df)}")
+
+        # corpus hierarchy: every CCP yields >= 1 SCCU, so ccps < sccus
+        check(f"(b) {sdk}: ccps < sccus",
+              0 < stats["ccps"] < stats["sccus"],
+              f"ccps={stats['ccps']} sccus={stats['sccus']}")
+
+        # python_files is populated; for the pipeline-built SDKs it must also
+        # cover every file referenced by the corpus (the original gold corpus
+        # was built from a slightly different commit of qiskit-ibm-runtime,
+        # so its referenced-file count can exceed the pinned tag's file count)
+        pf = stats.get("python_files") or 0
+        if stats.get("sampled"):
+            ok = pf > 0
+            if stats["files"] > pf:
+                print(f"  [note] {sdk}: corpus references {stats['files']} files "
+                      f"> {pf} .py files in the pinned tag (release-corpus "
+                      f"provenance, tolerated)")
+        else:
+            ok = pf > 0 and pf >= stats["files"]
+        check(f"(b) {sdk}: python_files populated", ok,
+              f"python_files={stats.get('python_files')} files={stats['files']}")
 
         # §2: comment density present and sane
         dens = stats.get("comment_density", {})
@@ -122,6 +143,13 @@ def test_precomputed_data():
         check(f"(b) {sdk}: radar builds with 1 trace",
               isinstance(fig, go.Figure)
               and isinstance(fig.data[0], go.Scatterpolar))
+
+    # original-3 CCP counts derive from the gold file's pair ids and must
+    # sum to the paper's total of 12,812 CCPs
+    original_ccps = sum(manifest["repos"][s]["ccps"]
+                        for s in ("qiskit", "qiskit-aer", "qiskit-ibm-runtime"))
+    check("(b) original-3 CCPs sum == 12,812", original_ccps == 12812,
+          f"got {original_ccps}")
 
     # (§8.4) density spot-check: direct recomputation on the pinned clone
     from repo_metrics import compute_comment_density

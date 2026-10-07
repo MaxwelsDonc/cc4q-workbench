@@ -94,7 +94,8 @@ def render_section1(stats, df):
     st.caption("Build — repository → labeled comment corpus.")
     cols = st.columns(3)
     with cols[0]:
-        metric_card(f"{stats['files']:,}", "Python files")
+        metric_card(f"{stats.get('python_files') or stats['files']:,}",
+                    "Python files")
     with cols[1]:
         metric_card(f"{stats['ccps']:,}", "CCPs")
     with cols[2]:
