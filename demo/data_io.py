@@ -21,6 +21,14 @@ CATEGORY_ORDER = [
     "Quantum circuit model", "Quantum hardware",
     "Quantum software framework", "Others",
 ]
+CATEGORY_SHORT = {
+    "Mathematics for quantum information": "Mathematics",
+    "Quantum algorithms": "Algorithms",
+    "Quantum circuit model": "Circuit model",
+    "Quantum hardware": "Hardware",
+    "Quantum software framework": "Software stack",
+    "Others": "Others",
+}
 ENTITY_ORDER = ["module", "class", "function"]
 CTYPE_ORDER = ["docstring", "block", "inline"]
 
@@ -80,3 +88,32 @@ def ctype_entity_frame(stats):
     ).fillna(0).astype(int)
     frame = frame.reindex(index=ENTITY_ORDER)
     return frame.reindex(columns=CTYPE_ORDER).dropna(axis=1, how="all").fillna(0).astype(int)
+
+
+def quantum_residence_frame(stats):
+    """Quantum SCCU *share* per (entity_level, comment_type).
+
+    Rows = entity levels, columns = comment forms, values = share of all
+    quantum SCCUs (0..1). NaN where the corpus has no such cell.
+    """
+    table = stats.get("quantum_ctype_by_entity", {})
+    counts = pd.DataFrame(
+        {ctype: pd.Series(entities) for ctype, entities in table.items()}
+    )
+    counts = counts.reindex(index=ENTITY_ORDER, columns=CTYPE_ORDER)
+    total = counts.sum().sum()
+    shares = counts / total if total else counts * float("nan")
+    return shares
+
+
+def radar_shares(stats):
+    """Six category shares of quantum SCCUs, in CATEGORY_ORDER."""
+    n_quantum = stats.get("quantum_sccus", 0)
+    counts = stats.get("category_counts", {})
+    if not n_quantum:
+        return [0.0] * len(CATEGORY_ORDER)
+    return [counts.get(k, 0) / n_quantum for k in CATEGORY_ORDER]
+
+
+def radar_labels():
+    return [CATEGORY_SHORT[k] for k in CATEGORY_ORDER]

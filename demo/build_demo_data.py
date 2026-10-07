@@ -9,6 +9,10 @@ Sources
   ``CCPs_final_modified_r2_cleaned_validated.jsonl`` (CCP-level records).
   Per-SDK statistics are computed over the FULL corpus, while the demo keeps
   only a 2,000-row random sample (seed 42) per SDK to stay under ~25 MB.
+* Comment density: recomputed at build time from the pinned repo checkouts
+  under ``data/input/`` (auto-cloned at the pinned tags from
+  ``REPO_SOURCES``), restricted to each pipeline config's ``include_dirs``.
+  Shared definition with live mode: ``demo/repo_metrics.py``.
 
 Both sources are normalised to one lean unit schema (code snippets and line
 numbers are dropped)::
@@ -18,7 +22,7 @@ numbers are dropped)::
 
 Outputs
 -------
-* ``demo/data/manifest.json``  -- per-repo stats + distributions
+* ``demo/data/manifest.json``  -- per-repo stats + distributions + density
 * ``demo/data/units/<sdk>.jsonl`` -- labeled units (one JSON object per line)
 
 Run from the workbench root (with .venv activated):
@@ -29,22 +33,36 @@ Run from the workbench root (with .venv activated):
 import json
 import os
 import random
+import subprocess
 import sys
 from collections import Counter
 
 DEMO_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(DEMO_DIR)
+if DEMO_DIR not in sys.path:
+    sys.path.insert(0, DEMO_DIR)
 DATA_DIR = os.path.join(DEMO_DIR, "data")
 UNITS_DIR = os.path.join(DATA_DIR, "units")
 
 SAMPLE_SIZE = 2000
 SAMPLE_SEED = 42
 
-NEW_SDKS = [
-    ("qiskit-machine-learning", "0.9.1"),
-    ("qiskit-nature", "0.8"),
-    ("qiskit-algorithms", "0.4.0"),
-]
+# sdk -> (clone URL, pinned tag, pipeline include_dirs (None = whole repo))
+REPO_SOURCES = {
+    "qiskit": ("https://github.com/Qiskit/qiskit", "2.1.0", None),
+    "qiskit-aer": ("https://github.com/Qiskit/qiskit-aer", "0.17.2", ["qiskit_aer"]),
+    "qiskit-ibm-runtime": ("https://github.com/Qiskit/qiskit-ibm-runtime",
+                           "0.45.1", ["qiskit_ibm_runtime"]),
+    "qiskit-machine-learning": ("https://github.com/qiskit-community/qiskit-machine-learning",
+                                "0.9.1", ["qiskit_machine_learning"]),
+    "qiskit-nature": ("https://github.com/qiskit-community/qiskit-nature",
+                      "0.8", ["qiskit_nature"]),
+    "qiskit-algorithms": ("https://github.com/qiskit-community/qiskit-algorithms",
+                          "0.4.0", ["qiskit_algorithms"]),
+}
+
+NEW_SDKS = ["qiskit-machine-learning", "qiskit-nature", "qiskit-algorithms"]
+ORIGINAL_SDKS = ["qiskit", "qiskit-aer", "qiskit-ibm-runtime"]
 
 ORIGINAL_GOLD = os.path.join(
     PROJECT_ROOT, "..", "TOSEM paper", "CC4Q_release", "data", "final_data",
@@ -94,7 +112,17 @@ def _lean_unit(unit, sdk, version):
     }
 
 
-def _stats(sdk, version, units, sampled):
+def _quantum_residence(units):
+    """Quantum SCCU counts per (comment_type, entity_level), quantum only."""
+    table = {}
+    for u in units:
+        if not u["quantum_related"]:
+            continue
+        table.setdefault(u["comment_type"], Counter())[u["code_entity_type"]] += 1
+    return {c: dict(sorted(e.items())) for c, e in sorted(table.items())}
+
+
+def _stats(sdk, version, units, sampled, comment_density=None):
     """Aggregate stats + distributions over a list of lean units."""
     n = len(units)
     n_quantum = sum(1 for u in units if u["quantum_related"])
@@ -115,18 +143,55 @@ def _stats(sdk, version, units, sampled):
         "sccus": n,
         "quantum_sccus": n_quantum,
         "quantum_proportion": round(n_quantum / n, 4) if n else 0.0,
+        "comment_density": comment_density or {"comment_lines": 0, "code_lines": 0, "value": 0.0},
         "intent_counts": {k: intent_counts.get(k, 0) for k in INTENT_ORDER},
         "category_counts": {k: category_counts.get(k, 0) for k in CATEGORY_ORDER},
         "ctype_by_entity": {
             ctype: dict(sorted(entities.items()))
             for ctype, entities in sorted(ctype_by_entity.items())
         },
+        "quantum_ctype_by_entity": _quantum_residence(units),
         "comment_type_counts": dict(sorted(Counter(u["comment_type"] for u in units).items())),
         "entity_type_counts": dict(sorted(Counter(u["code_entity_type"] for u in units).items())),
     }
 
 
-def build_new_sdk(sdk, version):
+def ensure_clone(sdk):
+    """Make sure data/input/<sdk> is a checkout of the pinned tag; clone if
+    missing or on the wrong tag (comment density is computed from it)."""
+    url, tag, include_dirs = REPO_SOURCES[sdk]
+    path = os.path.join(PROJECT_ROOT, "data", "input", sdk)
+    current = None
+    if os.path.isdir(os.path.join(path, ".git")):
+        try:
+            current = subprocess.run(
+                ["git", "-C", path, "describe", "--tags", "--exact-match"],
+                capture_output=True, text=True, timeout=30).stdout.strip()
+        except Exception:
+            current = None
+    if current == tag:
+        return path
+    if os.path.exists(path):
+        print(f"  re-cloning {sdk}: found tag {current!r}, need {tag}")
+        subprocess.run(["rm", "-rf", path], check=True)
+    print(f"  cloning {sdk} @ {tag} …")
+    subprocess.run(["git", "clone", "--depth", "1", "--branch", tag, url, path],
+                   check=True)
+    return path
+
+
+def density_for(sdk):
+    """Comment density over the pinned checkout, restricted to the pipeline's
+    include_dirs (whole repo when the config has none)."""
+    from repo_metrics import compute_comment_density
+
+    _, _, include_dirs = REPO_SOURCES[sdk]
+    path = ensure_clone(sdk)
+    return compute_comment_density(path, include_dirs)
+
+
+def build_new_sdk(sdk):
+    version = REPO_SOURCES[sdk][1]
     labeled = os.path.join(PROJECT_ROOT, "data", "output", sdk, "labeled",
                            "sccus_labeled.json")
     ccp_file = os.path.join(PROJECT_ROOT, "data", "output", sdk,
@@ -134,7 +199,8 @@ def build_new_sdk(sdk, version):
     with open(labeled, "r", encoding="utf-8") as f:
         raw = json.load(f)
     units = [_lean_unit(u, sdk, version) for u in raw]
-    stats = _stats(sdk, version, units, sampled=False)
+    stats = _stats(sdk, version, units, sampled=False,
+                   comment_density=density_for(sdk))
     if os.path.exists(ccp_file):
         with open(ccp_file, "r", encoding="utf-8") as f:
             stats["ccps"] = len(json.load(f))
@@ -166,7 +232,7 @@ def build_original_sdks():
     if not os.path.exists(ORIGINAL_GOLD):
         sys.exit(f"Gold corpus not found: {ORIGINAL_GOLD}")
 
-    target_sdks = {"qiskit", "qiskit-aer", "qiskit-ibm-runtime"}
+    target_sdks = set(ORIGINAL_SDKS)
     versions = {}
     files = {s: set() for s in target_sdks}
     n_total = Counter()
@@ -174,6 +240,7 @@ def build_original_sdks():
     intent_counts = {s: Counter() for s in target_sdks}
     category_counts = {s: Counter() for s in target_sdks}
     ctype_by_entity = {s: {} for s in target_sdks}
+    quantum_ctype = {s: {} for s in target_sdks}
     ctype_counts = {s: Counter() for s in target_sdks}
     entity_counts = {s: Counter() for s in target_sdks}
     reservoirs = {s: [] for s in target_sdks}
@@ -195,6 +262,8 @@ def build_original_sdks():
             if unit["quantum_related"] and unit["quantum_category"]:
                 category_counts[sdk][unit["quantum_category"]] += 1
             ctype_by_entity[sdk].setdefault(unit["comment_type"], Counter())[unit["code_entity_type"]] += 1
+            if unit["quantum_related"]:
+                quantum_ctype[sdk].setdefault(unit["comment_type"], Counter())[unit["code_entity_type"]] += 1
             ctype_counts[sdk][unit["comment_type"]] += 1
             entity_counts[sdk][unit["code_entity_type"]] += 1
             # reservoir sampling, seeded
@@ -222,11 +291,16 @@ def build_original_sdks():
             "sccus": n,
             "quantum_sccus": n_quantum[sdk],
             "quantum_proportion": round(n_quantum[sdk] / n, 4) if n else 0.0,
+            "comment_density": density_for(sdk),
             "intent_counts": {k: intent_counts[sdk].get(k, 0) for k in INTENT_ORDER},
             "category_counts": {k: category_counts[sdk].get(k, 0) for k in CATEGORY_ORDER},
             "ctype_by_entity": {
                 c: dict(sorted(e.items()))
                 for c, e in sorted(ctype_by_entity[sdk].items())
+            },
+            "quantum_ctype_by_entity": {
+                c: dict(sorted(e.items()))
+                for c, e in sorted(quantum_ctype[sdk].items())
             },
             "comment_type_counts": dict(sorted(ctype_counts[sdk].items())),
             "entity_type_counts": dict(sorted(entity_counts[sdk].items())),
@@ -244,20 +318,32 @@ def write_units(sdk, units):
     return path
 
 
+def _group_aggregate(manifest, members):
+    sccus = sum(manifest["repos"][s]["sccus"] for s in members)
+    quantum = sum(manifest["repos"][s]["quantum_sccus"] for s in members)
+    return {
+        "sdks": list(members),
+        "sccus": sccus,
+        "quantum_sccus": quantum,
+        "quantum_proportion": round(quantum / sccus, 4) if sccus else 0.0,
+    }
+
+
 def main():
     os.makedirs(UNITS_DIR, exist_ok=True)
     manifest = {"generated_by": "demo/build_demo_data.py",
                 "sample_seed": SAMPLE_SEED, "repos": {}}
     total_units = 0
 
-    for sdk, version in NEW_SDKS:
-        stats, units = build_new_sdk(sdk, version)
+    for sdk in NEW_SDKS:
+        stats, units = build_new_sdk(sdk)
         manifest["repos"][sdk] = stats
         write_units(sdk, units)
         total_units += len(units)
         print(f"[new]     {sdk:28s} files={stats['files']:5d} "
               f"ccps={stats['ccps']:6d} sccus={len(units):6d} "
-              f"quantum={stats['quantum_sccus']:5d}")
+              f"quantum={stats['quantum_sccus']:5d} "
+              f"density={stats['comment_density']['value']:.4f}")
 
     stats_map, units_map = build_original_sdks()
     for sdk in sorted(stats_map):
@@ -268,8 +354,13 @@ def main():
         total_units += len(units)
         print(f"[original] {sdk:28s} files={stats['files']:5d} "
               f"ccps={stats['ccps']:6d} sampled={len(units):6d} "
-              f"quantum={stats['quantum_sccus']:5d}")
+              f"quantum={stats['quantum_sccus']:5d} "
+              f"density={stats['comment_density']['value']:.4f}")
 
+    manifest["groups"] = {
+        "infrastructure": _group_aggregate(manifest, ORIGINAL_SDKS),
+        "application": _group_aggregate(manifest, NEW_SDKS),
+    }
     manifest["total_demo_units"] = total_units
     with open(os.path.join(DATA_DIR, "manifest.json"), "w", encoding="utf-8") as f:
         json.dump(manifest, f, ensure_ascii=False, indent=2)

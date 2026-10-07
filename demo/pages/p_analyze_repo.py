@@ -1,4 +1,4 @@
-"""Page — Analyze Repository: precomputed dashboards + live pipeline."""
+"""Page — Analyze Repository: Build → Inspect → Profile (the hero page)."""
 
 import streamlit as st
 
@@ -12,12 +12,19 @@ from model_cache import checkpoints_missing, get_models, missing_checkpoints_war
 from ui import footer  # noqa: E402
 
 STAGE_NUM = {"Cloning": 1, "Extracting": 2, "Segmenting": 3, "Labeling": 4}
+VALIDATION_TEXT = (
+    "**How trustworthy are the labels?** Live results and the three newest "
+    "SDKs are labeled by the release classifiers (fine-tuned "
+    "`bert-base-uncased`) and marked *model-labeled*. The three original "
+    "SDKs ship a human-validated gold corpus. In a human spot-check of "
+    "**379 SCCUs**, annotators agreed with the model labels **85.0%** of "
+    "the time (companion paper, validation section)."
+)
 
 
 def _render_precomputed(sdk, manifest):
     stats = manifest["repos"][sdk]
     df = data_io.load_units_df(sdk)
-    st.caption(f"**{sdk}** {stats['version']} — precomputed release corpus")
     dashboard.render_dashboard(stats, df)
 
 
@@ -25,7 +32,6 @@ def _render_live(url):
     key = f"live_result:{url.strip()}"
     if key in st.session_state:
         stats, df = st.session_state[key]
-        st.caption(f"**{stats['sdk']}** — analyzed live just now")
         dashboard.render_dashboard(stats, df)
         return
 
@@ -54,24 +60,24 @@ def _render_live(url):
         return
     status.update(label="Done — all 4 stages complete", state="complete")
     st.session_state[key] = (stats, df)
-
-    st.caption(f"**{stats['sdk']}** — analyzed live just now")
     dashboard.render_dashboard(stats, df)
 
 
 def render():
     st.header("Analyze Repository")
     st.write(
-        "Pick one of six precomputed Qiskit-ecosystem SDKs for instant "
-        "results, or paste a GitHub URL to run the full CC4Q pipeline live "
-        "(clone → extract → segment → label). Repos with more than 200 "
-        "Python files are directed to the Dockerized pipeline."
+        "Build a labeled comment corpus from a repository, inspect how much "
+        "quantum knowledge it carries and where it lives, then profile the "
+        "six-category quantum-knowledge distribution. Precomputed results for "
+        "six Qiskit-ecosystem SDKs render instantly; live mode runs the full "
+        "pipeline on any small GitHub repo (≤200 Python files)."
     )
 
     manifest = data_io.load_manifest()
     options = data_io.repo_options(manifest)
     sdk_labels = {label: sdk for sdk, label in options}
     labels = list(sdk_labels)
+    sdks_in_order = [sdk_labels[l] for l in labels]
 
     tab_pre, tab_live = st.tabs(["Precomputed SDKs", "Live repository"])
 
@@ -95,9 +101,7 @@ def render():
 
     st.divider()
     st.subheader("Compare mode")
-    st.caption("Pick two SDKs side by side — e.g. an infrastructure SDK "
-               "against an application-level one.")
-    sdks_in_order = [sdk_labels[l] for l in labels]
+    manifest_for_compare = manifest
 
     def _index(preferred):
         return sdks_in_order.index(preferred) if preferred in sdks_in_order else 0
@@ -108,7 +112,11 @@ def render():
     with c2:
         b = st.selectbox("SDK B", labels, index=_index("qiskit-machine-learning"))
     dashboard.render_compare(manifest["repos"][sdk_labels[a]],
-                             manifest["repos"][sdk_labels[b]])
+                             manifest["repos"][sdk_labels[b]],
+                             manifest_for_compare)
+
+    with st.expander("About the labels · human verification"):
+        st.markdown(VALIDATION_TEXT)
 
     footer()
 

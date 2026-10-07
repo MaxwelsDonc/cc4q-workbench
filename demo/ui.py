@@ -22,14 +22,16 @@ INTENT_COLORS = {
     "Why": "#DB2777",
     "Others": "#6B7280",
 }
+# Fixed colorblind-aware palette (design doc §6).
 CATEGORY_COLORS = {
-    "Mathematics for quantum information": "#7C3AED",
-    "Quantum algorithms": "#2563EB",
-    "Quantum circuit model": "#0891B2",
-    "Quantum hardware": "#B45309",
-    "Quantum software framework": "#6C3FC5",
-    "Others": "#6B7280",
+    "Mathematics for quantum information": "#1f77b4",
+    "Quantum algorithms": "#d62728",
+    "Quantum circuit model": "#6C3FC5",
+    "Quantum hardware": "#2ca02c",
+    "Quantum software framework": "#ff7f0e",
+    "Others": "#7f7f7f",
 }
+NON_QUANTUM_GRAY = "#9E9E9E"
 
 
 def apply_theme():
@@ -90,6 +92,23 @@ def apply_theme():
         .cc4q-chip.solid { color: white; }
         .cc4q-chip.outline { background: white; border: 1.5px solid; }
         .cc4q-chip.dim { background: #F1F0F7; color: #6A6390; border: 1px solid #DDD8EE; }
+        .cc4q-chip.big {
+            font-size: 0.92rem; padding: 4px 16px; font-weight: 700;
+            box-shadow: 0 1px 2px rgba(76, 42, 133, 0.25);
+        }
+        .cc4q-chip.nonquantum {
+            background: white; color: #757575; border: 1.5px dashed #9E9E9E;
+        }
+        .cc4q-intent {
+            color: #9A93BE; font-size: 0.76rem; font-weight: 500;
+        }
+        .cc4q-summary {
+            background: linear-gradient(90deg, #F2EDFC 0%, #E9E2FA 100%);
+            border: 1px solid #DCD2F3; border-radius: 12px;
+            padding: 12px 18px; margin-bottom: 14px;
+            color: #3A2A6B; font-size: 1.02rem; font-weight: 600;
+        }
+        .cc4q-summary b { color: #6C3FC5; font-size: 1.15rem; }
         .cc4q-footer {
             margin-top: 48px; padding-top: 18px; border-top: 1px solid #E0DBF2;
             color: #857FAC; font-size: 0.9rem; text-align: center;
@@ -119,14 +138,19 @@ def _chip(text, color=None, solid=False, dim=False):
 
 
 def unit_card(text, comment_type, entity_type, quantum, intent, category):
-    """Render one labeled comment unit as a card with badge chips."""
+    """Render one labeled comment unit as a card with badge hierarchy:
+    1. quantum badge (largest), 2. category chip, 3. intent (small gray)."""
     if quantum:
-        chips = _chip("✓ quantum", color=PRIMARY, solid=True)
+        chips = (f'<span class="cc4q-chip solid big" '
+                 f'style="background:{PRIMARY};border-color:{PRIMARY};">'
+                 f'✓ quantum</span>')
     else:
-        chips = _chip("✗ non-quantum", dim=True)
-    chips += _chip(f"intent · {intent}", color=INTENT_COLORS.get(intent, "#6B7280"))
+        chips = ('<span class="cc4q-chip big nonquantum">'
+                 '✗ non-quantum</span>')
     if quantum and category:
-        chips += _chip(category, color=CATEGORY_COLORS.get(category, PRIMARY))
+        color = CATEGORY_COLORS.get(category, PRIMARY)
+        chips += _chip(category, color=color)
+    chips += f'<span class="cc4q-intent">intent · {html.escape(intent)}</span>'
     meta = f'<span class="cc4q-entity">{html.escape(comment_type)} · {html.escape(entity_type)}</span>'
     st.markdown(
         f'<div class="cc4q-unit-card"><div class="text">{html.escape(text)}</div>'
@@ -135,11 +159,24 @@ def unit_card(text, comment_type, entity_type, quantum, intent, category):
     )
 
 
+def summary_strip(n_units, n_quantum):
+    """'N units · M quantum-related (P%)' strip (no intent)."""
+    pct = f"{100 * n_quantum / n_units:.1f}%" if n_units else "0.0%"
+    st.markdown(
+        f'<div class="cc4q-summary"><b>{n_units}</b> units · '
+        f'<b>{n_quantum}</b> quantum-related ({pct})</div>',
+        unsafe_allow_html=True,
+    )
+
+
 def footer():
     st.markdown(
         '<div class="cc4q-footer">CC4Q Workbench · '
         '<a href="https://www.buaa.edu.cn">Beihang University</a> · '
-        '<a href="https://github.com/MaxwelsDonc/cc4q-workbench">GitHub</a></div>',
+        'Released under the MIT License · '
+        '<a href="https://github.com/MaxwelsDonc/cc4q-workbench">GitHub</a> · '
+        '<a href="https://github.com/MaxwelsDonc/cc4q-workbench/releases">Releases</a>'
+        '</div>',
         unsafe_allow_html=True,
     )
 

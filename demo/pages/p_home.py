@@ -1,4 +1,4 @@
-"""Page — Home: positioning, product metrics, entry cards."""
+"""Page — Home: positioning, numbers, workflow strip, entry points."""
 
 import streamlit as st
 
@@ -9,6 +9,10 @@ boot()
 from ui import footer, metric_card  # noqa: E402
 
 GITHUB_URL = "https://github.com/MaxwelsDonc/cc4q-workbench"
+PAPER_CITATION = ('"Code Comments for Quantum Software Development Kits: '
+                  'An Empirical Study on Qiskit" — ACM Transactions on '
+                  'Software Engineering and Methodology (TOSEM), accepted.')
+DEMO_VIDEO_URL = "https://github.com/MaxwelsDonc/cc4q-workbench#demo-video"
 
 
 def render():
@@ -16,19 +20,30 @@ def render():
         """
         <div class="cc4q-hero">
             <h1>⚛ CC4Q Workbench</h1>
-            <p>Paste a quantum SDK, get a labeled comment corpus.</p>
+            <p>From quantum code to labeled comment corpora:
+               build, inspect, profile.</p>
         </div>
         """,
         unsafe_allow_html=True,
     )
 
+    b1, b2, b3 = st.columns([1, 1, 3])
+    with b1:
+        st.link_button("GitHub repository", GITHUB_URL, type="primary",
+                       use_container_width=True)
+    with b2:
+        st.link_button("▶ Demo video (placeholder)", DEMO_VIDEO_URL,
+                       use_container_width=True)
+    with b3:
+        with st.popover("Companion paper — citation"):
+            st.markdown(PAPER_CITATION)
+
     st.markdown(
-        "CC4Q turns raw Python source from quantum SDKs into **SCCUs** — "
-        "sentence-level comment code units — each labeled on three axes: "
-        "quantum-relatedness, developer intent, and quantum category. "
-        "The workbench wraps the full CC4Q pipeline "
-        "(comment-pair extraction → semantic segmentation → three-axis BERT "
-        "classification) behind a point-and-click interface."
+        "CC4Q Workbench turns any Python-based quantum SDK repository into a "
+        "labeled code-comment corpus (CCPs → SCCUs with three-axis labels), "
+        "then provides quantum-centric analyses of that corpus. The quantum "
+        "axis — binary quantum-relatedness plus the six-category "
+        "quantum-knowledge taxonomy — is the protagonist of every page."
     )
 
     cols = st.columns(3)
@@ -40,31 +55,37 @@ def render():
         metric_card("3", "Label axes per unit")
 
     st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
-    st.subheader("Start here")
+    st.subheader("One workflow, three verbs")
 
     entries = [
-        ("pages/p_analyze_code.py", "🧪 Analyze Code",
-         "Paste any Python snippet and watch each comment get labeled "
-         "quantum vs non-quantum, with its developer intent and quantum "
-         "category — in seconds, on CPU."),
-        ("pages/p_analyze_repo.py", "🗂️ Analyze Repository",
-         "Pick one of six precomputed Qiskit-ecosystem SDKs for instant "
-         "dashboards, or point the workbench at a new GitHub repo and run "
-         "the full pipeline live. Compare SDKs side by side."),
-        ("pages/p_explore.py", "🔎 Explore Corpus",
-         "Browse, filter and download the labeled corpus: full SCCUs from "
-         "the three newest SDKs plus seeded samples from the three "
-         "original ones."),
+        ("🛠️ Build", "pages/p_analyze_repo.py", "Analyze Repository",
+         "Repository → labeled comment corpus: clone, extract comment pairs, "
+         "segment into SCCUs, label on three axes. Precomputed for six SDKs; "
+         "live for any small GitHub repo."),
+        ("🔍 Inspect", "pages/p_analyze_code.py", "Analyze Code",
+         "Quantum-density health check at unit level: paste a snippet and see "
+         "which comments carry quantum knowledge, and where."),
+        ("📡 Profile", "pages/p_analyze_repo.py", "Analyze Repository",
+         "Six-category quantum-knowledge profile of an SDK — what kind of "
+         "quantum knowledge its comments explain — comparable across SDKs."),
     ]
     cols = st.columns(3)
-    for col, (target, title, blurb) in zip(cols, entries):
+    for col, (title, target, page_name, blurb) in zip(cols, entries):
         with col:
             st.markdown(
                 f'<div class="cc4q-card"><h3>{title}</h3><p>{blurb}</p></div>',
                 unsafe_allow_html=True,
             )
-            st.page_link(target, label=f"Open {title[2:].strip()} →",
+            st.page_link(target, label=f"Open {page_name} →",
                          use_container_width=True)
+
+    st.info(
+        "**Honest output.** Corpora produced by the release classifiers are "
+        "always marked as model-labeled. A human spot-check of **379 SCCUs** "
+        "agreed with the model labels **85.0%** of the time; the three "
+        "original SDKs ship a human-validated gold corpus.",
+        icon="✅",
+    )
 
     footer()
 

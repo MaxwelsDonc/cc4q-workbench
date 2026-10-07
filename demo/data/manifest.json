@@ -12,6 +12,11 @@
       "sccus": 3140,
       "quantum_sccus": 704,
       "quantum_proportion": 0.2242,
+      "comment_density": {
+        "comment_lines": 2450,
+        "code_lines": 14281,
+        "value": 0.1716
+      },
       "intent_counts": {
         "What": 1735,
         "How-to-use": 165,
@@ -45,6 +50,22 @@
           "module": 1
         }
       },
+      "quantum_ctype_by_entity": {
+        "block": {
+          "class": 1,
+          "function": 146,
+          "module": 7
+        },
+        "docstring": {
+          "class": 131,
+          "function": 330,
+          "module": 85
+        },
+        "inline": {
+          "class": 1,
+          "function": 3
+        }
+      },
       "comment_type_counts": {
         "block": 842,
         "docstring": 2153,
@@ -66,6 +87,11 @@
       "sccus": 4842,
       "quantum_sccus": 1379,
       "quantum_proportion": 0.2848,
+      "comment_density": {
+        "comment_lines": 3023,
+        "code_lines": 23902,
+        "value": 0.1265
+      },
       "intent_counts": {
         "What": 2639,
         "How-to-use": 312,
@@ -99,6 +125,22 @@
           "module": 19
         }
       },
+      "quantum_ctype_by_entity": {
+        "block": {
+          "class": 9,
+          "function": 171,
+          "module": 11
+        },
+        "docstring": {
+          "class": 309,
+          "function": 691,
+          "module": 181
+        },
+        "inline": {
+          "function": 4,
+          "module": 3
+        }
+      },
       "comment_type_counts": {
         "block": 959,
         "docstring": 3723,
@@ -120,6 +162,11 @@
       "sccus": 3535,
       "quantum_sccus": 915,
       "quantum_proportion": 0.2588,
+      "comment_density": {
+        "comment_lines": 2612,
+        "code_lines": 16829,
+        "value": 0.1552
+      },
       "intent_counts": {
         "What": 1945,
         "How-to-use": 156,
@@ -153,6 +200,21 @@
           "module": 2
         }
       },
+      "quantum_ctype_by_entity": {
+        "block": {
+          "class": 4,
+          "function": 146,
+          "module": 3
+        },
+        "docstring": {
+          "class": 196,
+          "function": 454,
+          "module": 104
+        },
+        "inline": {
+          "function": 8
+        }
+      },
       "comment_type_counts": {
         "block": 780,
         "docstring": 2567,
@@ -176,6 +238,11 @@
       "sccus": 21970,
       "quantum_sccus": 7778,
       "quantum_proportion": 0.354,
+      "comment_density": {
+        "comment_lines": 26128,
+        "code_lines": 245537,
+        "value": 0.1064
+      },
       "intent_counts": {
         "What": 11537,
         "How-to-use": 1680,
@@ -209,6 +276,23 @@
           "module": 38
         }
       },
+      "quantum_ctype_by_entity": {
+        "block": {
+          "class": 25,
+          "function": 1322,
+          "module": 296
+        },
+        "docstring": {
+          "class": 1181,
+          "function": 4255,
+          "module": 641
+        },
+        "inline": {
+          "class": 3,
+          "function": 54,
+          "module": 1
+        }
+      },
       "comment_type_counts": {
         "block": 5387,
         "docstring": 16134,
@@ -232,6 +316,11 @@
       "sccus": 2368,
       "quantum_sccus": 961,
       "quantum_proportion": 0.4058,
+      "comment_density": {
+        "comment_lines": 1499,
+        "code_lines": 13177,
+        "value": 0.1138
+      },
       "intent_counts": {
         "What": 1318,
         "How-to-use": 209,
@@ -265,6 +354,21 @@
           "module": 1
         }
       },
+      "quantum_ctype_by_entity": {
+        "block": {
+          "class": 3,
+          "function": 170,
+          "module": 6
+        },
+        "docstring": {
+          "class": 184,
+          "function": 520,
+          "module": 72
+        },
+        "inline": {
+          "function": 6
+        }
+      },
       "comment_type_counts": {
         "block": 583,
         "docstring": 1719,
@@ -288,6 +392,11 @@
       "sccus": 3738,
       "quantum_sccus": 878,
       "quantum_proportion": 0.2349,
+      "comment_density": {
+        "comment_lines": 3486,
+        "code_lines": 16587,
+        "value": 0.2102
+      },
       "intent_counts": {
         "What": 2129,
         "How-to-use": 191,
@@ -321,6 +430,22 @@
           "module": 34
         }
       },
+      "quantum_ctype_by_entity": {
+        "block": {
+          "class": 1,
+          "function": 107,
+          "module": 5
+        },
+        "docstring": {
+          "class": 239,
+          "function": 314,
+          "module": 202
+        },
+        "inline": {
+          "function": 6,
+          "module": 4
+        }
+      },
       "comment_type_counts": {
         "block": 755,
         "docstring": 2734,
@@ -331,6 +456,28 @@
         "function": 2527,
         "module": 703
       }
+    }
+  },
+  "groups": {
+    "infrastructure": {
+      "sdks": [
+        "qiskit",
+        "qiskit-aer",
+        "qiskit-ibm-runtime"
+      ],
+      "sccus": 28076,
+      "quantum_sccus": 9617,
+      "quantum_proportion": 0.3425
+    },
+    "application": {
+      "sdks": [
+        "qiskit-machine-learning",
+        "qiskit-nature",
+        "qiskit-algorithms"
+      ],
+      "sccus": 11517,
+      "quantum_sccus": 2998,
+      "quantum_proportion": 0.2603
     }
   },
   "total_demo_units": 17517

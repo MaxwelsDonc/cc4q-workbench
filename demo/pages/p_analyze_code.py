@@ -8,20 +8,14 @@ boot()
 
 import cc4q_analysis as analysis  # noqa: E402
 from model_cache import checkpoints_missing, get_models, missing_checkpoints_warning  # noqa: E402
-from ui import footer, metric_card, unit_card  # noqa: E402
+from ui import footer, summary_strip, unit_card  # noqa: E402
 
 
 def _results(units, fallback):
     n_quantum = sum(1 for u in units if u.get("quantum_related"))
-    cols = st.columns(3)
-    with cols[0]:
-        metric_card(str(len(units)), "Comment units")
-    with cols[1]:
-        metric_card(str(n_quantum), "Quantum-related")
-    with cols[2]:
-        metric_card("raw text" if fallback else "code", "Analysis mode")
+    summary_strip(len(units), n_quantum)
     if fallback:
-        st.caption("Fallback mode: input classified line by line without "
+        st.caption("Raw-text mode: input classified line by line without "
                    "code-comment extraction.")
 
     st.markdown("#### Labeled units")
@@ -49,8 +43,10 @@ def render():
 
     with left:
         code = st.text_area("Python source", value=analysis.QISKIT_SNIPPET,
-                            height=380, label_visibility="collapsed")
+                            height=360, label_visibility="collapsed")
         st.caption("Prefilled: a minimal Qiskit Bell-state circuit.")
+        force_raw = st.checkbox("Analyze as raw comment text "
+                                "(skip code parsing; classify each non-empty line)")
         run = st.button("Analyze", type="primary", use_container_width=True,
                         disabled=no_models)
 
@@ -64,10 +60,18 @@ def render():
                     "snippet. Classifiers load lazily on first run (CPU).")
             return
 
-        with st.spinner("Loading the three BERT classifiers (first run only)…"):
+        with st.spinner("Loading classifiers (first run takes a few seconds)"):
             models = get_models()
-        with st.spinner("Extracting, segmenting and classifying comments…"):
-            units, parse_error, fallback = analysis.analyze_code(code, models=models)
+
+        if force_raw:
+            units = analysis.raw_text_units(code)
+            parse_error, fallback = None, True
+            if units:
+                with st.spinner("Classifying…"):
+                    analysis.classify_units(units, models)
+        else:
+            with st.spinner("Extracting, segmenting and classifying…"):
+                units, parse_error, fallback = analysis.analyze_code(code, models=models)
 
         if parse_error:
             st.warning(parse_error + " Falling back to line-by-line classification.")

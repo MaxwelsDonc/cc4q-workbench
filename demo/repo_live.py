@@ -25,6 +25,7 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 from cc4q_analysis import classify_sccu_records  # noqa: E402
+from repo_metrics import compute_comment_density, quantum_residence  # noqa: E402
 
 MAX_PY_FILES = 200
 CLONE_TIMEOUT = 180
@@ -137,12 +138,14 @@ def analyze_live_repo(url, models, progress=None):
             progress("Labeling")
         if records:
             classify_sccu_records(records, models)
-        return _build_result(repo_name, n_py, n_ccps, records)
+        density = compute_comment_density(repo_dir)  # whole cloned repo
+        return _build_result(repo_name, n_py, n_ccps, records,
+                             comment_density=density)
     finally:
         shutil.rmtree(workdir, ignore_errors=True)
 
 
-def _build_result(repo_name, n_py, n_ccps, records):
+def _build_result(repo_name, n_py, n_ccps, records, comment_density=None):
     rows = []
     for r in records:
         rows.append({
@@ -176,10 +179,12 @@ def _build_result(repo_name, n_py, n_ccps, records):
         "sccus": n,
         "quantum_sccus": n_quantum,
         "quantum_proportion": round(n_quantum / n, 4) if n else 0.0,
+        "comment_density": comment_density or {"comment_lines": 0, "code_lines": 0, "value": 0.0},
         "intent_counts": (df["developer_intent"].value_counts().to_dict() if n else {}),
         "category_counts": (df[df["quantum_related"]]["quantum_category"]
                             .value_counts().to_dict() if n else {}),
         "ctype_by_entity": ctype_by_entity,
+        "quantum_ctype_by_entity": quantum_residence(rows),
         "comment_type_counts": (df["comment_type"].value_counts().to_dict() if n else {}),
         "entity_type_counts": (df["code_entity_type"].value_counts().to_dict() if n else {}),
     }

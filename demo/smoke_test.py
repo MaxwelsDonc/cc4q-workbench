@@ -1,4 +1,4 @@
-"""Smoke tests for the CC4Q Workbench demo.
+"""Smoke tests for the CC4Q Workbench demo (design doc §8).
 
 Run from the workbench root (with .venv activated):
 
@@ -6,11 +6,18 @@ Run from the workbench root (with .venv activated):
     python demo/smoke_test.py --models   # also run the BERT classifiers
     python demo/smoke_test.py --app      # also run AppTest page rendering
 
-Checks:
-  (a) Analyze Code pipeline produces clean labels on the default snippet
-  (b) Precomputed repo dashboard data renders for all 6 repos
-  (c) Compare-mode aggregation works
-  (d) Explore filters return rows
+Acceptance criteria covered:
+  1. --app passes; headless HTTP 200 on all four pages (checked separately
+     by the operator / CI with `streamlit run` + curl)
+  2. Precomputed dashboards for all six SDKs render §1-§3 + compare without
+     model checkpoints (this file never loads models for (b)-(d))
+  3. Live mode: covered by manual E2E (small repo completes 4 stages;
+     >200-file repo refused) — helpers tested here
+  4. Density values in §2 match a direct recomputation on the cloned repos
+  5. Compare aggregates reproduce the infra-vs-application gap
+     (Quantum % 34.3 vs 26.0)
+  6. No developer-intent charts anywhere (dashboard.py must not mention
+     intent); intent survives only as card badge + collapsed Explore filter
 """
 
 import os
@@ -61,6 +68,10 @@ def test_snippet_pipeline(with_models):
 
 
 def test_precomputed_data():
+    import pandas as pd
+    import plotly.graph_objects as go
+
+    import dashboard
     import data_io
 
     manifest = data_io.load_manifest()
@@ -69,10 +80,6 @@ def test_precomputed_data():
     expected = {"qiskit", "qiskit-aer", "qiskit-ibm-runtime",
                 "qiskit-machine-learning", "qiskit-nature", "qiskit-algorithms"}
     check("(b) expected SDK set", set(repos) == expected, str(set(repos) ^ expected))
-
-    import dashboard
-    import pandas as pd
-    import plotly.graph_objects as go
 
     frames = {}
     for sdk in repos:
@@ -87,31 +94,82 @@ def test_precomputed_data():
                   and len(df) == stats["sccus"])
         check(f"(b) {sdk}: stats/units consistent", ok,
               f"sccus={stats['sccus']} rows={len(df)}")
-        ctype_entity = data_io.ctype_entity_frame(stats)
-        check(f"(b) {sdk}: type×entity table non-empty", not ctype_entity.empty)
-        intent_frame = data_io.distribution_frame([stats], "intent_counts",
-                                                  data_io.INTENT_ORDER)
-        fig = go.Figure()
-        fig.add_bar(x=intent_frame.index, y=intent_frame[sdk])
-        dashboard.plotly_layout(fig)
-        check(f"(b) {sdk}: plotly figure builds", len(fig.data) == 1)
 
-    # (c) compare mode
+        # §2: comment density present and sane
+        dens = stats.get("comment_density", {})
+        check(f"(b) {sdk}: density present",
+              dens.get("comment_lines", 0) > 0 and dens.get("code_lines", 0) > 0
+              and 0 < dens.get("value", 0) < 1,
+              str(dens))
+
+        # §2: quantum residence table sums to quantum SCCUs
+        res = stats.get("quantum_ctype_by_entity", {})
+        res_total = sum(sum(e.values()) for e in res.values())
+        check(f"(b) {sdk}: quantum residence sums to quantum SCCUs",
+              res_total == stats["quantum_sccus"],
+              f"{res_total} vs {stats['quantum_sccus']}")
+        shares = data_io.quantum_residence_frame(stats)
+        check(f"(b) {sdk}: residence frame 3xN",
+              shares.shape[0] == 3 and shares.shape[1] >= 1)
+
+        # §1/§3 charts build
+        fig = dashboard._type_entity_chart(stats)
+        check(f"(b) {sdk}: type×entity figure builds", len(fig.data) >= 1)
+        fig = dashboard._quantum_residence_heatmap(stats)
+        check(f"(b) {sdk}: residence heatmap builds",
+              isinstance(fig, go.Figure) and len(fig.data) == 1)
+        fig = dashboard._radar_figure([(sdk, stats)], title="test")
+        check(f"(b) {sdk}: radar builds with 1 trace",
+              isinstance(fig, go.Figure)
+              and isinstance(fig.data[0], go.Scatterpolar))
+
+    # (§8.4) density spot-check: direct recomputation on the pinned clone
+    from repo_metrics import compute_comment_density
+    sdk = "qiskit-machine-learning"
+    clone = os.path.join(PROJECT_ROOT, "data", "input", sdk)
+    if os.path.isdir(clone):
+        direct = compute_comment_density(clone, ["qiskit_machine_learning"])
+        stored = manifest["repos"][sdk]["comment_density"]
+        check("(4) density matches direct recomputation",
+              direct["comment_lines"] == stored["comment_lines"]
+              and direct["code_lines"] == stored["code_lines"],
+              f"direct={direct} stored={stored}")
+    else:
+        check("(4) density matches direct recomputation", False,
+              f"clone missing at {clone}")
+
+    # (§8.5) group aggregates: infrastructure 34.3% vs application 26.0%
+    groups = manifest.get("groups", {})
+    infra = groups.get("infrastructure", {}).get("quantum_proportion")
+    app = groups.get("application", {}).get("quantum_proportion")
+    check("(5) infrastructure aggregate ≈ 34.3%", infra is not None
+          and abs(infra - 0.343) < 0.001, str(infra))
+    check("(5) application aggregate ≈ 26.0%", app is not None
+          and abs(app - 0.260) < 0.001, str(app))
+
+    # (§8.6) no intent charts anywhere: dashboard must not touch intent data
+    with open(os.path.join(DEMO_DIR, "dashboard.py")) as f:
+        dashboard_src = f.read()
+    check("(6) dashboard.py has no intent analysis",
+          "intent_counts" not in dashboard_src
+          and "INTENT_ORDER" not in dashboard_src)
+
+    # (c) compare mode: overlaid radar + aggregates
     a = manifest["repos"]["qiskit"]
     b = manifest["repos"]["qiskit-machine-learning"]
-    pair = data_io.distribution_frame([a, b], "intent_counts",
-                                      data_io.INTENT_ORDER)
-    check("(c) compare frame has both SDKs",
-          list(pair.columns) == ["qiskit", "qiskit-machine-learning"],
-          str(list(pair.columns)))
+    fig = dashboard._radar_figure([(a["sdk"], a), (b["sdk"], b)], title="test")
+    check("(c) compare radar overlays 2 traces", len(fig.data) == 2)
     check("(c) quantum proportion differs across SDKs",
           a["quantum_proportion"] != b["quantum_proportion"])
 
-    # (d) explore filters
+    # (d) explore corpus + default quantum-only logic
     all_df = pd.concat(frames.values(), ignore_index=True)
     check("(d) explore corpus row count",
           len(all_df) == manifest["total_demo_units"],
           f"{len(all_df)} vs {manifest['total_demo_units']}")
+    q_only = all_df[all_df["quantum_related"]]
+    check("(d) quantum-only default has rows", 0 < len(q_only) < len(all_df),
+          f"{len(q_only)} of {len(all_df)}")
     kw = all_df[all_df["comment_text"].str.contains("entangle", case=False,
                                                     na=False)]
     check("(d) keyword filter returns rows", len(kw) > 0, f"got {len(kw)}")
@@ -131,47 +189,74 @@ def test_app_rendering():
     at.run()
     check("app boots to Home", not at.exception, str(at.exception))
     hero = next((m.value for m in at.markdown
-                 if "labeled comment corpus" in (m.value or "")), None)
-    check("home hero renders", hero is not None)
+                 if "build, inspect, profile" in (m.value or "")), None)
+    check("home hero renders new one-liner", hero is not None)
+    all_md = "\n".join(m.value or "" for m in at.markdown)
+    check("home workflow strip renders",
+          all(k in all_md for k in ("Build", "Inspect", "Profile")))
+    check("home honesty note (379 / 85.0%)",
+          any("379" in (i.value or "") and "85.0%" in (i.value or "")
+              for i in at.info))
 
-    # Page 2: Analyze Code — click Analyze and verify labeled unit cards.
+    # Page 2: Analyze Code — click Analyze and verify summary strip + cards.
     at.switch_page("pages/p_analyze_code.py").run()
     check("page renders: analyze-code", not at.exception, str(at.exception))
     if not at.exception and at.button:
         at.button[0].click().run()
         ok = (not at.exception
-              and any("Labeled units" in (m.value or "") for m in at.markdown)
+              and any("quantum-related" in (m.value or "") for m in at.markdown)
               and any("✓ quantum" in (m.value or "") for m in at.markdown))
-        check("analyze-code: Analyze labels default snippet", ok,
+        check("analyze-code: summary strip + quantum badges", ok,
               str(at.exception))
 
-    # Page 3: Analyze Repository — precomputed dashboard + compare mode.
+    # Page 3: Analyze Repository — §1-§3 sections + compare.
     at.switch_page("pages/p_analyze_repo.py").run()
     check("page renders: analyze-repository", not at.exception, str(at.exception))
     if not at.exception:
-        check("repo dashboard: metric cards",
-              any("Quantum-related" in (m.value or "") for m in at.markdown))
+        subheaders = [s.value for s in at.subheader]
+        check("repo: §1 Corpus Built section", any("Corpus Built" in s for s in subheaders))
+        check("repo: §2 Quantum Density Check section",
+              any("Quantum Density Check" in s for s in subheaders))
+        check("repo: §3 Knowledge Profile section",
+              any("Knowledge Profile" in s for s in subheaders))
+        check("repo: density metric shown",
+              any("Comment density" in (m.value or "") for m in at.markdown))
+        check("repo: quantum % metric shown",
+              any("Quantum % of SCCUs" in (m.value or "") for m in at.markdown))
+        check("repo: validation expander text",
+              any("379" in (m.value or "") and "85.0%" in (m.value or "")
+                  for m in at.markdown))
         labels = [o for sb in at.selectbox for o in sb.options]
-        check("repo dashboard: 6 precomputed SDKs",
+        check("repo: 6 precomputed SDKs",
               any("qiskit (" in o for o in labels)
               and any("qiskit-nature" in o for o in labels))
-        # switch the precomputed SDK and re-render
         sb = at.selectbox[0]
         other = next(o for o in sb.options if o.startswith("qiskit-nature"))
         sb.set_value(other).run()
-        check("repo dashboard: second SDK renders", not at.exception,
-              str(at.exception))
-        check("compare mode: side-by-side metrics",
-              not at.exception
-              and sum(1 for m in at.markdown
-                      if "Quantum %" in (m.value or "")) == 2,
-              "expected 2 compare metric cards")
+        check("repo: second SDK renders", not at.exception, str(at.exception))
+        all_md = "\n".join(m.value or "" for m in at.markdown)
+        check("compare: group aggregates (infra vs application)",
+              "Group aggregates" in all_md
+              and "Infrastructure SDKs" in all_md
+              and "Application SDKs" in all_md)
 
-    # Page 4: Explore Corpus — filters + paginated table.
+    # Page 4: Explore Corpus — quantum-only default + keyword filter.
     at.switch_page("pages/p_explore.py").run()
     check("page renders: explore-corpus", not at.exception, str(at.exception))
     if not at.exception:
-        check("explore: dataframe renders", len(at.dataframe) > 0)
+        check("explore: quantum-only toggle exists (default off)",
+              len(at.toggle) == 1 and at.toggle[0].value is False)
+        caption_before = next((c.value for c in at.caption
+                               if "units match" in (c.value or "")), "")
+        n_before = int(caption_before.split()[0].replace(",", ""))
+        check("explore: default view is quantum-only",
+              0 < n_before < 17517, caption_before)
+        at.toggle[0].set_value(True).run()
+        caption_after = next((c.value for c in at.caption
+                              if "units match" in (c.value or "")), "")
+        n_after = int(caption_after.split()[0].replace(",", ""))
+        check("explore: toggle adds non-quantum rows", n_after > n_before,
+              f"{n_before} -> {n_after}")
         if at.text_input:
             at.text_input[0].set_value("entangle").run()
             ok = (not at.exception and len(at.dataframe) > 0

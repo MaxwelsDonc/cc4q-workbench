@@ -1,4 +1,4 @@
-"""Page — Explore Corpus: filters + paginated table over all labeled units."""
+"""Page — Explore Corpus: filters + paginated table over labeled SCCUs."""
 
 import streamlit as st
 
@@ -11,15 +11,10 @@ from ui import footer  # noqa: E402
 
 
 def _filter_frame(df):
+    include_nonquantum = st.toggle("Include non-quantum units", value=False)
     with st.expander("Filters", expanded=True):
         c1, c2, c3 = st.columns(3)
         with c1:
-            sdks = st.multiselect("SDK", sorted(df["sdk"].unique()),
-                                  default=sorted(df["sdk"].unique()))
-            intents = st.multiselect("Developer intent",
-                                     data_io.INTENT_ORDER,
-                                     default=[])
-        with c2:
             cats = st.multiselect("Quantum category", data_io.CATEGORY_ORDER,
                                   default=[])
             entity_choices = [e for e in data_io.ENTITY_ORDER
@@ -27,28 +22,35 @@ def _filter_frame(df):
                              sorted(df["code_entity_type"].unique())
             entities = st.multiselect("Code entity level", entity_choices,
                                       default=[])
-        with c3:
+        with c2:
             ctype_choices = [c for c in data_io.CTYPE_ORDER
                              if c in set(df["comment_type"])] or \
                             sorted(df["comment_type"].unique())
-            ctypes = st.multiselect("Comment type", ctype_choices, default=[])
+            ctypes = st.multiselect("Comment form", ctype_choices, default=[])
+            sdks = st.multiselect("SDK", sorted(df["sdk"].unique()),
+                                  default=sorted(df["sdk"].unique()))
+        with c3:
             keyword = st.text_input("Keyword search (comment text)",
                                     placeholder="e.g. entangle, backend, VQE")
 
-    out = df
-    if sdks:
-        out = out[out["sdk"].isin(sdks)]
-    if intents:
-        out = out[out["developer_intent"].isin(intents)]
+    with st.expander("More filters"):
+        intents = st.multiselect("Developer intent", data_io.INTENT_ORDER,
+                                 default=[])
+
+    out = df if include_nonquantum else df[df["quantum_related"]]
     if cats:
         out = out[out["quantum_category"].isin(cats)]
     if entities:
         out = out[out["code_entity_type"].isin(entities)]
     if ctypes:
         out = out[out["comment_type"].isin(ctypes)]
+    if sdks:
+        out = out[out["sdk"].isin(sdks)]
     if keyword.strip():
         out = out[out["comment_text"].str.contains(keyword.strip(),
                                                     case=False, na=False)]
+    if intents:
+        out = out[out["developer_intent"].isin(intents)]
     return out
 
 
@@ -76,8 +78,8 @@ def _display(out):
         column_config={
             "sdk": "SDK",
             "file": "File",
-            "comment_type": "Comment type",
-            "code_entity_type": "Entity",
+            "comment_type": "Comment form",
+            "code_entity_type": "Entity level",
             "comment_text": st.column_config.TextColumn("Comment text",
                                                         width="large"),
             "quantum_related": st.column_config.CheckboxColumn("Quantum?"),
@@ -90,11 +92,11 @@ def _display(out):
 def render():
     st.header("Explore Corpus")
     st.write(
-        "Every labeled SCCU behind the workbench: the full corpora of the "
-        "three newest SDKs (qiskit-machine-learning, qiskit-nature, "
+        "Browse the labeled SCCUs behind the workbench: the full corpora of "
+        "the three newest SDKs (qiskit-machine-learning, qiskit-nature, "
         "qiskit-algorithms) plus 2,000-row seeded samples from each of the "
         "three original SDKs (qiskit, qiskit-aer, qiskit-ibm-runtime). "
-        "Filter, page through, or download what you see."
+        "The default view shows quantum units only."
     )
 
     df = data_io.load_all_units()
