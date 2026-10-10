@@ -10,29 +10,29 @@ from segment_core.python_segment.inline_comment_segmenter import segment_inline_
 from segment_core.python_segment.block_comment_segmenter import segment_block_comment
 
 def test_segmentation():
-    print('=== 测试 Docstring 分割 ===')
+    print('=== Testing docstring segmentation ===')
     docstring_text = 'Calculate quantum state.\n    \n    Args:\n        state: Initial state\n        \n    Returns:\n        Final state\n    '
     docstring_result = segment_docstring(docstring_text)
-    print(f'Docstring 分割结果: {len(docstring_result)} 个段')
+    print(f'Docstring segmentation result: {len(docstring_result)} blocks')
     for i, segment in enumerate(docstring_result, 1):
-        print(f"  段 {i}: type='{segment['type']}', content='{segment['content'][:50]}...'")
-    print('\n=== 测试 Inline Comment 分割 ===')
+        print(f"  block {i}: type='{segment['type']}', content='{segment['content'][:50]}...'")
+    print('\n=== Testing inline comment segmentation ===')
     inline_text = 'Initialize quantum register. Apply gates sequentially. Measure results.'
     inline_result = segment_inline_comment(inline_text)
-    print(f'Inline 分割结果: {len(inline_result)} 个句子')
+    print(f'Inline segmentation result: {len(inline_result)} sentences')
     for i, sentence in enumerate(inline_result, 1):
-        print(f"  句子 {i}: '{sentence}'")
-    print('\n=== 测试 Block Comment 分割 ===')
+        print(f"  sentence {i}: '{sentence}'")
+    print('\n=== Testing block comment segmentation ===')
     block_text = 'This module implements quantum algorithms.\n    It provides various optimization functions.\n    Performance is O(n²) complexity.'
     block_result = segment_block_comment(block_text)
-    print(f'Block 分割结果: {len(block_result)} 个句子')
+    print(f'Block segmentation result: {len(block_result)} sentences')
     for i, sentence in enumerate(block_result, 1):
-        print(f"  句子 {i}: '{sentence}'")
-    print('\n=== 测试简单 Docstring ===')
+        print(f"  sentence {i}: '{sentence}'")
+    print('\n=== Testing simple docstring ===')
     simple_docstring = 'Helper function for converting a circuit to a gate'
     simple_result = segment_docstring(simple_docstring)
-    print(f'简单 Docstring 分割结果: {len(simple_result)} 个段')
+    print(f'Simple docstring segmentation result: {len(simple_result)} blocks')
     for i, segment in enumerate(simple_result, 1):
-        print(f"  段 {i}: type='{segment['type']}', content='{segment['content']}'")
+        print(f"  block {i}: type='{segment['type']}', content='{segment['content']}'")
 if __name__ == '__main__':
     test_segmentation()

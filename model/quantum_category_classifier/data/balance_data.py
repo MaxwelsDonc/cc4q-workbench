@@ -12,7 +12,7 @@ with open(input_file, 'r', encoding='utf-8') as f:
         if line.strip():
             data.append(json.loads(line))
 label_counts = Counter((d['label'] for d in data))
-print('原始类别分布：', label_counts)
+print('Original class distribution:', label_counts)
 balanced_data = []
 for label in sorted(label_counts.keys()):
     samples = [d for d in data if d['label'] == label]
@@ -30,5 +30,5 @@ with open(output_file, 'w', encoding='utf-8') as f:
     for item in balanced_data:
         f.write(json.dumps(item, ensure_ascii=False) + '\n')
 new_counts = Counter((d['label'] for d in balanced_data))
-print('平衡后类别分布：', new_counts)
-print(f'已保存到: {output_file}')
+print('Balanced class distribution:', new_counts)
+print(f'Saved to: {output_file}')

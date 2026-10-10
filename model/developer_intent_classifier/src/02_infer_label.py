@@ -27,18 +27,18 @@ def predict(model, tokenizer, texts, batch_size=32, device='cpu'):
 
 def classify_ccps(model_dir, source_file, output_dir, file_suffix):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    logger.info(f'使用设备：{device}')
-    logger.info(f'加载模型：{model_dir}')
+    logger.info(f'Using device: {device}')
+    logger.info(f'Loading model: {model_dir}')
     tokenizer, model = load_model_and_tokenizer(model_dir)
     model.to(device)
-    logger.info(f'加载源数据：{source_file}')
+    logger.info(f'Loading source data: {source_file}')
     with open(source_file, 'r', encoding='utf-8') as f:
         data = json.load(f)
-    logger.info(f'总数据量：{len(data)}')
+    logger.info(f'Total records: {len(data)}')
     comment_texts = [item['comment_text'] for item in data]
     ids = [item['id'] for item in data]
     SDKs = [item['SDK'] for item in data]
-    logger.info('开始进行开发者意图分类预测...')
+    logger.info('Starting developer-intent classification...')
     predictions = predict(model, tokenizer, comment_texts, device=device)
     results = {}
     intent_counts = {intent: 0 for intent in INTENT_MAPPING.values()}
@@ -50,18 +50,18 @@ def classify_ccps(model_dir, source_file, output_dir, file_suffix):
     output_file = os.path.join(output_dir, f'task2_results_{file_suffix}_r2.json')
     with open(output_file, 'w', encoding='utf-8') as f:
         json.dump(results, f, ensure_ascii=False, indent=2)
-    logger.info(f'分类完成！')
-    logger.info(f'结果已保存到：{output_file}')
-    logger.info('各意图类别统计：')
+    logger.info(f'Classification finished!')
+    logger.info(f'Results saved to: {output_file}')
+    logger.info('Per-intent counts:')
     for intent, count in intent_counts.items():
-        logger.info(f'  - {intent}: {count} 条')
+        logger.info(f'  - {intent}: {count} records')
     return (results, intent_counts)
 if __name__ == '__main__':
     MODEL_DIR = 'model/developer_intent_classifier/BERT_DI_classifier/saved_best_model'
     OUTPUT_DIR = 'model/developer_intent_classifier/output'
     SOURCE_FILES = [{'file': 'model/quantum_related_classifier/output/not_quantum_related_r2.json', 'suffix': 'quantum_not_related'}, {'file': 'model/quantum_related_classifier/output/quantum_related_r2.json', 'suffix': 'quantum_related'}]
     for source_info in SOURCE_FILES:
-        logger.info(f"\n开始处理文件：{source_info['file']}")
+        logger.info(f"\nProcessing file: {source_info['file']}")
         results, counts = classify_ccps(MODEL_DIR, source_info['file'], OUTPUT_DIR, source_info['suffix'])
-        logger.info(f"文件 {source_info['suffix']} 处理完成！\n")
-    logger.info('所有开发者意图分类任务完成！')
+        logger.info(f"File {source_info['suffix']} done!\n")
+    logger.info('All developer-intent classification tasks finished!')

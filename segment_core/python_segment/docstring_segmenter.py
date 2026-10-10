@@ -23,7 +23,7 @@ except OSError:
             nlp = spacy.load('en_core_web_lg')
         except OSError:
             nlp = None
-            print('Warning: 无法加载 spaCy 英文模型，paragraph 分割功能将被禁用')
+            print('Warning: spaCy English model not available; paragraph segmentation is disabled')
 
 def dummy_role(name, rawtext, text, lineno, inliner, options=None, content=None):
     return ([nodes.literal(text, text)], [])
@@ -189,9 +189,9 @@ def parse_docstring_to_blocks(docstring: str) -> List[Dict[str, Any]]:
 if __name__ == '__main__':
     test_docstring = '\nBuild a :class:`.Gate` object from a :class:`.QuantumCircuit`.\n\nThe gate is anonymous (not tied to a named quantum register),\nand so can be inserted into another circuit. The gate will\nhave the same string name as the circuit.\n\nArgs:\n    circuit (QuantumCircuit): the input circuit.\n\n    parameter_map (dict): For parameterized circuits, a mapping from\n    parameters in the circuit to parameters to be used in the gate.\n    If None, existing circuit parameters will also parameterize the\n    Gate.\n\n    equivalence_library (EquivalenceLibrary): Optional equivalence library\n    where the converted gate will be registered.\n    label (str): Optional gate label.\n\nRaises:\n    QiskitError: if circuit is non-unitary or if\n    parameter_map is not compatible with circuit\n\nReturn:\n    Gate: a Gate equivalent to the action of the\n    input circuit. Upon decomposition, this gate will\n    yield the components comprising the original circuit.\n'
     blocks = segment_docstring(test_docstring)
-    print(f'分割成 {len(blocks)} 个语义块:')
+    print(f'Segmented into {len(blocks)} semantic blocks:')
     for i, block in enumerate(blocks, 1):
         if block['type'] == 'directive':
-            print(f"{i}. 类型: {block['type']}, 指令名: {block['name']}, 内容: {block['content'][:50]}...")
+            print(f"{i}. type: {block['type']}, directive: {block['name']}, content: {block['content'][:50]}...")
         else:
-            print(f"{i}. 类型: {block['type']}, 内容: {block['content'][:50]}...")
+            print(f"{i}. type: {block['type']}, content: {block['content'][:50]}...")

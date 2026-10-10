@@ -1,19 +1,19 @@
-# 清洗模式：可选值为 current_only / full / none
+# Cleaning mode: current_only / full / none
 clean_mode: none
 
-# 项目信息
+# Project info
 project: qiskit
 version: 2.1.0
 language: python
 
-# 输入输出路径（建议使用解析后自动拼接）
+# Input/output paths
 input_dir: data/input/qiskit
 output_dir: data/output/qiskit
 
-# 包含的源码目录（相对 input_dir）
+# Source directories to include (relative to input_dir)
 include_dirs:
 
 
 pipeline:
-  analyze: true        # 是否统计注释类型分布
-  segment: true        # 是否进行注释语义分割
+  analyze: true        # whether to tally the comment-type distribution
+  segment: true        # whether to run comment segmentation

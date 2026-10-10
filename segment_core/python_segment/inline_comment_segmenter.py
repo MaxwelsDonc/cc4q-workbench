@@ -11,7 +11,7 @@ except OSError:
         try:
             nlp = spacy.load('en_core_web_lg')
         except OSError:
-            raise ImportError('请安装 spaCy 英文模型: python -m spacy download en_core_web_sm')
+            raise ImportError('Please install the spaCy English model: python -m spacy download en_core_web_sm')
 
 def segment_inline_comment(comment_text: str) -> List[str]:
     if not comment_text or not comment_text.strip():
@@ -30,10 +30,10 @@ def segment_inline_comment_advanced(comment_text: str, min_length: int=5) -> Lis
     return filtered_sentences
 if __name__ == '__main__':
     test_comments = ['Initialize the quantum register. Set default parameters.', 'This is a single sentence comment.', 'First sentence! Second sentence? Third sentence.', "Check if Dr. Smith's algorithm works. It should be fine.", 'Short.', '# Remove comment symbols and split properly.', '// Multiple comment styles supported here.', '* Bullet point style comment with multiple sentences. This is the second one.']
-    print('测试 Inline Comment 分割:')
+    print('Testing inline comment segmentation:')
     for i, comment in enumerate(test_comments, 1):
         sentences = segment_inline_comment(comment)
-        print(f'\n{i}. 原文: {comment}')
-        print(f'   分割结果 ({len(sentences)} 个句子):')
+        print(f'\n{i}. original: {comment}')
+        print(f'   segmentation result ({len(sentences)} sentences):')
         for j, sentence in enumerate(sentences, 1):
             print(f'   {j}. {sentence}')

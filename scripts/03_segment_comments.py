@@ -38,16 +38,16 @@ def segment_comment_pairs(input_file: str, output_file: str=None) -> None:
         with open(input_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
     except FileNotFoundError:
-        logger.error(f'错误: 找不到文件 {input_file}')
+        logger.error(f'Error: file not found {input_file}')
         return
     except json.JSONDecodeError as e:
-        logger.error(f'错误: JSON解析失败 - {e}')
+        logger.error(f'Error: JSON parse failed - {e}')
         return
     if output_file is None:
         base_name = os.path.splitext(input_file)[0]
         output_file = f'{base_name}_segmented.json'
     segmented_data = []
-    logger.info(f'开始处理 {len(data)} 个注释对...')
+    logger.info(f'Starting to process {len(data)} comment pairs...')
     for item in tqdm(data):
         original_id = item.get('id', '')
         comment_type = item.get('comment_type', '')
@@ -81,40 +81,40 @@ def segment_comment_pairs(input_file: str, output_file: str=None) -> None:
                     new_item['comment_text'] = segment
                     segmented_data.append(new_item)
             else:
-                logger.warning(f"未知的comment_type '{comment_type}' for id {original_id}")
+                logger.warning(f"Unknown comment_type '{comment_type}' for id {original_id}")
                 segmented_data.append(item)
         except Exception as e:
-            logger.error(f'错误: 处理id {original_id} 时出错 - {e}')
+            logger.error(f'Error processing id {original_id} - {e}')
             segmented_data.append(item)
     try:
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(segmented_data, f, ensure_ascii=False, indent=2)
-        logger.info(f'分割完成!')
-        logger.info(f'原始数据: {len(data)} 个注释对')
-        logger.info(f'分割后数据: {len(segmented_data)} 个注释段')
-        logger.info(f'输出文件: {output_file}')
+        logger.info(f'Segmentation finished!')
+        logger.info(f'Input records: {len(data)} comment pairs')
+        logger.info(f'Segmented records: {len(segmented_data)} comment segments')
+        logger.info(f'Output file: {output_file}')
     except Exception as e:
-        logger.error(f'错误: 保存文件失败 - {e}')
+        logger.error(f'Error: failed to save file - {e}')
 
 def analyze_comment_types(input_file: str) -> None:
     try:
         with open(input_file, 'r', encoding='utf-8') as f:
             data = json.load(f)
     except FileNotFoundError:
-        logger.error(f'错误: 找不到文件 {input_file}')
+        logger.error(f'Error: file not found {input_file}')
         return
     except json.JSONDecodeError as e:
-        logger.error(f'错误: JSON解析失败 - {e}')
+        logger.error(f'Error: JSON parse failed - {e}')
         return
     type_counts = {}
     for item in data:
         comment_type = item.get('comment_type', 'unknown')
         type_counts[comment_type] = type_counts.get(comment_type, 0) + 1
-    logger.info('注释类型分布:')
+    logger.info('Comment type distribution:')
     for comment_type, count in sorted(type_counts.items()):
         logger.info(f'  {comment_type}: {count}')
-    logger.info(f'总计: {len(data)}')
+    logger.info(f'Total: {len(data)}')
 if __name__ == '__main__':
     import sys
     if len(sys.argv) > 1:
@@ -127,11 +127,11 @@ if __name__ == '__main__':
     out_file_path = os.path.join(config['output_dir'], f'segmented/comment_pairs_{clean_mode}_segmented.json')
     logger.add('scripts/log/03_segment_comments.log', rotation='1 day', retention='7 days', compression='zip')
     if config.get('pipeline', {}).get('analyze', True):
-        logger.info('🔍 分析注释类型分布...')
+        logger.info('🔍 Analyzing comment type distribution...')
         analyze_comment_types(input_file_path)
     if config.get('pipeline', {}).get('segment', True):
-        logger.info('✂️  开始注释语义分割...')
+        logger.info('✂️  Starting comment segmentation...')
         segment_comment_pairs(input_file_path, out_file_path)
-        logger.info('✅ 注释语义分割完成！')
+        logger.info('✅ Comment segmentation finished!')
     else:
-        logger.warning('⚠️  已跳过语义分割阶段。')
+        logger.warning('⚠️  Segmentation stage skipped.')

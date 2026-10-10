@@ -12,7 +12,7 @@ except OSError:
         try:
             nlp = spacy.load('en_core_web_lg')
         except OSError:
-            raise ImportError('请安装 spaCy 英文模型: python -m spacy download en_core_web_sm')
+            raise ImportError('Please install the spaCy English model: python -m spacy download en_core_web_sm')
 
 def segment_block_comment(comment_text: str) -> List[str]:
     if not comment_text or not comment_text.strip():
@@ -50,10 +50,10 @@ def _is_file_header(text: str) -> bool:
     return keyword_count >= 2
 if __name__ == '__main__':
     test_comments = ['This module implements quantum error correction codes\n\n        It provides functions for encoding and decoding quantum states \n        The implementation supports various error correction schemes', 'Copyright (c) 2024 Quantum Computing Inc.\n        All rights reserved.\n        Licensed under the MIT License.', 'File: quantum_circuit.py\n        Author: Dr. Smith\n        Date: 2024-01-01\n        Description: Implementation of quantum circuits.', 'Single sentence block comment.', "First sentence with abbreviation like Dr. Smith's work.\n        Second sentence continues here.\n        Visit https://example.com for more info.\n        Contact us at contact@example.com for questions."]
-    print('测试 Block Comment 分割:')
+    print('Testing block comment segmentation:')
     for i, comment in enumerate(test_comments, 1):
         sentences = segment_block_comment(comment)
-        print(f'\n{i}. 原文: {comment[:50]}...')
-        print(f'   分割结果 ({len(sentences)} 个句子):')
+        print(f'\n{i}. original: {comment[:50]}...')
+        print(f'   segmentation result ({len(sentences)} sentences):')
         for j, sentence in enumerate(sentences, 1):
             print(f'   {j}. {sentence}')

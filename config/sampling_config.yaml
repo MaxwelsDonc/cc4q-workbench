@@ -1,13 +1,13 @@
-# 输入文件路径
+# Input file path
 input_file: data/output/qiskit/comment_pairs_segment.json
 
-# 输出目录
+# Output directory
 output_dir: data/output/samping_results
 
-# 抽样比例 (0-1之间的浮点数)
+# Sampling ratio (float between 0 and 1)
 sample_ratio: 0.1
 
-# 关键词列表
+# Keyword list
 keywords:
   - "quantum"
   - "measure"

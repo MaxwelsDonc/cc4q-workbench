@@ -163,9 +163,9 @@ class LibCSTVisitor(cst.CSTVisitor):
             code_by_position = '\n'.join(source_lines)
             code_by_wrapper = self.wrapper.module.code_for_node(node)
             if code_by_position.strip() != code_by_wrapper.strip():
-                print(f"\n=== ⚠️ {label or 'Node'} 代码内容不一致 ===")
-                print(f'PositionProvider 行号范围: {start_line} ~ {end_line}')
+                print(f"\n=== ⚠️ {label or 'Node'}: inconsistent code content ===")
+                print(f'PositionProvider line range: {start_line} ~ {end_line}')
                 diff = difflib.unified_diff(code_by_position.splitlines(), code_by_wrapper.splitlines(), fromfile='source_lines', tofile='wrapper.code_for_node', lineterm='')
                 print('\n'.join(diff))
         except Exception as e:
-            print(f'[debug_inconsistent_lineno] 失败: {e}')
+            print(f'[debug_inconsistent_lineno] failed: {e}')

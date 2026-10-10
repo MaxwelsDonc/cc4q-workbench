@@ -28,32 +28,32 @@ def predict(model, tokenizer, texts, batch_size=32, device='cpu'):
 
 def evaluate(model_dir, test_file):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    logger.info(f'使用设备：{device}')
+    logger.info(f'Using device: {device}')
     tokenizer, model = load_model_and_tokenizer(model_dir)
     model.to(device)
-    logger.info(f'加载测试数据：{test_file}')
+    logger.info(f'Loading test data: {test_file}')
     dataset = load_dataset('json', data_files={'test': test_file})
     test_data = dataset['test']
     texts = test_data['comment']
     labels = test_data['label']
-    logger.info(f'测试样本数量：{len(texts)}')
+    logger.info(f'Test samples: {len(texts)}')
     preds = predict(model, tokenizer, texts, device=device)
     acc = accuracy_score(labels, preds)
     report = classification_report(labels, preds, digits=4)
-    logger.info(f'准确率：{acc}')
-    logger.info(f'\n分类报告：\n{report}')
+    logger.info(f'Accuracy: {acc}')
+    logger.info(f'\nClassification report:\n{report}')
 
 def classify_and_split_data(model_dir, source_file, out_dir):
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    logger.info(f'使用设备：{device}')
+    logger.info(f'Using device: {device}')
     tokenizer, model = load_model_and_tokenizer(model_dir)
     model.to(device)
-    logger.info(f'加载源数据：{source_file}')
+    logger.info(f'Loading source data: {source_file}')
     with open(source_file, 'r', encoding='utf-8') as f:
         data = json.load(f)
-    logger.info(f'总数据量：{len(data)}')
+    logger.info(f'Total records: {len(data)}')
     comment_texts = [item['comment_text'] for item in data]
-    logger.info('开始进行分类预测...')
+    logger.info('Starting classification...')
     predictions = predict(model, tokenizer, comment_texts, device=device)
     quantum_specific_data = []
     not_quantum_specific_data = []
@@ -69,10 +69,10 @@ def classify_and_split_data(model_dir, source_file, out_dir):
         json.dump(quantum_specific_data, f, ensure_ascii=False, indent=2)
     with open(not_quantum_file, 'w', encoding='utf-8') as f:
         json.dump(not_quantum_specific_data, f, ensure_ascii=False, indent=2)
-    logger.info(f'分类完成！')
-    logger.info(f'Quantum specific (标签=1): {len(quantum_specific_data)} 条')
-    logger.info(f'Not quantum specific (标签=0): {len(not_quantum_specific_data)} 条')
-    logger.info(f'结果已保存到：')
+    logger.info(f'Classification finished!')
+    logger.info(f'Quantum specific (label=1): {len(quantum_specific_data)} records')
+    logger.info(f'Not quantum specific (label=0): {len(not_quantum_specific_data)} records')
+    logger.info(f'Results saved to:')
     logger.info(f'  - {quantum_file}')
     logger.info(f'  - {not_quantum_file}')
     return (len(quantum_specific_data), len(not_quantum_specific_data))
