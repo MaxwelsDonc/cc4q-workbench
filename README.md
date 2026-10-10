@@ -5,168 +5,94 @@
 **Turn any Python-based quantum SDK repository into a labeled code-comment
 corpus, then inspect and profile its quantum knowledge.**
 
-CC4Q Workbench is the tool companion of the paper:
+CC4Q Workbench is the tool companion of *"Code Comments for Quantum Software
+Development Kits: An Empirical Study on Qiskit"* (TOSEM, accepted). It
+packages that study's methodology as a reusable tool:
 
-> **Code Comments for Quantum Software Development Kits: An Empirical Study on Qiskit**
-> (accepted for publication)
+- a **corpus-construction pipeline**: repository → code-comment pairs (CCPs)
+  → sentence-level comment units (SCCUs);
+- three released **fine-tuned BERT classifiers** (quantum-relatedness,
+  developer intent, quantum-knowledge category);
+- a four-page **web workbench**: live snippet labeling, repository
+  dashboards, cross-SDK comparison, corpus exploration.
 
-It packages the full methodology as a reusable tool: a corpus-construction
-pipeline (repository → code-comment pairs → sentence-level comment units),
-three released fine-tuned BERT classifiers (quantum-relatedness, developer
-intent, quantum-knowledge category), and a four-page web workbench for
-snippet labeling, repository dashboards, cross-SDK comparison, and corpus
-exploration. The companion study's **gold corpus** (28,076 human-validated
-units from `qiskit` 2.1.0, `qiskit-aer` 0.17.2, `qiskit-ibm-runtime` 0.45.1)
-is archived separately (see the companion paper's artifact link; the corpus
-is too large for git). The validation evidence for the three additional SDKs
-analyzed in the tool paper lives in `exp/`.
+## Try it
 
-```
-demo/                           CC4Q Workbench: interactive Streamlit app (see below)
-scripts/                        pipeline: download repos → extract pairs → segment units
-parser_core/ segment_core/ utils/ config/   pipeline libraries & configurations
-examples/                       tiny sample sources for a quick run
-model/                          three BERT classifiers: training code, data, label mappings
-rqs/                            companion study: analysis scripts, results, tables, figures
-exp/                            tool-paper validation: new-SDK corpora stats + label verification
-doc/                            labeling guideline + workbench design document
+**Option 1 — Docker (easiest; nothing to install beyond Docker):**
+
+```bash
+docker build -t cc4q-workbench .
+docker run -p 8501:8501 cc4q-workbench     # open http://localhost:8501
 ```
 
-## Quick start
+The image bundles the workbench, the pipeline, and precomputed results for
+six Qiskit-ecosystem SDKs; classifier checkpoints are fetched at container
+start (SHA256-verified). GPU hosts: build with
+`docker build --build-arg TORCH_CHANNEL=cu126 -t cc4q-workbench:gpu .` and run
+with `--gpus all`; the app auto-detects CUDA. (We develop on Apple Silicon,
+so the GPU flavor is currently untested by us — feedback welcome.)
 
-**Prerequisites: Python >= 3.11** (the pinned Sphinx version requires it).
+**Option 2 — local install** (requires **Python ≥ 3.11**):
 
 ```bash
 git clone https://github.com/MaxwelsDonc/cc4q-workbench.git
 cd cc4q-workbench
-
-# create an isolated environment (conda recommended; venv works too)
-conda create -n cc4q python=3.11 -y
-conda activate cc4q
+conda create -n cc4q python=3.11 -y && conda activate cc4q
 # or: python3.11 -m venv .venv && source .venv/bin/activate
 #     (Windows PowerShell: .venv\Scripts\Activate.ps1)
 
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 
-# run the pipeline on the bundled example files
+# the web workbench
+pip install -r demo/requirements-demo.txt
+streamlit run demo/app.py
+
+# the pipeline on bundled examples
 python scripts/02_extract_code_comment_pairs.py config/examples.yaml
 python scripts/03_segment_comments.py config/examples.yaml
 ```
 
-Outputs are written to `examples/output/`. The full install including
-`torch` and `sentence-transformers` is ~3 GB and takes a few minutes; the
-pipeline itself only needs the parsing/segmentation dependencies, so if you
-only want to try extraction, `pip install libcst==1.8.2 pyyaml loguru tqdm
-docutils==0.21.2 sphinx==8.2.3 spacy==3.8.7 nltk` suffices.
+Only trying the pipeline, not the classifiers? A lean install suffices:
+`pip install libcst==1.8.2 pyyaml loguru tqdm docutils==0.21.2 sphinx==8.2.3 spacy==3.8.7 nltk`.
 
-> **Note while the repository is private** (until the paper deadline):
-> `scripts/download_models.py` will 404 for anyone without repository access.
-> Collaborators can fetch the checkpoints with `gh release download` after
-> `gh auth login`, or ask us for the files directly.
-
-## Web demo (CC4Q Workbench)
-
-`demo/` contains a four-page Streamlit app: a Home page, a live **Analyze
-Code** page (paste a snippet, get every comment labeled on the three axes),
-an **Analyze Repository** page (precomputed dashboards for six Qiskit-ecosystem
-SDKs, live analysis of any GitHub repo under 200 Python files, and an
-infrastructure-vs-application compare mode), and an **Explore Corpus** page
-(filters + download over 17.5k labeled units). The app reads its precomputed
-content from the committed `demo/data/`.
-
-```bash
-pip install -r demo/requirements-demo.txt
-streamlit run demo/app.py
-```
-
-The Analyze pages need the fine-tuned checkpoints in `models_checkpoints/`
-(too large for git). Fetch them once from the
-[v0.1.0 release](https://github.com/MaxwelsDonc/cc4q-workbench/releases/tag/v0.1.0)
-(~1.2 GB, SHA256-verified):
+**Classifier checkpoints** (~1.2 GB, needed for the Analyze pages and for
+labeling new corpora):
 
 ```bash
 python scripts/download_models.py            # download + verify + extract
 python scripts/download_models.py --check    # verify only
 ```
 
-Without them the app still starts — the Analyze pages show the download
-command, and every precomputed dashboard works.
+Everything else works without them.
 
-## Run with Docker
+## Repository layout
 
-The all-in-one image bundles the demo UI, the full pipeline, and the
-precomputed demo corpus; models are fetched at container start.
-
-```bash
-docker build -t cc4q-workbench .
-docker run -p 8501:8501 cc4q-workbench        # open http://localhost:8501
+```
+demo/           the web workbench (Streamlit) + precomputed dashboards
+scripts/        pipeline entry points (download → extract → segment) + model download
+parser_core/ segment_core/ utils/ config/   pipeline libraries & per-SDK configs
+model/          classifier training code, training data, label mappings
+examples/       tiny sample sources for the quick start
+exp/            tool-paper validation evidence (see exp/README.md)
+rqs/            companion study's analysis scripts and results
+doc/            labeling guideline + workbench design document
 ```
 
-How the models get in:
+## Documentation
 
-- By default the entrypoint runs `python scripts/download_models.py`
-  (best-effort). If the download fails — e.g. no network, or the release is
-  still private — the container still starts and the demo shows the download
-  instructions on the Analyze pages.
-- Skip it with `-e CC4Q_SKIP_MODEL_DOWNLOAD=1`, or mount checkpoints you
-  already have:
-  `docker run -p 8501:8501 -v "$PWD/models_checkpoints:/app/models_checkpoints" cc4q-workbench`
+- `doc/workbench_design.md` — the workbench's design specification
+  (pages, analyses, acceptance criteria)
+- `doc/Guideline_for_labelling_training.md` — the annotation guideline used
+  in the companion study
+- `exp/README.md` — the validation data behind the tool paper's numbers
 
-The same image runs the pipeline CLI (the entrypoint is only a wrapper):
+## Companion corpus
 
-```bash
-docker run --entrypoint python cc4q-workbench \
-    scripts/02_extract_code_comment_pairs.py config/examples.yaml
-```
-
-### GPU support
-
-One `Dockerfile` serves both CPU and GPU via a build argument:
-
-```bash
-# CPU (default): torch CPU wheels, ~2.5 GB image
-docker build -t cc4q-workbench .
-
-# GPU: torch 2.14.0+cu126 wheels (CUDA runtime libs are bundled in the
-# wheel, so no CUDA base image is needed), ~7 GB image
-docker build --build-arg TORCH_CHANNEL=cu126 -t cc4q-workbench:gpu .
-docker run --gpus all -p 8501:8501 cc4q-workbench:gpu
-```
-
-The GPU build needs an NVIDIA driver + nvidia-container-toolkit on the
-host, but also runs fine on CPU-only hosts. No `CC4Q_DEVICE` is baked into
-either image — the app auto-detects CUDA at startup (the Analyze Code page
-shows `running on: cuda`); force CPU with `-e CC4Q_DEVICE=cpu` if ever
-needed. Note that CPU inference is already fast enough for the demo
-(a snippet analysis takes seconds), so the GPU build mainly matters for
-batch/live labeling of larger repositories. Without Docker, a CUDA host
-just needs the matching torch wheels and the app picks up the GPU on its
-own:
-
-```bash
-pip install torch --index-url https://download.pytorch.org/whl/cu126
-streamlit run demo/app.py
-```
-
-> **Note:** we develop on Apple Silicon, so the GPU build has not been
-> built or run by us yet — the wheel indexes and base image are verified to
-> exist, but the GPU image itself is untested. Feedback (and pull requests)
-> from CUDA hosts are very welcome.
-
-## Using the dataset
-
-```python
-import pandas as pd
-
-df = pd.read_json(
-    "data/final_data/CCPs_final_modified_r2_cleaned_validated.jsonl",
-    lines=True,
-)
-print(df.shape)          # (28076, 14)
-```
-
-Each line is one comment unit with the following fields:
+The companion study's gold corpus (28,076 human-validated units from
+`qiskit` 2.1.0, `qiskit-aer` 0.17.2, `qiskit-ibm-runtime` 0.45.1) is archived
+separately (see the companion paper's artifact link; too large for git).
+Each unit is a JSON object:
 
 | Field | Description |
 | --- | --- |
@@ -178,73 +104,20 @@ Each line is one comment unit with the following fields:
 | `code_entity_type` | `module` / `class` / `function` |
 | `is_quantum_specific` | whether the unit is quantum related |
 | `developer_intent_category` | `what` / `why` / `how-to-use` / `how-it-is-done` / `property` / `developer-others` |
-| `quantum_specific_category` | for quantum-specific units: one of six quantum-knowledge categories (see the labeling guideline in `doc/`), else `null` |
+| `quantum_specific_category` | one of six quantum-knowledge categories (quantum-specific units only) |
 
-## Reproducing the full pipeline
+## Reproducing the analyses
 
-The upstream source code is not redistributed; download the pinned versions
-with the helper script, then run the extraction steps. Each entry in
-`config/repo_list.yaml` carries a `ref` field pinning the exact release tag;
-the script clones that tag and verifies existing checkouts against it.
-
-```bash
-python scripts/01_download_repos.py
-python scripts/02_extract_code_comment_pairs.py config/config_qiskit.yaml
-python scripts/02_extract_code_comment_pairs.py config/config_qiskit-aer.yaml
-python scripts/02_extract_code_comment_pairs.py config/config_qiskit-ibm-runtime.yaml
-python scripts/03_segment_comments.py config/config_qiskit.yaml
-python scripts/03_segment_comments.py config/config_qiskit-aer.yaml
-python scripts/03_segment_comments.py config/config_qiskit-ibm-runtime.yaml
-```
-
-The annotation workflow (human labeling + model-assisted labeling) is
-described in the labeling guideline; the released file contains the final
-agreed labels.
-
-## Models
-
-Training code, training data, and label mappings for the three
-`bert-base-uncased` classifiers used for model-assisted annotation live under
-`model/<name>/`:
-
-| Model | Task |
-| --- | --- |
-| `quantum_related_classifier` | binary: is the comment quantum related? |
-| `quantum_category_classifier` | 6-way quantum-knowledge category |
-| `developer_intent_classifier` | 6-way developer intent |
-
-```bash
-# fine-tune from scratch (downloads bert-base-uncased from the Hugging Face Hub)
-python model/quantum_related_classifier/src/01_build_model.py
-python model/quantum_category_classifier/src/01_build_model.py
-python model/developer_intent_classifier/src/01_build_model.py
-```
-
-The inference entrypoints (`src/02_infer_label.py`) batch-classify a
-JSON/JSONL input file with a trained checkpoint; point the path constants at
-the bottom of each script at your model directory and input file.
-
-## Empirical analyses (RQ scripts)
-
-`rqs/` contains the analysis scripts, results, generated tables, and figures
-reported in the paper:
-
-```bash
-# comment distribution, comment density, quantum proportions
-python rqs/distribution_based/analysis/rq1_distributions.py
-python rqs/distribution_based/analysis/rq2_comment_density.py
-python rqs/distribution_based/analysis/rq4_quantum_proportion.py
-
-# quantum-specific analyses (category distribution, relations, similarity)
-python rqs/quantum_specific/analysis/rq8_quantum_distribution.py data/final_data/CCPs_final_modified_r2_cleaned_validated.jsonl
-python rqs/quantum_specific/analysis/rq9_relation.py data/final_data/CCPs_final_modified_r2_cleaned_validated.jsonl
-```
+Build a corpus for a new SDK: add an entry to `config/repo_list.yaml`
+(`url` + pinned `ref`), run `scripts/01_download_repos.py`, then scripts
+`02`/`03` with a per-SDK config (see `config/config_qiskit.yaml`), then label
+with `exp/run_inference.py`. The companion study's RQ analyses live in
+`rqs/`, and the tool paper's generalization/verification numbers in `exp/`;
+both directories contain step-by-step notes.
 
 ## License & attribution
 
-This archive (code and annotations) is released under the MIT license — see
-`LICENSE`. The comment/code content of the dataset is extracted from the Qiskit
-projects listed above, which are licensed under the Apache License 2.0, and the
-fine-tuned models are derived from `bert-base-uncased` (Hugging Face,
-Apache-2.0). Please attribute the respective upstream projects when using the
-data. If you use this artifact, please cite the paper.
+Code and annotations: MIT (see `LICENSE`). Comment/code content is extracted
+from the Qiskit projects (Apache-2.0); the classifiers are derived from
+`bert-base-uncased` (Apache-2.0). If you use this artifact, please cite the
+companion paper.
