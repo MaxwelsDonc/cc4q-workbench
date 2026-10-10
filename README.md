@@ -32,8 +32,18 @@ doc/                            labeling guideline + workbench design document
 
 ## Quick start
 
+**Prerequisites: Python >= 3.11** (the pinned Sphinx version requires it).
+
 ```bash
-# Python >= 3.9
+git clone https://github.com/MaxwelsDonc/cc4q-workbench.git
+cd cc4q-workbench
+
+# create an isolated environment (conda recommended; venv works too)
+conda create -n cc4q python=3.11 -y
+conda activate cc4q
+# or: python3.11 -m venv .venv && source .venv/bin/activate
+#     (Windows PowerShell: .venv\Scripts\Activate.ps1)
+
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 
@@ -42,7 +52,16 @@ python scripts/02_extract_code_comment_pairs.py config/examples.yaml
 python scripts/03_segment_comments.py config/examples.yaml
 ```
 
-Outputs are written to `examples/output/`.
+Outputs are written to `examples/output/`. The full install including
+`torch` and `sentence-transformers` is ~3 GB and takes a few minutes; the
+pipeline itself only needs the parsing/segmentation dependencies, so if you
+only want to try extraction, `pip install libcst==1.8.2 pyyaml loguru tqdm
+docutils==0.21.2 sphinx==8.2.3 spacy==3.8.7 nltk` suffices.
+
+> **Note while the repository is private** (until the paper deadline):
+> `scripts/download_models.py` will 404 for anyone without repository access.
+> Collaborators can fetch the checkpoints with `gh release download` after
+> `gh auth login`, or ask us for the files directly.
 
 ## Web demo (CC4Q Workbench)
 
