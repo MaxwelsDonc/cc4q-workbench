@@ -1,5 +1,7 @@
 # CC4Q Workbench — Building and Analyzing Quantum Code Comment Corpora
 
+[![CI](https://github.com/MaxwelsDonc/cc4q-workbench/actions/workflows/ci.yml/badge.svg)](https://github.com/MaxwelsDonc/cc4q-workbench/actions/workflows/ci.yml)
+
 **Turn any Python-based quantum SDK repository into a labeled code-comment
 corpus, then inspect and profile its quantum knowledge.**
 

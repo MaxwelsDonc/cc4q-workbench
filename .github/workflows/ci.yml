@@ -1,0 +1,109 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quickstart:
+    name: Quick start (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            demo/requirements-demo.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install -r demo/requirements-demo.txt
+          python -m spacy download en_core_web_sm
+
+      - name: Pipeline quick start (examples)
+        run: |
+          python scripts/02_extract_code_comment_pairs.py config/examples.yaml
+          python scripts/03_segment_comments.py config/examples.yaml
+
+      - name: Assert pipeline outputs exist
+        shell: bash
+        run: |
+          ls -lh examples/output/
+          test -s examples/output/comment_pairs_current_only.json
+          test -s examples/output/segmented/comment_pairs_current_only_segmented.json
+
+      - name: Demo smoke tests (data mode, no checkpoints)
+        run: python demo/smoke_test.py
+
+      - name: Streamlit boot check
+        shell: bash
+        run: |
+          streamlit run demo/app.py --server.port 8502 --server.headless true \
+            > streamlit_boot.log 2>&1 &
+          APP_PID=$!
+          ok=""
+          for i in $(seq 1 30); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8502/ || true)
+            if [ "$code" = "200" ]; then ok="$code"; break; fi
+            sleep 2
+          done
+          kill $APP_PID 2>/dev/null || true
+          cat streamlit_boot.log
+          if [ "$ok" != "200" ]; then
+            echo "Streamlit boot check failed (last HTTP code: '$code')"
+            exit 1
+          fi
+          echo "Streamlit boot check OK (HTTP 200)"
+
+  docker:
+    name: Docker images (CPU run + GPU build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build CPU image
+        run: docker build -t cc4q-workbench:test-cpu .
+
+      - name: Run CPU image and check HTTP 200 (no checkpoints)
+        run: |
+          docker run -d --name cc4q -p 8501:8501 \
+            -e CC4Q_SKIP_MODEL_DOWNLOAD=1 cc4q-workbench:test-cpu
+          ok=""
+          for i in $(seq 1 45); do
+            code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8501/ || true)
+            if [ "$code" = "200" ]; then ok="$code"; break; fi
+            sleep 3
+          done
+          docker logs cc4q || true
+          docker stop cc4q || true
+          if [ "$ok" != "200" ]; then
+            echo "Container HTTP check failed (last code: '$code')"
+            exit 1
+          fi
+          echo "Container HTTP check OK (HTTP 200)"
+
+      - name: Pipeline CLI inside the CPU container
+        run: |
+          docker run --rm --entrypoint python cc4q-workbench:test-cpu \
+            scripts/02_extract_code_comment_pairs.py config/examples.yaml
+          docker run --rm --entrypoint python cc4q-workbench:test-cpu \
+            scripts/03_segment_comments.py config/examples.yaml
+
+      - name: Build GPU image (build-only, no GPU runtime needed)
+        run: docker build --build-arg TORCH_CHANNEL=gpu -t cc4q-workbench:test-gpu .
