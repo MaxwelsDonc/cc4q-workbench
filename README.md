@@ -16,6 +16,11 @@ packages that study's methodology as a reusable tool:
 - a four-page **web workbench**: live snippet labeling, repository
   dashboards, cross-SDK comparison, corpus exploration.
 
+<p align="center">
+  <img src="doc/screenshot_analyze_repo.png" alt="Analyze Repository dashboard" width="49%">
+  <img src="doc/screenshot_analyze_code.png" alt="Analyze Code: live snippet labeling" width="49%">
+</p>
+
 ## Try it
 
 **Option 1 — Docker (easiest; nothing to install beyond Docker):**
@@ -65,6 +70,26 @@ python scripts/download_models.py --check    # verify only
 ```
 
 Everything else works without them.
+
+## Tests
+
+One command runs the test suite (pytest is in `demo/requirements-demo.txt`):
+
+```bash
+pip install pytest   # plus: pip install -r demo/requirements-demo.txt for the app tests
+pytest
+```
+
+- `tests/test_data.py` — demo-data integrity, packaging checks, and the
+  snippet pipeline (no checkpoints needed; same checks CI runs via
+  `python demo/smoke_test.py`).
+- `tests/test_segmenters.py` — unit tests for the three comment segmenters.
+- `tests/test_models_and_app.py` — three-axis classification and Streamlit
+  page rendering; **skipped automatically** when `models_checkpoints/` is
+  absent.
+
+`demo/smoke_test.py` remains the CI entry point; `scripts/test_segment.py`
+is a runnable usage example for the segmenters.
 
 ## Repository layout
 
@@ -121,3 +146,16 @@ Code and annotations: MIT (see `LICENSE`). Comment/code content is extracted
 from the Qiskit projects (Apache-2.0); the classifiers are derived from
 `bert-base-uncased` (Apache-2.0). If you use this artifact, please cite the
 companion paper.
+
+## Citation
+
+```bibtex
+@article{cc4q2026tosem,
+  author  = {Zhou, Zenghui and Li, Yuechen and Cai, Yi and Wen, Jinlong and Yu, Xiaohan and Zheng, Zheng and Yin, Beibei},
+  title   = {Code Comments for Quantum Software Development Kits: An Empirical Study on Qiskit},
+  journal = {ACM Transactions on Software Engineering and Methodology},
+  year    = {2026},
+  note    = {Accepted for publication}
+}
+```
+
