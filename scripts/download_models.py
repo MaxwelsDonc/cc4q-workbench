@@ -34,15 +34,15 @@ BASE_URL = f"https://github.com/{REPO}/releases/download/{RELEASE}"
 CHECKPOINTS = {
     "quantum_related.tar.gz": (
         "quantum_related",
-        "a9df9441e0abea67dae5ce580d21f102de6b5f7ea88cb96e967d9ba4a55ec6b2",
+        "3a519c5173f323f735434065d248b50bc58a8a36d0ce6f59f6f21196b10f7bdd",
     ),
     "quantum_category.tar.gz": (
         "quantum_category",
-        "64ab092d012e50d6539c869c870db55defb8174d688c7b1acfd2950f00c6e64d",
+        "de17c00707c23adcb8818844e84a1acb0b03486cb655999e8513989ab3c81b32",
     ),
     "developer_intent.tar.gz": (
         "developer_intent",
-        "603b81a7a6345c821d751cbe0333e31e84de6419b079d9a79a1efa4fb36d525b",
+        "3e397e177f1479ab2d91d2d6de7233bb2c7f4b19de37dfa9fbeba7f3849b8286",
     ),
 }
 
