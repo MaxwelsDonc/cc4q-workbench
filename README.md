@@ -43,8 +43,8 @@ so the GPU flavor is currently untested by us — feedback welcome.)
 git clone https://github.com/MaxwelsDonc/cc4q-workbench.git
 cd cc4q-workbench
 conda create -n cc4q python=3.11 -y && conda activate cc4q
-# or: python3.11 -m venv .venv && source .venv/bin/activate
-#     (Windows PowerShell: .venv\Scripts\Activate.ps1)
+# For Windows PowerShell, using the following instead: 
+# conda create -n cc4q python=3.11 -y; conda activate cc4q
 
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
