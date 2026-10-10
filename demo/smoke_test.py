@@ -34,7 +34,10 @@ FAILURES = []
 
 def check(name, condition, detail=""):
     status = "PASS" if condition else "FAIL"
-    print(f"[{status}] {name}" + (f" — {detail}" if detail and not condition else ""))
+    line = f"[{status}] {name}" + (f" - {detail}" if detail and not condition else "")
+    # stay printable even on cp1252/ascii consoles (Windows runners)
+    print(line.encode(sys.stdout.encoding or "utf-8", "replace").decode(
+        sys.stdout.encoding or "utf-8", "replace"))
     if not condition:
         FAILURES.append(name)
 
@@ -237,6 +240,9 @@ def test_packaging():
               "ENV CC4Q_DEVICE" not in upper)
         check("(pkg) Dockerfile installs torch from the pytorch index",
               "download.pytorch.org/whl/" in src)
+        check("(pkg) Dockerfile uses the TORCH_CHANNEL var in the index URL "
+              "(no hardcoded/invalid channel)",
+              "whl/${TORCH_CHANNEL}" in src and "whl/gpu" not in src.lower())
 
 
 def test_app_rendering():

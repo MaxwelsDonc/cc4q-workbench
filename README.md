@@ -130,7 +130,7 @@ docker build -t cc4q-workbench .
 
 # GPU: torch 2.14.0+cu126 wheels (CUDA runtime libs are bundled in the
 # wheel, so no CUDA base image is needed), ~7 GB image
-docker build --build-arg TORCH_CHANNEL=gpu -t cc4q-workbench:gpu .
+docker build --build-arg TORCH_CHANNEL=cu126 -t cc4q-workbench:gpu .
 docker run --gpus all -p 8501:8501 cc4q-workbench:gpu
 ```
 

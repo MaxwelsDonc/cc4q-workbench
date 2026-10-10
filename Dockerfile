@@ -6,7 +6,7 @@
 #
 #   GPU (CUDA wheels; needs an NVIDIA driver + nvidia-container-toolkit on
 #   the host, and runs on CPU-only hosts too — just larger):
-#     docker build --build-arg TORCH_CHANNEL=gpu -t cc4q-workbench:gpu .
+#     docker build --build-arg TORCH_CHANNEL=cu126 -t cc4q-workbench:gpu .
 #     docker run --gpus all -p 8501:8501 cc4q-workbench:gpu
 #
 # No CC4Q_DEVICE is baked in: the app auto-detects CUDA at runtime
@@ -16,8 +16,8 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# TORCH_CHANNEL=cpu (default) -> torch CPU wheels, ~2.5 GB image.
-# TORCH_CHANNEL=gpu           -> torch 2.14.0+cu126 wheels; the bundled
+# TORCH_CHANNEL=cpu  (default) -> torch CPU wheels, ~2.5 GB image.
+# TORCH_CHANNEL=cu126          -> torch 2.14.0+cu126 CUDA wheels; the bundled
 #                                nvidia-*-cu12 runtime libraries make the
 #                                image GPU-capable, ~7 GB.
 ARG TORCH_CHANNEL=cpu
