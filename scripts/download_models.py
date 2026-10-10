@@ -26,8 +26,10 @@ import urllib.request
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CKPT_ROOT = os.path.join(PROJECT_ROOT, "models_checkpoints")
 
+# Checkpoints are hosted in a separate public repository so they are
+# anonymously downloadable even while the workbench repository is private.
+REPO = "MaxwelsDonc/cc4q-checkpoints"
 RELEASE = "v0.1.0"
-REPO = "MaxwelsDonc/cc4q-workbench"
 BASE_URL = f"https://github.com/{REPO}/releases/download/{RELEASE}"
 
 # asset name -> (checkpoint dir name, SHA256 of the .tar.gz)
