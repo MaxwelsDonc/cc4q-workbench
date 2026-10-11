@@ -75,7 +75,9 @@ def render():
                 units, parse_error, fallback = analysis.analyze_code(code, models=models)
 
         if parse_error:
-            st.warning(parse_error + " Falling back to line-by-line classification.")
+            st.warning("Not valid Python — falling back to line-by-line mode.")
+            with st.expander("Technical detail"):
+                st.code(parse_error)
         if not units:
             st.info("No comments found — nothing to classify. Try adding a "
                     "docstring or a comment.")

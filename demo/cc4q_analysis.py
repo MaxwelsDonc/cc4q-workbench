@@ -123,7 +123,7 @@ def _segment_record(record):
 def extract_units(source_code):
     """Extract + segment a Python snippet -> list of SCCU dicts.
 
-    Returns (units, error). error is a user-facing message when the
+    Returns (units, error). error is a short user-facing message when the
     snippet could not be parsed at all.
     """
     try:
@@ -132,7 +132,8 @@ def extract_units(source_code):
             id_gen=id_generator(), version="demo",
             host_language="python", clean_mode="current_only")
     except Exception as exc:
-        return [], f"Could not parse the snippet as Python ({exc})."
+        detail = f"{type(exc).__name__}: {str(exc).splitlines()[0][:300]}"
+        return [], f"Could not parse the snippet as Python ({detail})."
     units = []
     for record in records:
         units.extend(_segment_record(record))

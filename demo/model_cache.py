@@ -14,12 +14,20 @@ import cc4q_analysis as analysis  # noqa: E402
 from download_models import missing_checkpoints  # noqa: E402
 
 
+CKPT_DIR = os.path.join(PROJECT_ROOT, "models_checkpoints")
+REQUIRED = ("quantum_related", "quantum_category", "developer_intent")
+
+
 def checkpoints_missing():
-    """Names of missing checkpoint dirs ([] when the demo can classify)."""
-    try:
-        return missing_checkpoints()
-    except Exception:
-        return []
+    """Names of missing checkpoint dirs ([] when the demo can classify).
+
+    Only a missing checkpoints root is treated as "all missing"; any other
+    error from the completeness check propagates (fail loudly, never
+    silently claim checkpoints exist).
+    """
+    if not os.path.isdir(CKPT_DIR):
+        return list(REQUIRED)
+    return missing_checkpoints()
 
 
 def missing_checkpoints_warning():

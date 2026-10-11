@@ -34,7 +34,7 @@ def render():
         st.link_button("GitHub repository", GITHUB_URL, type="secondary",
                        use_container_width=True)
     with b2:
-        st.link_button("▶ Demo video (placeholder)", DEMO_VIDEO_URL,
+        st.link_button("▶ Demo video (soon)", DEMO_VIDEO_URL,
                        type="secondary", use_container_width=True)
     with b3:
         with st.popover("Companion paper — citation", use_container_width=True):

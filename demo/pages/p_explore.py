@@ -29,9 +29,11 @@ def _filter_frame(df):
             ctypes = st.multiselect("Comment form", ctype_choices, default=[])
             sdks = st.multiselect("SDK", sorted(df["sdk"].unique()),
                                   default=sorted(df["sdk"].unique()))
+            st.caption("No SDK selection = all SDKs.")
         with c3:
             keyword = st.text_input("Keyword search (comment text)",
-                                    placeholder="e.g. entangle, backend, VQE")
+                                    placeholder="e.g. entangle, backend, VQE "
+                                                "(press Enter to apply)")
 
     # developer intent stays in the data layer (units JSONL, downloads) —
     # it is not an Explore filter (design doc §2, quantum-centric)
@@ -63,8 +65,11 @@ def _display(out):
     start = (page - 1) * page_size
     chunk = out.iloc[start:start + page_size]
 
-    st.caption(f"{total:,} units match — showing rows {start + 1:,}–"
-               f"{min(start + page_size, total):,}.")
+    if total:
+        st.caption(f"{total:,} units match — showing rows {start + 1:,}–"
+                   f"{min(start + page_size, total):,}.")
+    else:
+        st.caption("0 units match — adjust or clear the filters.")
     st.dataframe(
         chunk[["sdk", "file", "comment_type", "code_entity_type",
                "comment_text", "quantum_related", "quantum_category"]],
