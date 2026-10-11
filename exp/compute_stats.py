@@ -27,6 +27,26 @@ REPOS = [
 ]
 CLEAN_MODE = "current_only"
 
+MISSING_HINT = """\
+[✗] Required pipeline output not found: {path}
+
+This script reads the stage-02/03 outputs of the generalization experiment,
+which are not part of the git checkout. To reproduce them:
+
+  1. Clone the pinned repos:   python scripts/01_download_repos.py config/repo_list_generalization.yaml
+  2. For each repo config in config/config_qiskit-*.yaml:
+       python scripts/02_extract_code_comment_pairs.py <config>
+       python scripts/03_segment_comments.py <config>
+  3. Label the SCCUs:          python exp/run_inference.py   (needs the checkpoints)
+
+See exp/generalization_results.md for the full reproduction walkthrough.
+"""
+
+
+def require(path):
+    if not os.path.isfile(path):
+        sys.exit(MISSING_HINT.format(path=path))
+
 
 def load_config(project):
     cfg_path = os.path.join(PROJECT_ROOT, "config", f"config_{project}.yaml")
@@ -44,12 +64,14 @@ def main():
         py_files = get_files_from_dir(base_dir, cfg.get("include_dirs", []))
 
         ccp_file = os.path.join(output_dir, f"comment_pairs_{CLEAN_MODE}.json")
+        require(ccp_file)
         with open(ccp_file, "r", encoding="utf-8") as f:
             ccps = json.load(f)
 
         sccu_file = os.path.join(
             output_dir, "segmented", f"comment_pairs_{CLEAN_MODE}_segmented.json"
         )
+        require(sccu_file)
         with open(sccu_file, "r", encoding="utf-8") as f:
             sccus = json.load(f)
 

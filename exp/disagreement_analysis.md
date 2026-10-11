@@ -1,8 +1,8 @@
 # Disagreement analysis: human vs model quantum-axis labels (3 new SDKs)
 
-Sample: 379 author-verified SCCUs (154 blind + 225 assisted), 6 calibration items excluded.
-Disagreements: 57 (32 false positives, 25 false negatives).
-Blind subset agreement 84.4% (95% CI 77.9-89.3); assisted subset 85.3% (95% CI 80.1-89.4).
+Sample: 379 author-verified SCCUs (385 sampled per Cochran's formula; 6
+calibration items excluded). Disagreements: 57 (32 false positives, 25
+false negatives). Overall agreement 85.0% (95% CI 81.0-88.2).
 
 ## False-positive patterns (model=quantum, human=non-quantum; 32)
 

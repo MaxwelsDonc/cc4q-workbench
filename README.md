@@ -59,7 +59,7 @@ python scripts/03_segment_comments.py config/examples.yaml
 ```
 
 Only trying the pipeline, not the classifiers? A lean install suffices:
-`pip install libcst==1.8.2 pyyaml loguru tqdm docutils==0.21.2 sphinx==8.2.3 spacy==3.8.7 nltk`.
+`pip install libcst==1.8.2 pyyaml loguru tqdm docutils==0.21.2 sphinx==8.2.3 spacy==3.8.7 && python -m spacy download en_core_web_sm`.
 
 **Classifier checkpoints** (~1.2 GB, needed for the Analyze pages and for
 labeling new corpora):
@@ -79,6 +79,9 @@ One command runs the test suite (pytest is in `demo/requirements-demo.txt`):
 pip install pytest   # plus: pip install -r demo/requirements-demo.txt for the app tests
 pytest
 ```
+
+Prerequisite: the spaCy English model (`python -m spacy download
+en_core_web_sm`) — without it the segmenter tests are skipped, not failed.
 
 - `tests/test_data.py` — demo-data integrity, packaging checks, and the
   snippet pipeline (no checkpoints needed; same checks CI runs via
