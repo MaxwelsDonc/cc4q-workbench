@@ -3,9 +3,9 @@
 The three fine-tuned BERT classifiers (one directory per label axis) are
 shipped as release assets because they are too large for git:
 
-    https://github.com/MaxwelsDonc/cc4q-workbench/releases/tag/v0.1.0
+    https://github.com/MaxwelsDonc/cc4q-checkpoints/releases/tag/v0.1.0
 
-Usage (from the workbench root, any Python >= 3.9, no extra deps):
+Usage (from the workbench root, Python >= 3.11, no extra deps):
 
     python scripts/download_models.py            # download what is missing
     python scripts/download_models.py --check    # verify only, exit 1 if incomplete
@@ -70,11 +70,30 @@ def _sha256(path, chunk_size=1 << 20):
     return digest.hexdigest()
 
 
-def _download(asset, dest_path):
+def _download_once(asset, dest_path):
     url = f"{BASE_URL}/{asset}"
     req = urllib.request.Request(url, headers={"User-Agent": "cc4q-workbench"})
-    with urllib.request.urlopen(req) as resp, open(dest_path, "wb") as out:
+    with urllib.request.urlopen(req, timeout=60) as resp, open(dest_path, "wb") as out:
         shutil.copyfileobj(resp, out, length=1 << 20)
+
+
+def _download(asset, dest_path):
+    try:
+        _download_once(asset, dest_path)
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError(
+            f"Release asset not found at {BASE_URL}/{asset} (HTTP {exc.code}) "
+            "- check https://github.com/MaxwelsDonc/cc4q-checkpoints/releases"
+        ) from exc
+    except Exception:
+        # one retry (transient network errors), then give up
+        try:
+            _download_once(asset, dest_path)
+        except urllib.error.HTTPError as exc:
+            raise RuntimeError(
+                f"Release asset not found at {BASE_URL}/{asset} (HTTP {exc.code}) "
+                "- check https://github.com/MaxwelsDonc/cc4q-checkpoints/releases"
+            ) from exc
 
 
 def fetch_missing(verbose=True):
