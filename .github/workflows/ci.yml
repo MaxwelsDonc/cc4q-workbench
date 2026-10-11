@@ -112,3 +112,42 @@ jobs:
 
       - name: Build GPU image (build-only, no GPU runtime needed)
         run: docker build --build-arg TORCH_CHANNEL=cu126 -t cc4q-workbench:test-gpu .
+
+  pytest:
+    name: pytest suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            demo/requirements-demo.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+          python -m pip install -r demo/requirements-demo.txt
+          python -m spacy download en_core_web_sm
+
+      - name: Run pytest (model tests self-skip without checkpoints)
+        run: python -m pytest -v
+
+  assets:
+    name: Checkpoint release assets reachable
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check ccq-checkpoints v0.1.0 asset URLs
+        run: |
+          base="https://github.com/MaxwelsDonc/cc4q-checkpoints/releases/download/v0.1.0"
+          failed=0
+          for asset in quantum_related.tar.gz quantum_category.tar.gz developer_intent.tar.gz; do
+            code=$(curl -sIL -o /dev/null -w "%{http_code}" --max-time 60 "$base/$asset")
+            echo "$asset -> HTTP $code"
+            if [ "$code" != "200" ]; then failed=1; fi
+          done
+          exit $failed
