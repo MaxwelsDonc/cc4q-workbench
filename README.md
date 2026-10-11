@@ -59,7 +59,7 @@ python scripts/03_segment_comments.py config/examples.yaml
 ```
 
 Only trying the pipeline, not the classifiers? A lean install suffices:
-`pip install libcst==1.8.2 pyyaml loguru tqdm docutils==0.21.2 sphinx==8.2.3 spacy==3.8.7 && python -m spacy download en_core_web_sm`.
+`pip install libcst==1.8.2 pyyaml loguru tqdm docutils==0.21.2 sphinx==8.2.3 spacy==3.8.7 click && python -m spacy download en_core_web_sm`.
 
 **Classifier checkpoints** (~1.2 GB, needed for the Analyze pages and for
 labeling new corpora):

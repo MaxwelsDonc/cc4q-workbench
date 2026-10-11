@@ -11,6 +11,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  lean:
+    name: Lean install (pipeline only)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Lean install per README + run pipeline
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install libcst==1.8.2 pyyaml loguru tqdm docutils==0.21.2 sphinx==8.2.3 spacy==3.8.7 click
+          python -m spacy download en_core_web_sm
+          python scripts/02_extract_code_comment_pairs.py config/examples.yaml
+          python scripts/03_segment_comments.py config/examples.yaml
+
   quickstart:
     name: Quick start (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
