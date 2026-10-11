@@ -22,8 +22,9 @@ except OSError:
         try:
             nlp = spacy.load('en_core_web_lg')
         except OSError:
-            nlp = None
-            print('Warning: spaCy English model not available; paragraph segmentation is disabled')
+            raise ImportError(
+                'Please install the spaCy English model: '
+                'python -m spacy download en_core_web_sm')
 
 def dummy_role(name, rawtext, text, lineno, inliner, options=None, content=None):
     return ([nodes.literal(text, text)], [])
@@ -181,7 +182,7 @@ def segment_docstring(comment_text: str) -> List[Dict[str, Any]]:
             else:
                 blocks.append({'type': typename, 'content': node.astext()})
         return blocks
-    except Exception as e:
+    except Exception:
         return [{'type': 'paragraph', 'content': comment_text.strip()}]
 
 def parse_docstring_to_blocks(docstring: str) -> List[Dict[str, Any]]:

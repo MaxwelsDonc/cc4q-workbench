@@ -49,7 +49,7 @@ SAMPLE_SEED = 42
 
 # sdk -> (clone URL, pinned tag, pipeline include_dirs (None = whole repo))
 REPO_SOURCES = {
-    "qiskit": ("https://github.com/Qiskit/qiskit", "2.1.0", None),
+    "qiskit": ("https://github.com/Qiskit/qiskit", "2.1.0", ["qiskit"]),
     "qiskit-aer": ("https://github.com/Qiskit/qiskit-aer", "0.17.2", ["qiskit_aer"]),
     "qiskit-ibm-runtime": ("https://github.com/Qiskit/qiskit-ibm-runtime",
                            "0.45.1", ["qiskit_ibm_runtime"]),

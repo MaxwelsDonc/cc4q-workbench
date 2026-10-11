@@ -236,16 +236,16 @@
       "sampled": true,
       "sample_size": 2000,
       "sample_seed": 42,
-      "python_files": 1105,
+      "python_files": 681,
       "files": 681,
       "ccps": 9677,
       "sccus": 21970,
       "quantum_sccus": 7778,
       "quantum_proportion": 0.354,
       "comment_density": {
-        "comment_lines": 26128,
-        "code_lines": 245537,
-        "value": 0.1064
+        "comment_lines": 14826,
+        "code_lines": 117733,
+        "value": 0.1259
       },
       "intent_counts": {
         "What": 11537,

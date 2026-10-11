@@ -34,11 +34,12 @@ def clone_repo(repo, output_dir):
                 ['git', '-C', repo_path, 'describe', '--tags', '--always'],
                 capture_output=True, text=True, check=True).stdout.strip()
             if actual != ref:
-                print(f'[!] {name}: existing checkout is at "{actual}", '
-                      f'expected "{ref}" - remove {repo_path} to re-clone')
-                return
+                print(f'[✗] {name}: existing checkout is at "{actual}", '
+                      f'expected "{ref}" - remove {repo_path} to re-clone',
+                      file=sys.stderr)
+                return False
         print(f'[✓] Skipping existing repo: {name}')
-        return
+        return True
 
     cmd = ['git', 'clone', '--depth', '1']
     if ref:
@@ -47,6 +48,7 @@ def clone_repo(repo, output_dir):
     label = f'{name}@{ref}' if ref else name
     print(f'[→] Cloning {label}...')
     subprocess.run(cmd, check=True)
+    return True
 
 
 def main():
@@ -56,11 +58,18 @@ def main():
         config = yaml.safe_load(f)
     output_dir = config.get('output_dir', 'data/input')
     os.makedirs(output_dir, exist_ok=True)
+    failed = False
     for repo in config['repos']:
         try:
-            clone_repo(repo, output_dir)
+            if not clone_repo(repo, output_dir):
+                failed = True
         except subprocess.CalledProcessError:
-            print(f'[✗] Failed to clone: {repo}')
+            print(f'[✗] Failed to clone: {repo}', file=sys.stderr)
+            failed = True
+    if failed:
+        print('[✗] One or more repositories could not be prepared',
+              file=sys.stderr)
+        sys.exit(1)
 
 
 if __name__ == '__main__':

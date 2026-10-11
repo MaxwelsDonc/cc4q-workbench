@@ -8,6 +8,8 @@ from libcst.metadata import MetadataWrapper
 from parser_core.utils.code_cleaner import clean_code_snippet
 from utils.path_utils import split_path
 
+DEBUG_INCONSISTENT_LINENO = False
+
 class LibCSTVisitor(cst.CSTVisitor):
     METADATA_DEPENDENCIES = (PositionProvider,)
 
@@ -152,9 +154,15 @@ class LibCSTVisitor(cst.CSTVisitor):
 
     def get_records(self) -> List[Dict]:
         return self.records
-    import difflib
 
     def debug_inconsistent_lineno(self, node: cst.CSTNode, label: str='') -> None:
+        """Diagnostic for PositionProvider vs code_for_node drift.
+
+        Silent by default; set DEBUG_INCONSISTENT_LINENO = True to print
+        diffs while investigating extraction issues.
+        """
+        if not DEBUG_INCONSISTENT_LINENO:
+            return
         try:
             pos = self.get_metadata(PositionProvider, node)
             start_line = pos.start.line

@@ -13,7 +13,7 @@ from utils.id_utils import id_generator
 
 class CommentPairExtractor:
 
-    def __init__(self, base_dir: str, output_dir: str, project: str, version: str='latest', clean_mode: str='none', host_language: str='python', include_dirs: List[str]=None, id_gen: str=id_generator()):
+    def __init__(self, base_dir: str, output_dir: str, project: str, version: str='latest', clean_mode: str='none', host_language: str='python', include_dirs: List[str]=None, id_gen: str=None):
         self.base_dir = base_dir
         self.output_dir = output_dir
         self.project = project
@@ -21,12 +21,15 @@ class CommentPairExtractor:
         self.clean_mode = clean_mode
         self.host_language = host_language
         self.include_dirs = include_dirs or []
-        self.id_gen = id_gen
+        # build the id generator per instance (a generator default argument
+        # would be shared across all instances and exhausted after one use)
+        self.id_gen = id_gen if id_gen is not None else id_generator()
         self.parsers: Dict[str, Callable] = {'python': python_extract_comment_pairs}
         if host_language not in self.parsers:
             raise ValueError(f'Unsupported host language: {host_language}')
         self.extract_func = self.parsers[host_language]
-        logger.add('scripts/log/02_extract_code_comment_pairs.log', rotation='1 day', retention='7 days', compression='zip')
+        logger.add(os.path.join(get_project_path(), 'scripts/log/02_extract_code_comment_pairs.log'),
+                   rotation='1 day', retention='7 days', compression='zip')
 
     @classmethod
     def from_config(cls, config_path: str):
@@ -73,11 +76,26 @@ class CommentPairExtractor:
 if __name__ == '__main__':
     import sys
     project_path = get_project_path()
-    rel_config = sys.argv[1] if len(sys.argv) > 1 else 'config/config_qiskit-aer.yaml'
+    rel_config = sys.argv[1] if len(sys.argv) > 1 else 'config/examples.yaml'
     config_path = os.path.join(project_path, rel_config)
+    if not os.path.isdir(os.path.dirname(config_path)) or not os.path.isfile(config_path):
+        print(f'[✗] Config not found: {config_path}', file=sys.stderr)
+        sys.exit(1)
     extractor = CommentPairExtractor.from_config(config_path)
     logger.info('Starting comment pair extraction process.')
     logger.info(f'the extractor mode is {extractor.clean_mode}')
+    if not os.path.isdir(extractor.base_dir):
+        print(f'[✗] input_dir does not exist: {extractor.base_dir} '
+              f'(clone the repo first, e.g. scripts/01_download_repos.py)',
+              file=sys.stderr)
+        sys.exit(1)
+    files = extractor.get_target_files()
+    if not files:
+        print(f'[✗] No .py files found under {extractor.base_dir} '
+              f'(include_dirs={extractor.include_dirs!r}) - nothing to extract',
+              file=sys.stderr)
+        sys.exit(1)
+    logger.info(f'Found {len(files)} {extractor.host_language} files to process')
     records = extractor.process_all()
     extractor.save_to_json(records, filename=f'comment_pairs_{extractor.clean_mode}.json')
     logger.info('Extraction and saving completed.')
