@@ -105,10 +105,8 @@ jobs:
 
       - name: Pipeline CLI inside the CPU container
         run: |
-          docker run --rm --entrypoint python cc4q-workbench:test-cpu \
-            scripts/02_extract_code_comment_pairs.py config/examples.yaml
-          docker run --rm --entrypoint python cc4q-workbench:test-cpu \
-            scripts/03_segment_comments.py config/examples.yaml
+          docker run --rm --entrypoint bash cc4q-workbench:test-cpu -c \
+            "python scripts/02_extract_code_comment_pairs.py config/examples.yaml && python scripts/03_segment_comments.py config/examples.yaml"
 
       - name: Build GPU image (build-only, no GPU runtime needed)
         run: docker build --build-arg TORCH_CHANNEL=cu126 -t cc4q-workbench:test-gpu .
