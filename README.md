@@ -96,6 +96,34 @@ python scripts/download_models.py --check    # verify only
 
 Everything else works without them.
 
+## Python API & CLI
+
+Everything above is also available as a library and a CLI
+(`pip install git+https://github.com/MaxwelsDonc/cc4q-workbench`):
+
+```python
+import cc4q
+
+models = cc4q.load_models()                       # released checkpoints
+labeled = cc4q.predict_corpus("sccus.jsonl", models=models)
+sample = cc4q.sample(labeled, by=["SDK"], n=200, seed=42)
+cc4q.annotate(sample, schema={"text_column": "comment_text",
+                              "id_column": "id",
+                              "labels": ["quantum", "non-quantum"]},
+              mode="adjudicate", output_dir="ann/")
+result = cc4q.evaluate_files(csv_path="ann/annotations.csv",
+                             key_path="key.jsonl")
+```
+
+```bash
+cc4q build --repo https://github.com/Qiskit/qiskit-aer --output-dir out/aer
+cc4q train --task quantum_related --data annotations.jsonl \
+    --output-dir out/my_classifier
+```
+
+Full command reference (`cc4q --help`) and Sphinx docs: `docs/`
+(GitHub Pages once the repo is public).
+
 ## Tests
 
 One command runs the test suite (pytest is in `demo/requirements-demo.txt`):
@@ -122,11 +150,14 @@ is a runnable usage example for the segmenters.
 ## Repository layout
 
 ```
+cc4q/             the pip-installable library + CLI (pipeline, models, predict,
+                  train, evaluate, sample, annotate, viz)
 demo/           the web workbench (Streamlit) + precomputed dashboards
 scripts/        pipeline entry points (download → extract → segment) + model download
-parser_core/ segment_core/ utils/ config/   pipeline libraries & per-SDK configs
+parser_core/ segment_core/ utils/ config/   compatibility shims & per-SDK configs
 model/          classifier training code, training data, label mappings
-examples/       tiny sample sources for the quick start
+examples/       tiny sample sources + the model-assisted-annotation recipe
+docs/           Sphinx documentation (guides, API reference, data contracts)
 exp/            tool-paper validation evidence (see exp/README.md)
 rqs/            companion study's analysis scripts and results
 doc/            labeling guideline + workbench design document
