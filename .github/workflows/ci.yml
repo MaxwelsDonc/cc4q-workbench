@@ -193,6 +193,11 @@ jobs:
           python -c "import cc4q; print(cc4q.__version__)"
           python -c "from cc4q.pipeline.files import get_files_from_dir; print('pipeline OK')"
           cc4q --help >/dev/null && echo "console script OK"
+          cc4q download-models --check
+          for c in download-models build predict sample annotate train evaluate demo serve; do
+            cc4q "$c" --help >/dev/null || exit 1
+          done
+          echo "all subcommand --help OK"
 
   assets:
     name: Checkpoint release assets reachable

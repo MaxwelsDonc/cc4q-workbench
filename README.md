@@ -58,6 +58,31 @@ python scripts/02_extract_code_comment_pairs.py config/examples.yaml
 python scripts/03_segment_comments.py config/examples.yaml
 ```
 
+The same workflow is available as the `cc4q` CLI (install with
+`pip install -e .`; every subcommand has `--help`):
+
+```bash
+cc4q download-models                 # fetch the classifier checkpoints
+cc4q build --repo https://github.com/Qiskit/qiskit-aer \
+    --include-dir qiskit_aer --output-dir out/aer   # clone + extract + segment
+cc4q predict --input out/aer/sccus_segmented.json \
+    --output out/aer/labeled.jsonl                  # three-axis labels
+cc4q sample --input out/aer/labeled.jsonl --by SDK --n 200 \
+    --output out/aer/sample.jsonl                   # stratified spot-check
+cc4q annotate --data out/aer/sample.jsonl \
+    --schema schema.yaml --mode adjudicate \
+    --predictions out/aer/labeled.jsonl \
+    --output-dir out/aer/ann                        # human spot-check UI
+cc4q evaluate --annotations out/aer/ann/annotations.csv \
+    --key out/aer/key.jsonl                         # agreement / P / R / CI
+cc4q demo                            # launch the Streamlit workbench
+```
+
+`examples/recipe_model_assisted_annotation.py` chains the whole loop in one
+command (`run-all`), and `walk-spotcheck` replays the paper's 385-item
+spot-check (predict -> sample -> annotate -> evaluate, asserting 85.0%
+agreement).
+
 Only trying the pipeline, not the classifiers? A lean install suffices:
 `pip install libcst==1.8.2 pyyaml loguru tqdm docutils==0.21.2 sphinx==8.2.3 spacy==3.8.7 click && python -m spacy download en_core_web_sm`.
 
