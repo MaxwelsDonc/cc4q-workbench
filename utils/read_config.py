@@ -1,7 +1,4 @@
-import yaml
-from typing import List, Dict, Any
+"""Shim: the implementation moved to cc4q.pipeline.config."""
+from cc4q.pipeline.config import read_config
 
-def read_config(config_path: str) -> Dict[str, Any]:
-    with open(config_path, 'r', encoding='utf-8') as f:
-        config = yaml.safe_load(f)
-    return config
+__all__ = ["read_config"]

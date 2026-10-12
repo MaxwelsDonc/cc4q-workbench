@@ -1,7 +1,4 @@
-from typing import Iterator
+"""Shim: the implementation moved to cc4q.pipeline.ids."""
+from cc4q.pipeline.ids import id_generator
 
-def id_generator(start: int=1) -> Iterator[str]:
-    i = start
-    while True:
-        yield str(i)
-        i += 1
+__all__ = ["id_generator"]

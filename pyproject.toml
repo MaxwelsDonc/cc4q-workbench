@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "cc4q"
+version = "0.1.0"
+description = "Build, inspect, and profile labeled comment corpora for Python-based quantum SDKs"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    # runtime core (the analysis/dev stack stays in requirements.txt)
+    "libcst==1.8.2",
+    "PyYAML==6.0.2",
+    "loguru==0.7.3",
+    "tqdm>=4.60",
+    "docutils==0.21.2",
+    "spacy==3.8.7",
+    "torch>=2.1",
+    "transformers>=4.45",
+]
+
+[project.scripts]
+cc4q = "cc4q.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["cc4q*"]

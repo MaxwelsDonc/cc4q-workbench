@@ -11,6 +11,9 @@ checkout, e.g.:
 
 Usage:
     python scripts/01_download_repos.py [config/repo_list.yaml]
+
+Exit status is nonzero if any clone fails or an existing checkout does not
+match the requested ref. The implementation lives in cc4q.pipeline.download.
 """
 
 import os
@@ -19,36 +22,9 @@ import sys
 
 import yaml
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-def clone_repo(repo, output_dir):
-    if isinstance(repo, str):
-        url, ref = repo, None
-    else:
-        url, ref = repo['url'], repo.get('ref')
-    name = url.strip().split('/')[-1].replace('.git', '')
-    repo_path = os.path.join(output_dir, name)
-
-    if os.path.exists(repo_path):
-        if ref:
-            actual = subprocess.run(
-                ['git', '-C', repo_path, 'describe', '--tags', '--always'],
-                capture_output=True, text=True, check=True).stdout.strip()
-            if actual != ref:
-                print(f'[✗] {name}: existing checkout is at "{actual}", '
-                      f'expected "{ref}" - remove {repo_path} to re-clone',
-                      file=sys.stderr)
-                return False
-        print(f'[✓] Skipping existing repo: {name}')
-        return True
-
-    cmd = ['git', 'clone', '--depth', '1']
-    if ref:
-        cmd += ['--branch', ref]
-    cmd += [url, repo_path]
-    label = f'{name}@{ref}' if ref else name
-    print(f'[→] Cloning {label}...')
-    subprocess.run(cmd, check=True)
-    return True
+from cc4q.pipeline.download import clone_repo
 
 
 def main():

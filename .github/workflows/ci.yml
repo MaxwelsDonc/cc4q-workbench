@@ -158,6 +158,29 @@ jobs:
       - name: Run pytest (model tests self-skip without checkpoints)
         run: python -m pytest -v
 
+  packaging:
+    name: Packaging (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install package (no deps)
+        run: python -m pip install -e . --no-deps
+
+      - name: Import cc4q (light) and pipeline.files
+        run: |
+          python -c "import cc4q; print(cc4q.__version__)"
+          python -c "from cc4q.pipeline.files import get_files_from_dir; print('pipeline OK')"
+          cc4q --help >/dev/null && echo "console script OK"
+
   assets:
     name: Checkpoint release assets reachable
     runs-on: ubuntu-latest
