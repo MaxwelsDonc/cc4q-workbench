@@ -176,6 +176,7 @@ jobs:
         run: python -m pip install -e . --no-deps
 
       - name: Import cc4q (light) and pipeline.files
+        shell: bash
         run: |
           python -c "import cc4q; print(cc4q.__version__)"
           python -c "from cc4q.pipeline.files import get_files_from_dir; print('pipeline OK')"
