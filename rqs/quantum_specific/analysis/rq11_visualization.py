@@ -13,7 +13,7 @@ def rq11_latex_code(top_k=5):
     data_dict = {}
     for res_file in res_dict.values():
         temp_dir = os.path.join(parent_root, 'results', res_file)
-        with open(temp_dir, 'r') as f:
+        with open(temp_dir, 'r', encoding='utf-8') as f:
             temp_data = json.load(f)
         data_dict[res_file] = temp_data
     data_content = ''
@@ -54,5 +54,5 @@ if __name__ == '__main__':
     save_dir = os.path.join(parent_root, 'visualization')
     os.makedirs(save_dir, exist_ok=True)
     save_file = os.path.join(save_dir, f'RQ11_table.tex')
-    with open(save_file, 'w') as f:
+    with open(save_file, 'w', encoding='utf-8') as f:
         f.write(latex_code)

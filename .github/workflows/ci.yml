@@ -128,8 +128,15 @@ jobs:
         run: docker build --build-arg TORCH_CHANNEL=cu126 -t cc4q-workbench:test-gpu .
 
   pytest:
-    name: pytest suite
-    runs-on: ubuntu-latest
+    name: pytest suite (${{ matrix.os }})
+    # Deliberately NO PYTHONUTF8 here: the suite must pass on a default
+    # Windows (GBK) console too, so every file open in our code is forced
+    # to declare encoding="utf-8".
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
       - uses: actions/checkout@v4
 

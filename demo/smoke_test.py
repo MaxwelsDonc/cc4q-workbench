@@ -181,7 +181,7 @@ def test_precomputed_data():
           and abs(app - 0.260) < 0.001, str(app))
 
     # (§8.6) no intent charts anywhere: dashboard must not touch intent data
-    with open(os.path.join(DEMO_DIR, "dashboard.py")) as f:
+    with open(os.path.join(DEMO_DIR, "dashboard.py"), encoding="utf-8") as f:
         dashboard_src = f.read()
     check("(6) dashboard.py has no intent analysis",
           "intent_counts" not in dashboard_src
@@ -233,7 +233,7 @@ def test_packaging():
     check("(pkg) no separate Dockerfile.gpu",
           not os.path.isfile(os.path.join(PROJECT_ROOT, "Dockerfile.gpu")))
     if os.path.isfile(dockerfile):
-        with open(dockerfile) as f:
+        with open(dockerfile, encoding="utf-8") as f:
             src = f.read()
         upper = src.upper()
         check("(pkg) Dockerfile has TORCH_CHANNEL build-arg",
