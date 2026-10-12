@@ -49,6 +49,9 @@ _LAZY = {
     "train": "cc4q.train",
     "evaluate": "cc4q.evaluate",
     "evaluate_files": "cc4q.evaluate",
+    # sampling + annotation (WP3)
+    "sample": "cc4q.sample",
+    "annotate": "cc4q.annotate",
 }
 
 __all__ = sorted(_LAZY)
