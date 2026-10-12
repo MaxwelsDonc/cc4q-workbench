@@ -7,14 +7,13 @@ import streamlit as st
 
 DEMO_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(DEMO_DIR)
-if os.path.join(PROJECT_ROOT, "scripts") not in sys.path:
-    sys.path.insert(0, os.path.join(PROJECT_ROOT, "scripts"))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
 
-import cc4q_analysis as analysis  # noqa: E402
-from download_models import missing_checkpoints  # noqa: E402
+from cc4q.models.hub import (default_model_dir, load_models,  # noqa: E402
+                             missing_checkpoints)
 
-
-CKPT_DIR = os.path.join(PROJECT_ROOT, "models_checkpoints")
+CKPT_DIR = default_model_dir()
 REQUIRED = ("quantum_related", "quantum_category", "developer_intent")
 
 
@@ -27,7 +26,7 @@ def checkpoints_missing():
     """
     if not os.path.isdir(CKPT_DIR):
         return list(REQUIRED)
-    return missing_checkpoints()
+    return missing_checkpoints(CKPT_DIR)
 
 
 def missing_checkpoints_warning():
@@ -44,10 +43,4 @@ def missing_checkpoints_warning():
 
 @st.cache_resource(show_spinner=False)
 def get_models():
-    missing = checkpoints_missing()
-    if missing:
-        raise RuntimeError(
-            f"Missing model checkpoints: {', '.join(missing)}. "
-            "Run: python scripts/download_models.py"
-        )
-    return analysis.load_models()
+    return load_models(model_dir=CKPT_DIR)
