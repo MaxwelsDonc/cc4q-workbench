@@ -15,8 +15,8 @@ def _results(units, fallback):
     n_quantum = sum(1 for u in units if u.get("quantum_related"))
     summary_strip(len(units), n_quantum)
     if fallback:
-        st.caption("Raw-text mode: input classified line by line without "
-                   "code-comment extraction.")
+        st.caption("Line-by-line fallback: input could not be parsed as "
+                   "Python, so each non-empty line was classified directly.")
 
     st.markdown("#### Labeled units")
     for u in units:
@@ -45,8 +45,6 @@ def render():
         code = st.text_area("Python source", value=analysis.QISKIT_SNIPPET,
                             height=360, label_visibility="collapsed")
         st.caption("Prefilled: a minimal Qiskit Bell-state circuit.")
-        force_raw = st.checkbox("Analyze as raw comment text "
-                                "(skip code parsing; classify each non-empty line)")
         run = st.button("Analyze", type="primary", use_container_width=True,
                         disabled=no_models)
         st.caption(f"running on: {analysis.DEVICE}")
@@ -63,16 +61,8 @@ def render():
 
         with st.spinner("Loading classifiers (first run takes a few seconds)"):
             models = get_models()
-
-        if force_raw:
-            units = analysis.raw_text_units(code)
-            parse_error, fallback = None, True
-            if units:
-                with st.spinner("Classifying…"):
-                    analysis.classify_units(units, models)
-        else:
-            with st.spinner("Extracting, segmenting and classifying…"):
-                units, parse_error, fallback = analysis.analyze_code(code, models=models)
+        with st.spinner("Extracting, segmenting and classifying…"):
+            units, parse_error, fallback = analysis.analyze_code(code, models=models)
 
         if parse_error:
             st.warning("Not valid Python — falling back to line-by-line mode.")

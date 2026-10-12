@@ -61,8 +61,7 @@ Four pages, reachable via the top navigation (`st.navigation`):
 ### 3.2 Analyze Code
 
 - Left column: code textarea pre-filled with a Bell-state example (verified
-  clean labels; no `(|00>+|11>)/sqrt(2)` line). Buttons: **Analyze**,
-  "Analyze as raw comment text" fallback checkbox.
+  clean labels; no `(|00>+|11>)/sqrt(2)` line). Button: **Analyze**.
 - Right column, on result:
   - Summary strip: `N units · M quantum-related (P%)` — intent is NOT in the
     summary strip.
@@ -75,7 +74,8 @@ Four pages, reachable via the top navigation (`st.navigation`):
 - Model loading: lazy via `st.cache_resource` on first Analyze click; spinner
   text "Loading classifiers (first run takes a few seconds)". CPU only.
 - Edge states: empty input → info message; non-parseable Python → warning +
-  automatic raw-text fallback; missing checkpoints → warning with
+  automatic line-by-line fallback (no manual raw-text mode); missing
+  checkpoints → warning with
   `python scripts/download_models.py` instructions and disabled button.
 
 ### 3.3 Analyze Repository

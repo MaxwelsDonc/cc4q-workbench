@@ -52,6 +52,17 @@ def test_snippet_pipeline(with_models):
           f"got {len(units)}")
     check("(a) no mislabel-prone math comment in snippet",
           "sqrt(2)" not in analysis.QISKIT_SNIPPET)
+    # non-Python input auto-falls back to line-by-line classification
+    junk = "this is not python at all\n# another plain line\nquantum stuff"
+    units, error, fallback = analysis.analyze_code(junk)
+    check("(a) non-Python input auto-falls back with warning",
+          error is not None and fallback, f"error={error} fallback={fallback}")
+    check("(a) fallback still yields labeled units", len(units) >= 2,
+          f"got {len(units)}")
+    # empty input is graceful (no units, no crash)
+    units, error, fallback = analysis.analyze_code("   \n  ")
+    check("(a) empty input is graceful", units == [] and not fallback,
+          f"units={len(units)}")
     if not with_models:
         return
     models = analysis.load_models()
@@ -283,6 +294,24 @@ def test_app_rendering():
         rendered = "\n".join(m.value or "" for m in at.markdown)
         check("analyze-code: no intent badge in UI",
               "intent ·" not in rendered.lower())
+
+        # non-Python input -> auto-fallback warning + line-by-line labels
+        at.text_area[0].set_value("this is not python at all\n# quantum line")
+        at.run()
+        at.button[0].click().run()
+        ok = (not at.exception
+              and any("Not valid Python" in (w.value or "") for w in at.warning)
+              and any("Line-by-line fallback" in (c.value or "") for c in at.caption))
+        check("analyze-code: non-Python auto-fallback", ok, str(at.exception))
+
+        # empty input -> graceful info, no crash
+        at.text_area[0].set_value("")
+        at.run()
+        at.button[0].click().run()
+        ok = (not at.exception
+              and any("No comments found" in (i.value or "") for i in at.info))
+        check("analyze-code: empty input handled gracefully", ok,
+              str(at.exception))
 
     # Page 3: Analyze Repository — §1-§3 sections + compare.
     at.switch_page("pages/p_analyze_repo.py").run()

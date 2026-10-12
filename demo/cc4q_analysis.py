@@ -141,7 +141,7 @@ def extract_units(source_code):
 
 
 def raw_text_units(raw_text):
-    """Fallback mode: classify raw comment text line by line."""
+    """Automatic fallback: classify non-parseable input line by line."""
     return [{"text": line.strip().lstrip("#").strip(), "comment_type": "raw"}
             for line in raw_text.splitlines()
             if line.strip().lstrip("#").strip()]
