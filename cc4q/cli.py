@@ -73,11 +73,16 @@ def build(repo: str = typer.Option(..., "--repo", help="GitHub URL to clone"),
 
     workdir = tempfile.mkdtemp(prefix="cc4q_build_")
     try:
-        entry = {"url": repo, "ref": ref} if ref else repo
-        if not clone_repo(entry, workdir):
-            raise typer.Exit(1)
-        name = repo.strip().split("/")[-1].replace(".git", "")
-        src = os.path.join(workdir, name)
+        if os.path.isdir(repo):
+            # local source directory: no clone needed
+            src = os.path.abspath(repo)
+            name = os.path.basename(src.rstrip(os.sep))
+        else:
+            entry = {"url": repo, "ref": ref} if ref else repo
+            if not clone_repo(entry, workdir):
+                raise typer.Exit(1)
+            name = repo.strip().split("/")[-1].replace(".git", "")
+            src = os.path.join(workdir, name)
 
         from cc4q.pipeline.files import get_files_from_dir
         files = get_files_from_dir(src, include_dir or None)

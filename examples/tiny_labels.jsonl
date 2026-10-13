@@ -1,0 +1,4 @@
+{"comment": "Apply a Hadamard gate to the first qubit.", "label": 1}
+{"comment": "Increment the retry counter.", "label": 0}
+{"comment": "Measure both qubits in the computational basis.", "label": 1}
+{"comment": "Sort the list in place.", "label": 0}
