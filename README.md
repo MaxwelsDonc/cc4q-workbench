@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/MaxwelsDonc/cc4q-workbench/actions/workflows/ci.yml/badge.svg)](https://github.com/MaxwelsDonc/cc4q-workbench/actions/workflows/ci.yml)
 
-**Turn any Python-based quantum SDK repository into a labeled code-comment corpus, then inspect and profile its quantum knowledge.**
+**Point CC4Q at any Python quantum-SDK repository and get a corpus of comments, each labeled by how much quantum knowledge it carries — ready to study, extend, or retrain.**
 
 <p align="center">
   <img src="doc/screenshot_analyze_repo.png" alt="Analyze Repository dashboard" width="49%">
@@ -44,14 +44,13 @@ Eight standalone-first primitives — every command works on its own
 GitHub URL instead. Snippets marked ⚡ require the checkpoints
 (`cc4q download-models`).
 
-**Build** — clone a repository and turn its comments into labeled-ready
-units (comment pairs → sentence-level SCCUs):
+**Build** — turn a repository's comments into small, labeled-ready text units (one JSON file you can search and filter):
 
 ```bash
 cc4q build --repo examples/tiny_repo --output-dir /tmp/cc4q_out
 ```
 
-**Analyze** — corpus statistics in a few lines of Python:
+**Analyze** — count and break down what's in a corpus (how many comments, what kinds, where they live) with a few lines of Python:
 
 ```bash
 python -c "
@@ -60,24 +59,21 @@ recs = json.load(open('/tmp/cc4q_out/sccus_segmented.json'))
 print(len(recs), 'SCCUs;', collections.Counter(r['comment_type'] for r in recs))"
 ```
 
-**Predict ⚡** — label every unit on the three CC4Q axes (quantum-related,
-developer intent, quantum category):
+**Predict ⚡** — have the trained models read every comment and answer: is it about quantum? what kind of quantum knowledge? what was the author trying to say?
 
 ```bash
 cc4q predict --input /tmp/cc4q_out/sccus_segmented.json \
     --output /tmp/cc4q_out/labeled.jsonl
 ```
 
-**Sample** — random, stratified, or quota sampling over any JSONL:
+**Sample** — pick a fair subset for human review (random, or balanced so every project/label is represented):
 
 ```bash
 cc4q sample --input /tmp/cc4q_out/labeled.jsonl --by SDK --n 2 \
     --output /tmp/cc4q_out/sample.jsonl
 ```
 
-**Annotate** — schema-driven human spot-check UI (blind or adjudicate mode;
-resumable; train-ready export). `--dry-run` validates the session without
-launching:
+**Annotate** — review model labels in a click-through web UI: confirm, fix, or skip each item; your answers save as you go and export as a ready-to-train file. `--dry-run` checks the setup without opening the UI:
 
 ```bash
 cc4q annotate --data /tmp/cc4q_out/sample.jsonl \
@@ -86,23 +82,21 @@ cc4q annotate --data /tmp/cc4q_out/sample.jsonl \
     --output-dir /tmp/cc4q_out/ann --dry-run
 ```
 
-**Train** — fine-tune your own classifier on annotated data (drop
-`--dry-run` to train for real):
+**Train** — teach the models your own labeling decisions, starting from the released classifiers or plain BERT (drop `--dry-run` to train for real):
 
 ```bash
 cc4q train --task quantum_related --data examples/tiny_labels.jsonl \
     --output-dir /tmp/cc4q_out/clf --dry-run
 ```
 
-**Evaluate** — human-vs-model agreement with precision/recall and a Wilson
-95% CI:
+**Evaluate** — score how much a human agrees with the model (percent agreement, precision/recall, and a confidence interval), the same statistics reported in the paper:
 
 ```bash
 cc4q evaluate --annotations examples/tiny_spotcheck/annotations.csv \
     --key examples/tiny_spotcheck/key.jsonl
 ```
 
-**Visualize** — publication-style charts as pure plotly figures:
+**Visualize** — turn label counts into charts you can embed anywhere — Jupyter notebooks, HTML pages, or figures for a paper:
 
 ```bash
 python -c "
@@ -114,9 +108,7 @@ stats = {'quantum_sccus': len(q),
 viz.radar_figure([('corpus', stats)], 'Knowledge profile').write_html('/tmp/cc4q_out/radar.html')"
 ```
 
-**Web workbench** — the four-page Streamlit app (live snippet labeling,
-repository dashboards, cross-SDK comparison, corpus exploration); the
-precomputed dashboards work without checkpoints:
+**Web workbench** — a browser app that ties it all together: label a pasted snippet, explore ready-made dashboards for six quantum SDKs, and compare projects side by side (precomputed dashboards work without the model checkpoints):
 
 ```bash
 cc4q demo   # open http://localhost:8501
