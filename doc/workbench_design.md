@@ -40,22 +40,45 @@ quantum-specific comment taxonomy.
 
 ## 3. Information Architecture
 
-Seven pages, reachable via the top navigation (`st.navigation`):
+Dual-space IA. The top navigation uses `st.navigation` **sections** (streamlit
+1.64 renders top-position sections as two labelled dropdown menus — chosen
+over a segmented-control fallback because it renders cleanly in AppTest and
+the browser and keeps URLs stable), plus a ⚙ Models button in the brand row
+that opens a settings `st.dialog` on every page:
 
-| Page | Workflow stage | Purpose |
+- **Explore**: Home · SDK Dashboards · Playground · Corpus
+- **Build**: 1. Get Data · 2. Label · 3. Train · 4. Evaluate
+- **⚙ Models** — registry dialog (default star, upload zip, download zip,
+  delete); not a page. The former Your Models page was removed (its URL now
+  404s).
+
+| Page | Space | Purpose |
 |---|---|---|
-| 1. Home | — | Positioning, numbers, 8-primitive workflow strip |
-| 2. Analyze Code | Inspect (unit level) | Paste snippet → real-time three-axis labels |
-| 3. Analyze Repository | Build → Inspect → Profile | The hero page (precomputed + live) |
-| 4. Annotate | Annotate | Sample a corpus, review in the embedded annotation UI, export / send to Train |
-| 5. Train & Evaluate | Train / Evaluate | In-page fine-tuning with live metrics; auto-comparison vs the released model |
-| 6. Your Models | — | Registry of trained/uploaded model packages (default model, download, delete) |
-| 7. Explore Corpus | Inspect (browse) | Filter/search labeled SCCUs |
+| 1. Home | Explore | Positioning, metrics, two entry cards (Explore the ready-made corpora / Build your own), 8-primitive workflow strip |
+| 2. SDK Dashboards | Explore | Precomputed §1–§3 dashboards + compare + live mode (was Analyze Repository) |
+| 3. Playground | Explore | Paste snippet → labeled cards; uses the global default model (was Analyze Code) |
+| 4. Corpus | Explore | Filter/search/download labeled SCCUs (was Explore Corpus) |
+| 5. 1. Get Data | Build | Clone a repo URL / local dir / upload JSONL → corpus preview |
+| 6. 2. Label | Build | Predict with the default model → sample → embedded annotation UI → export |
+| 7. 3. Train | Build | In-page fine-tuning with live metrics; registers into ⚙ Models |
+| 8. 4. Evaluate | Build | Compare two models on a shared corpus sample (agreement/P/R/Wilson + radar) |
 
-Analyze Code and the repository live mode share a **model selector**:
-released checkpoints (default) or any package from Your Models; uploaded
-zips register on the spot. Single-axis packages fall back to the released
-checkpoints for the missing axes.
+### Build stepper state machine
+
+Each Build page renders a 4-step indicator (Get Data → Label → Train →
+Evaluate); the current step is highlighted, completed steps show ✓ and are
+clickable, future steps are disabled. State: `st.session_state["build_step"]`
+(1-based). Step outputs stash for the next step: `build_corpus` (SCCU
+records) → `build_labeled`/`predict_output` + annotation rows (`train_stash`)
+→ `build_trained` (registry id) → `build_eval` (report). "Continue to …"
+buttons advance via `st.switch_page`.
+
+### Model resolution
+
+`cc4q.app.model_select.resolve_default_handle()`: registry default (★ in ⚙
+Models) if set, else the released checkpoints. Single-axis custom packages
+compose with the released fallback for missing axes
+(`cc4q.models.hub.load_models_from`).
 
 ### 3.1 Home
 
@@ -66,7 +89,7 @@ checkpoints for the missing axes.
   one-line description and a `st.page_link` to the relevant page.
 - Footer: Beihang University, MIT license note, artifact links.
 
-### 3.2 Analyze Code
+### 3.2 Playground
 
 - Left column: code textarea pre-filled with a Bell-state example (verified
   clean labels; no `(|00>+|11>)/sqrt(2)` line). Button: **Analyze**.
@@ -86,7 +109,7 @@ checkpoints for the missing axes.
   checkpoints → warning with
   `python scripts/download_models.py` instructions and disabled button.
 
-### 3.3 Analyze Repository
+### 3.3 SDK Dashboards
 
 Top: two tabs — **Precomputed SDKs** (instant) and **Live repository**.
 
@@ -129,35 +152,7 @@ paper
   cards. This is the figure that supports the paper's infrastructure-vs-
   application-layer finding.
 
-### 3.4 Annotate
-- Source: precomputed SDK corpus (quantum-only toggle), uploaded JSONL, or
-  session predict output.
-- Sampling: random / stratified-by-columns / per-stratum quotas, n + seed.
-- Review: the annotation UI embedded via `cc4q.annotate.ui.render_annotation`
-  (namespaced session state; blind/adjudicate; adjudicate suggestions from
-  `quantum_related` when present). Export CSV/JSONL; "Send to Train" stashes
-  rows for the Train page.
-
-### 3.5 Train & Evaluate
-- Data: stashed annotations or uploaded JSONL/CSV; free-form labels are
-  mapped onto the task contract (quantum_related accepts quantum/non-quantum
-  words; 6-class tasks accept canonical names); contract violations show
-  `cc4q.train`'s example-row error and disable training.
-- Guardrail: >2,000 rows warns that the CLI is recommended.
-- Training runs in-session (`cc4q.train`, HF Trainer) with a callback
-  streaming loss/eval to the page; defaults: bert-base-uncased, 3 epochs,
-  batch 32.
-- On completion the model registers into Your Models and the page compares
-  it against the released model (agreement / precision / recall / Wilson CI)
-  on the training texts.
-
-### 3.6 Your Models
-- Registry: `registry.json` over `user_models/` (repo-local in a checkout,
-  `~/.cache/cc4q/user_models` from a wheel; `CC4Q_USER_MODELS` overrides).
-- Operations: list, set-default (drives the Analyze-page selector), download
-  zip, delete, upload zip (validated: one HF dir per axis).
-
-### 3.7 Explore Corpus
+### 3.4 Corpus
 
 - Default view: **quantum units only** (toggle to include non-quantum).
 - Filter bar order: quantum category → entity level → comment form → SDK →
@@ -258,7 +253,7 @@ missing checkpoints disable Analyze buttons with instructions, never crash.
    (spot-check one SDK).
 5. Compare mode visually reproduces the infra-vs-application gap
    (Quantum % 34.3 vs 26.0 aggregate).
-6. All seven pages render under AppTest; the Annotate page loads a
+6. All eight pages render under AppTest; the Annotate page loads a
    precomputed corpus, draws a sample, and shows the embedded UI; the Train
    page rejects contract violations with its example-row error; the model
    selector defaults to the released checkpoints.

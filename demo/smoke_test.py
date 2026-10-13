@@ -287,7 +287,7 @@ def test_app_rendering():
     at.switch_page(os.path.join(APP_DIR, "pages", "p_analyze_code.py")).run()
     check("page renders: analyze-code", not at.exception, str(at.exception))
     if not at.exception and at.button:
-        at.button[0].click().run()
+        next(b for b in at.button if b.label == "Analyze").click().run()
         ok = (not at.exception
               and any("quantum-related" in (m.value or "") for m in at.markdown)
               and any("✓ quantum" in (m.value or "") for m in at.markdown))
@@ -300,7 +300,7 @@ def test_app_rendering():
         # non-Python input -> auto-fallback warning + line-by-line labels
         at.text_area[0].set_value("this is not python at all\n# quantum line")
         at.run()
-        at.button[0].click().run()
+        next(b for b in at.button if b.label == "Analyze").click().run()
         ok = (not at.exception
               and any("Not valid Python" in (w.value or "") for w in at.warning)
               and any("Line-by-line fallback" in (c.value or "") for c in at.caption))
@@ -309,7 +309,7 @@ def test_app_rendering():
         # empty input -> graceful info, no crash
         at.text_area[0].set_value("")
         at.run()
-        at.button[0].click().run()
+        next(b for b in at.button if b.label == "Analyze").click().run()
         ok = (not at.exception
               and any("No comments found" in (i.value or "") for i in at.info))
         check("analyze-code: empty input handled gracefully", ok,
@@ -376,24 +376,35 @@ def test_app_rendering():
             check("explore: keyword filter returns rows", ok, str(at.exception))
 
     # Page 5: Annotate — precomputed source loads, sample draw, embedded UI
-    at.switch_page(os.path.join(APP_DIR, "pages", "p_annotate.py")).run()
-    check("page renders: annotate", not at.exception, str(at.exception))
+    # Page 5: 2. Label — stepper + precomputed source + embedded UI
+    at.switch_page(os.path.join(APP_DIR, "pages", "p_label.py")).run()
+    check("page renders: label", not at.exception, str(at.exception))
     if not at.exception:
-        ok = any("records loaded" in (c.value or "") for c in at.caption)
-        check("annotate: precomputed source loads records", ok)
-        draw = next((b for b in at.button if b.label == "Draw sample"), None)
-        if draw:
-            draw.click().run()
-            ok = (not at.exception
-                  and any(("✓ " in (b.label or "")) or (b.label == "quantum")
-                          for b in at.button))
-            check("annotate: sample drawn + embedded UI labels", ok,
-                  str(at.exception))
+        check("label: stepper highlights step 2",
+              any((b.label or "") == "▶ Label"
+                  for b in at.button))
+        sb = next((s for s in at.selectbox
+                   if s.label == "Corpus"), None)
+        if sb:
+            sb.set_value("Precomputed SDK corpus").run()
+            ok = any("records loaded" in (c.value or "") for c in at.caption)
+            check("label: precomputed source loads records", ok)
+            draw = next((b for b in at.button
+                         if b.label == "Draw sample"), None)
+            if draw:
+                draw.click().run()
+                ok = (not at.exception
+                      and any(("✓ " in (b.label or ""))
+                              or (b.label == "quantum") for b in at.button))
+                check("label: sample drawn + embedded UI labels", ok,
+                      str(at.exception))
 
-    # Page 6: Train & Evaluate — empty state, then contract rejection
+    # Page 6: 3. Train — empty state, then contract rejection
     at.switch_page(os.path.join(APP_DIR, "pages", "p_train.py")).run()
     check("page renders: train", not at.exception, str(at.exception))
     if not at.exception:
+        check("train: stepper highlights step 3",
+              any((b.label or "") == "▶ Train" for b in at.button))
         check("train: empty state informs",
               any("No annotated rows yet" in (i.value or "") for i in at.info))
     at.session_state["train_stash"] = [{"nothing": "usable"}]
@@ -405,12 +416,29 @@ def test_app_rendering():
                   for e in at.error), str(at.exception))
     at.session_state["train_stash"] = None
 
-    # Page 7: Your Models — empty registry informs
-    at.switch_page(os.path.join(APP_DIR, "pages", "p_models.py")).run()
-    check("page renders: your-models", not at.exception, str(at.exception))
+    # Page 7: 1. Get Data + 4. Evaluate — stepper states render
+    at.switch_page(os.path.join(APP_DIR, "pages", "p_get_data.py")).run()
+    check("page renders: get-data", not at.exception, str(at.exception))
     if not at.exception:
-        check("models: empty registry informs",
-              any("No user models yet" in (i.value or "") for i in at.info))
+        check("get-data: stepper highlights step 1",
+              any((b.label or "") == "▶ Get Data" for b in at.button))
+    at.switch_page(os.path.join(APP_DIR, "pages", "p_evaluate.py")).run()
+    check("page renders: evaluate", not at.exception, str(at.exception))
+    if not at.exception:
+        check("evaluate: stepper highlights step 4",
+              any((b.label or "") == "▶ Evaluate" for b in at.button))
+
+    # Settings dialog: gear button opens it, close returns to the page
+    gear = next((b for b in at.button if b.label == "⚙ Models"), None)
+    if gear:
+        gear.click().run()
+        opened = (not at.exception and any(
+            "Registered" in (m.value or "") or
+            "No custom models" in (c.value or "")
+            for m in at.markdown for c in at.caption))
+        check("settings: Models dialog opens", opened, str(at.exception))
+    else:
+        check("settings: Models dialog opens", False, "gear button missing")
 
 
 def main():
