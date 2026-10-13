@@ -37,32 +37,23 @@ start (SHA256-verified). GPU hosts: build with
 with `--gpus all`; the app auto-detects CUDA. (We develop on Apple Silicon,
 so the GPU flavor is currently untested by us — feedback welcome.)
 
-**Option 2 — local install** (requires **Python ≥ 3.11**):
+**Option 2 — pip install cc4q (CLI + library; requires Python ≥ 3.11):**
 
 ```bash
-git clone https://github.com/MaxwelsDonc/cc4q-workbench.git
-cd cc4q-workbench
-conda create -n cc4q python=3.11 -y && conda activate cc4q
-# For Windows PowerShell, using the following instead: 
-# conda create -n cc4q python=3.11 -y; conda activate cc4q
-
-pip install -r requirements.txt
+pip install git+https://github.com/MaxwelsDonc/cc4q-workbench
 python -m spacy download en_core_web_sm
-
-# the web workbench
-pip install -r demo/requirements-demo.txt
-streamlit run demo/app.py
-
-# the pipeline on bundled examples
-python scripts/02_extract_code_comment_pairs.py config/examples.yaml
-python scripts/03_segment_comments.py config/examples.yaml
+cc4q download-models          # ~1.2 GB checkpoints (SHA256-verified)
 ```
 
-The same workflow is available as the `cc4q` CLI (install with
-`pip install -e .`; every subcommand has `--help`):
+Then either launch the workbench:
 
 ```bash
-cc4q download-models                 # fetch the classifier checkpoints
+cc4q demo                     # open http://localhost:8501
+```
+
+or run the corpus-building walkthrough (every step has `--help`):
+
+```bash
 cc4q build --repo https://github.com/Qiskit/qiskit-aer \
     --include-dir qiskit_aer --output-dir out/aer   # clone + extract + segment
 cc4q predict --input out/aer/sccus_segmented.json \
@@ -70,36 +61,43 @@ cc4q predict --input out/aer/sccus_segmented.json \
 cc4q sample --input out/aer/labeled.jsonl --by SDK --n 200 \
     --output out/aer/sample.jsonl                   # stratified spot-check
 cc4q annotate --data out/aer/sample.jsonl \
-    --schema schema.yaml --mode adjudicate \
+    --labels quantum,non-quantum --mode adjudicate \
     --predictions out/aer/labeled.jsonl \
     --output-dir out/aer/ann                        # human spot-check UI
 cc4q evaluate --annotations out/aer/ann/annotations.csv \
     --key out/aer/key.jsonl                         # agreement / P / R / CI
-cc4q demo                            # launch the Streamlit workbench
 ```
 
-`examples/recipe_model_assisted_annotation.py` chains the whole loop in one
-command (`run-all`), and `walk-spotcheck` replays the paper's 385-item
-spot-check (predict -> sample -> annotate -> evaluate, asserting 85.0%
-agreement).
+`examples/recipe_model_assisted_annotation.py` (in a source checkout) chains
+the whole loop in one command (`run-all`), and `walk-spotcheck` replays the
+paper's 385-item spot-check (predict -> sample -> annotate -> evaluate,
+asserting 85.0% agreement).
 
-Only trying the pipeline, not the classifiers? A lean install suffices:
-`pip install libcst==1.8.2 pyyaml loguru tqdm docutils==0.21.2 sphinx==8.2.3 spacy==3.8.7 click && python -m spacy download en_core_web_sm`.
-
-**Classifier checkpoints** (~1.2 GB, needed for the Analyze pages and for
-labeling new corpora):
+**Option 3 — clone for development / paper reproduction:**
 
 ```bash
-python scripts/download_models.py            # download + verify + extract
-python scripts/download_models.py --check    # verify only
+git clone https://github.com/MaxwelsDonc/cc4q-workbench.git
+cd cc4q-workbench
+conda create -n cc4q python=3.11 -y && conda activate cc4q
+pip install -r requirements.txt -r demo/requirements-demo.txt
+python -m spacy download en_core_web_sm
+pip install -e .
+
+pytest                        # 22 tests (model tests need the checkpoints)
+python scripts/02_extract_code_comment_pairs.py config/examples.yaml
+python scripts/03_segment_comments.py config/examples.yaml
+streamlit run demo/app.py     # the workbench from the checkout
 ```
 
-Everything else works without them.
+The `rqs/` and `exp/` trees hold the companion study's analysis scripts and
+the tool-paper validation evidence (see their READMEs). Classifier
+checkpoints: `python scripts/download_models.py` (same as `cc4q
+download-models`).
 
 ## Python API & CLI
 
-Everything above is also available as a library and a CLI
-(`pip install git+https://github.com/MaxwelsDonc/cc4q-workbench`):
+The pip-installed `cc4q` package is also a library; the CLI mirrors it 1:1
+(`cc4q --help`):
 
 ```python
 import cc4q
@@ -115,14 +113,8 @@ result = cc4q.evaluate_files(csv_path="ann/annotations.csv",
                              key_path="key.jsonl")
 ```
 
-```bash
-cc4q build --repo https://github.com/Qiskit/qiskit-aer --output-dir out/aer
-cc4q train --task quantum_related --data annotations.jsonl \
-    --output-dir out/my_classifier
-```
-
-Full command reference (`cc4q --help`) and Sphinx docs: `docs/`
-(GitHub Pages once the repo is public).
+Full guides and the API reference: `docs/` (Sphinx; publishes to GitHub
+Pages once the repo is public).
 
 ## Tests
 
