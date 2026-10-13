@@ -269,8 +269,9 @@ def test_app_rendering():
                  if "From quantum code to labeled" in (m.value or "")), None)
     check("home hero renders clean typography hero", hero is not None)
     all_md = "\n".join(m.value or "" for m in at.markdown)
-    check("home workflow strip renders",
-          all(k in all_md for k in ("Build", "Inspect", "Profile")))
+    check("home workflow strip renders (8 primitives)",
+          all(k in all_md for k in ("Build", "Predict", "Annotate",
+                                    "Train", "Evaluate", "Visualize")))
     check("home metric card foregrounds quantum axes",
           any("Quantum label axes per unit" in (m.value or "") for m in at.markdown))
     check("home: no honesty info block",
@@ -373,6 +374,43 @@ def test_app_rendering():
             ok = (not at.exception and len(at.dataframe) > 0
                   and any("units match" in (c.value or "") for c in at.caption))
             check("explore: keyword filter returns rows", ok, str(at.exception))
+
+    # Page 5: Annotate — precomputed source loads, sample draw, embedded UI
+    at.switch_page(os.path.join(APP_DIR, "pages", "p_annotate.py")).run()
+    check("page renders: annotate", not at.exception, str(at.exception))
+    if not at.exception:
+        ok = any("records loaded" in (c.value or "") for c in at.caption)
+        check("annotate: precomputed source loads records", ok)
+        draw = next((b for b in at.button if b.label == "Draw sample"), None)
+        if draw:
+            draw.click().run()
+            ok = (not at.exception
+                  and any(("✓ " in (b.label or "")) or (b.label == "quantum")
+                          for b in at.button))
+            check("annotate: sample drawn + embedded UI labels", ok,
+                  str(at.exception))
+
+    # Page 6: Train & Evaluate — empty state, then contract rejection
+    at.switch_page(os.path.join(APP_DIR, "pages", "p_train.py")).run()
+    check("page renders: train", not at.exception, str(at.exception))
+    if not at.exception:
+        check("train: empty state informs",
+              any("No annotated rows yet" in (i.value or "") for i in at.info))
+    at.session_state["train_stash"] = [{"nothing": "usable"}]
+    at.run()
+    check("train: contract violation rejected with error",
+          not at.exception
+          and any("contract" in (e.value or "").lower()
+                  or "need a text column" in (e.value or "").lower()
+                  for e in at.error), str(at.exception))
+    at.session_state["train_stash"] = None
+
+    # Page 7: Your Models — empty registry informs
+    at.switch_page(os.path.join(APP_DIR, "pages", "p_models.py")).run()
+    check("page renders: your-models", not at.exception, str(at.exception))
+    if not at.exception:
+        check("models: empty registry informs",
+              any("No user models yet" in (i.value or "") for i in at.info))
 
 
 def main():

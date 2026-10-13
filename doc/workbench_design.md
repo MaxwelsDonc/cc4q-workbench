@@ -40,14 +40,22 @@ quantum-specific comment taxonomy.
 
 ## 3. Information Architecture
 
-Four pages, reachable via the top navigation (`st.navigation`):
+Seven pages, reachable via the top navigation (`st.navigation`):
 
 | Page | Workflow stage | Purpose |
 |---|---|---|
-| 1. Home | — | Positioning, numbers, entry points |
+| 1. Home | — | Positioning, numbers, 8-primitive workflow strip |
 | 2. Analyze Code | Inspect (unit level) | Paste snippet → real-time three-axis labels |
-| 3. Analyze Repository | Build → Inspect → Profile | The hero page |
-| 4. Explore Corpus | Inspect (browse) | Filter/search labeled SCCUs |
+| 3. Analyze Repository | Build → Inspect → Profile | The hero page (precomputed + live) |
+| 4. Annotate | Annotate | Sample a corpus, review in the embedded annotation UI, export / send to Train |
+| 5. Train & Evaluate | Train / Evaluate | In-page fine-tuning with live metrics; auto-comparison vs the released model |
+| 6. Your Models | — | Registry of trained/uploaded model packages (default model, download, delete) |
+| 7. Explore Corpus | Inspect (browse) | Filter/search labeled SCCUs |
+
+Analyze Code and the repository live mode share a **model selector**:
+released checkpoints (default) or any package from Your Models; uploaded
+zips register on the spot. Single-axis packages fall back to the released
+checkpoints for the missing axes.
 
 ### 3.1 Home
 
@@ -121,7 +129,35 @@ paper
   cards. This is the figure that supports the paper's infrastructure-vs-
   application-layer finding.
 
-### 3.4 Explore Corpus
+### 3.4 Annotate
+- Source: precomputed SDK corpus (quantum-only toggle), uploaded JSONL, or
+  session predict output.
+- Sampling: random / stratified-by-columns / per-stratum quotas, n + seed.
+- Review: the annotation UI embedded via `cc4q.annotate.ui.render_annotation`
+  (namespaced session state; blind/adjudicate; adjudicate suggestions from
+  `quantum_related` when present). Export CSV/JSONL; "Send to Train" stashes
+  rows for the Train page.
+
+### 3.5 Train & Evaluate
+- Data: stashed annotations or uploaded JSONL/CSV; free-form labels are
+  mapped onto the task contract (quantum_related accepts quantum/non-quantum
+  words; 6-class tasks accept canonical names); contract violations show
+  `cc4q.train`'s example-row error and disable training.
+- Guardrail: >2,000 rows warns that the CLI is recommended.
+- Training runs in-session (`cc4q.train`, HF Trainer) with a callback
+  streaming loss/eval to the page; defaults: bert-base-uncased, 3 epochs,
+  batch 32.
+- On completion the model registers into Your Models and the page compares
+  it against the released model (agreement / precision / recall / Wilson CI)
+  on the training texts.
+
+### 3.6 Your Models
+- Registry: `registry.json` over `user_models/` (repo-local in a checkout,
+  `~/.cache/cc4q/user_models` from a wheel; `CC4Q_USER_MODELS` overrides).
+- Operations: list, set-default (drives the Analyze-page selector), download
+  zip, delete, upload zip (validated: one HF dir per axis).
+
+### 3.7 Explore Corpus
 
 - Default view: **quantum units only** (toggle to include non-quantum).
 - Filter bar order: quantum category → entity level → comment form → SDK →
@@ -222,7 +258,11 @@ missing checkpoints disable Analyze buttons with instructions, never crash.
    (spot-check one SDK).
 5. Compare mode visually reproduces the infra-vs-application gap
    (Quantum % 34.3 vs 26.0 aggregate).
-6. No developer-intent UI anywhere — no intent charts, badges, filters, or
+6. All seven pages render under AppTest; the Annotate page loads a
+   precomputed corpus, draws a sample, and shows the embedded UI; the Train
+   page rejects contract violations with its example-row error; the model
+   selector defaults to the released checkpoints.
+7. No developer-intent UI anywhere — no intent charts, badges, filters, or
    table columns; intent appears only in the data layer (units JSONL,
    manifest, downloads). The third classifier still runs at inference time.
 
