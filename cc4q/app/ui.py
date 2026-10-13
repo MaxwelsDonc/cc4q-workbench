@@ -24,6 +24,25 @@ BORDER = "#E5E7EB"         # hairline card/widget borders
 BG = "#FBFBFC"             # app background (very light neutral)
 NON_QUANTUM_GRAY = "#9E9E9E"
 
+# ---- Design tokens (design doc §6) --------------------------------
+SPACING = {"xs": 4, "sm": 8, "md": 12, "lg": 16, "xl": 24, "2xl": 32}
+RADIUS = {"sm": 10, "md": 12}
+TYPE_SCALE = {
+    "caption": {"size": "0.78rem", "weight": 600},
+    "body": {"size": "0.96rem", "weight": 400},
+    "lead": {"size": "1.08rem", "weight": 400},
+    "h3": {"size": "1.15rem", "weight": 650},
+    "h2": {"size": "1.5rem", "weight": 700},
+    "h1": {"size": "2.7rem", "weight": 800},
+}
+
+BADGE_TONES = {
+    "neutral": {"fg": "#374151", "bg": "#F3F4F6", "border": "#E5E7EB"},
+    "quantum": {"fg": PRIMARY, "bg": "#F6F3FC", "border": "#E5DDF7"},
+    "success": {"fg": "#047857", "bg": "#ECFDF5", "border": "#D1FAE5"},
+    "warn": {"fg": "#B45309", "bg": "#FFFBEB", "border": "#FDE68A"},
+}
+
 # Fixed colorblind-aware category palette (design doc §6). Developer-intent
 # colors are not needed: intent stays in the data layer, out of the UI.
 CATEGORY_COLORS = {
@@ -51,6 +70,13 @@ def apply_theme():
             --cc4q-muted: #6B7280;
             --cc4q-border: #E5E7EB;
             --cc4q-bg: #FBFBFC;
+            /* design tokens: spacing scale (8/12/16/24) + radius (10/12) */
+            --cc4q-space-sm: 8px;
+            --cc4q-space-md: 12px;
+            --cc4q-space-lg: 16px;
+            --cc4q-space-xl: 24px;
+            --cc4q-radius-sm: 10px;
+            --cc4q-radius-md: 12px;
         }
         .stApp { background: #FBFBFC; color: #1A1A1A; }
         .stApp a { color: #1A1A1A; text-decoration: underline;
@@ -166,6 +192,68 @@ def apply_theme():
         }
         .cc4q-entity { color: #9CA3AF; font-size: 0.8rem; font-weight: 500;
             text-transform: uppercase; letter-spacing: 0.04em; }
+        /* ---- Page header: title + one-liner + right-aligned action ---- */
+        .cc4q-page-head { padding: 14px 0 2px 0; }
+        .cc4q-page-head h1 { font-size: 1.9rem; font-weight: 800;
+            letter-spacing: -0.02em; margin: 0 0 4px 0; color: #111111;
+            line-height: 1.2; }
+        .cc4q-page-head .sub { color: #6B7280; font-size: 1.02rem;
+            margin: 0; line-height: 1.45; }
+        /* ---- Section divider: subsection heading with hairline ---- */
+        .cc4q-section {
+            display: flex; align-items: baseline; gap: 12px;
+            margin: 26px 0 14px 0; padding-bottom: 10px;
+            border-bottom: 1px solid #E5E7EB;
+        }
+        .cc4q-section h2 { font-size: 1.25rem; font-weight: 700; margin: 0;
+            color: #1A1A1A; letter-spacing: -0.01em; }
+        .cc4q-section .cc4q-section-sub { color: #6B7280; font-size: 0.9rem; }
+        /* ---- Status badges ---- */
+        .cc4q-badge {
+            display: inline-block; border-radius: 999px;
+            padding: 2px 10px; font-size: 0.75rem; font-weight: 600;
+            line-height: 1.6; border: 1px solid transparent;
+        }
+        .cc4q-badge.neutral { color: #374151; background: #F3F4F6;
+            border-color: #E5E7EB; }
+        .cc4q-badge.quantum { color: #6C3FC5; background: #F6F3FC;
+            border-color: #E5DDF7; }
+        .cc4q-badge.success { color: #047857; background: #ECFDF5;
+            border-color: #D1FAE5; }
+        .cc4q-badge.warn { color: #B45309; background: #FFFBEB;
+            border-color: #FDE68A; }
+        /* ---- Asset card grid (HTML/CSS cards + native buttons below) ---- */
+        .cc4q-asset-grid {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 16px; margin-bottom: 4px;
+        }
+        .cc4q-asset-card {
+            background: white; border: 1px solid #E5E7EB;
+            border-radius: 12px; padding: 16px 18px; height: 100%;
+            min-height: 148px; box-shadow: none;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .cc4q-asset-card h3 { margin: 0; font-size: 1.05rem; font-weight: 700;
+            color: #1A1A1A; }
+        .cc4q-asset-card .meta-line { color: #6B7280; font-size: 0.88rem;
+            line-height: 1.45; }
+        .cc4q-asset-card .meta-line b { color: #374151; font-weight: 600; }
+        .cc4q-asset-card .spacer { flex: 1; }
+        /* ---- Empty state ---- */
+        .cc4q-empty {
+            text-align: center; padding: 48px 24px 40px 24px;
+            border: 1px dashed #D1D5DB; border-radius: 12px;
+            background: #FFFFFF; margin: 8px 0 4px 0;
+        }
+        .cc4q-empty .glyph {
+            width: 52px; height: 52px; margin: 0 auto 14px auto;
+            border-radius: 50%; background: #F6F3FC; color: #6C3FC5;
+            font-size: 1.5rem; font-weight: 700; line-height: 52px;
+        }
+        .cc4q-empty h3 { margin: 0 0 8px 0; font-size: 1.15rem;
+            font-weight: 700; color: #1A1A1A; }
+        .cc4q-empty p { margin: 0 auto 6px auto; max-width: 460px;
+            color: #6B7280; font-size: 0.95rem; }
         </style>
         """,
         unsafe_allow_html=True,
@@ -248,3 +336,129 @@ def plotly_layout(fig, height=360):
         hovermode="x unified",
     )
     return fig
+
+
+# ---------------------------------------------------------------------------
+# Workspace components (WP1B): page chrome + asset cards + empty states.
+# Every helper keeps Streamlit-native widgets for anything interactive so
+# AppTest can drive pages by label.
+# ---------------------------------------------------------------------------
+
+
+def page_header(title, description, action_label=None, action_help=None,
+                key="page_header_action"):
+    """Page title + one-liner + optional right-aligned primary action.
+
+    Returns True on the run where the action button was clicked.
+    """
+    left, right = st.columns([5, 1])
+    with left:
+        st.markdown(
+            f'<div class="cc4q-page-head"><h1>{html.escape(title)}</h1>'
+            f'<div class="sub">{html.escape(description)}</div></div>',
+            unsafe_allow_html=True,
+        )
+    clicked = False
+    with right:
+        st.markdown('<div style="height:26px"></div>',
+                    unsafe_allow_html=True)
+        if action_label:
+            clicked = st.button(action_label, type="primary", key=key,
+                                help=action_help or "",
+                                use_container_width=True)
+    return clicked
+
+
+def section_divider(title, description=None):
+    """Subsection heading with a hairline underneath."""
+    sub = (f'<span class="cc4q-section-sub">{html.escape(description)}</span>'
+           if description else "")
+    st.markdown(
+        f'<div class="cc4q-section"><h2>{html.escape(title)}</h2>{sub}</div>',
+        unsafe_allow_html=True,
+    )
+
+
+def status_badge(text, tone="neutral"):
+    """Small pill badge; ``tone`` is neutral | quantum | success | warn.
+    Returns an HTML string so it can be composed into cards and tables."""
+    if tone not in BADGE_TONES:
+        tone = "neutral"
+    return f'<span class="cc4q-badge {tone}">{html.escape(text)}</span>'
+
+
+def asset_card_grid(items, key_prefix="asset", columns=3):
+    """Responsive card grid with native action buttons.
+
+    Each item is a dict: ``title`` (str), optional ``badge``
+    (``(text, tone)`` tuple), ``meta`` (list of HTML-escaped strings; a
+    leading ``!`` marks a line as prominent), and ``actions`` (list of
+    dicts). An action dict has a ``label`` and either ``on_click`` (a
+    zero-arg callable run when the button is clicked) or ``download``
+    (a ``{data, file_name}`` dict rendered as a native download button).
+
+    Cards are pure HTML/CSS (`.cc4q-asset-grid`); the action buttons are
+    Streamlit-native and rendered in a matching column row directly below
+    the grid, so AppTest can click them by label.
+    """
+    def _card_html(item):
+        badge = ""
+        if item.get("badge"):
+            badge = status_badge(item["badge"][0], item["badge"][1])
+        meta_lines = ""
+        for line in item.get("meta") or []:
+            prominent = line.startswith("!")
+            body = line[1:] if prominent else line
+            body = f"<b>{html.escape(body)}</b>" if prominent \
+                else html.escape(body)
+            meta_lines += f'<div class="meta-line">{body}</div>'
+        return (
+            f'<div class="cc4q-asset-card"><div>{badge}</div>'
+            f'<h3>{html.escape(item["title"])}</h3>'
+            f'<div class="spacer"></div>{meta_lines}</div>'
+        )
+
+    # One grid per row so each row's native action buttons sit directly
+    # beneath its cards.
+    for row_start in range(0, len(items), columns):
+        row = items[row_start:row_start + columns]
+        st.markdown(
+            f'<div class="cc4q-asset-grid">'
+            f'{"".join(_card_html(i) for i in row)}</div>',
+            unsafe_allow_html=True,
+        )
+        if not any(i.get("actions") for i in row):
+            continue
+        cols = st.columns(len(row))
+        for offset, (col, item) in enumerate(zip(cols, row)):
+            index = row_start + offset
+            with col:
+                for ai, action in enumerate(item.get("actions") or []):
+                    key = f"{key_prefix}_{index}_{ai}"
+                    if "download" in action:
+                        st.download_button(
+                            action["label"],
+                            data=action["download"]["data"],
+                            file_name=action["download"]["file_name"],
+                            key=key, use_container_width=True)
+                    elif st.button(action["label"], key=key,
+                                   use_container_width=True):
+                        action["on_click"]()
+
+
+def empty_state(title, hint, action_label=None, key="empty_state_action"):
+    """Centered empty state: glyph + title + hint + one big primary CTA.
+
+    Returns True on the run where the CTA was clicked.
+    """
+    st.markdown(
+        f'<div class="cc4q-empty"><div class="glyph">◇</div>'
+        f'<h3>{html.escape(title)}</h3><p>{html.escape(hint)}</p></div>',
+        unsafe_allow_html=True,
+    )
+    if not action_label:
+        return False
+    pad_l, cta, pad_r = st.columns([2, 1, 2])
+    with cta:
+        return st.button(action_label, type="primary", key=key,
+                         use_container_width=True)
