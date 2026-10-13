@@ -48,9 +48,11 @@ that opens a settings `st.dialog` on every page:
 
 - **Explore**: Home · SDK Dashboards · Playground · Corpus
 - **Build**: 1. Get Data · 2. Label · 3. Train · 4. Evaluate
+- **Models**: Models — released checkpoints, your model registry, and an
+  inline train-new-model flow (WP1B reference implementation of the
+  workspace IA; the integrator flattens the final 6-page nav)
 - **⚙ Models** — registry dialog (default star, upload zip, download zip,
-  delete); not a page. The former Your Models page was removed (its URL now
-  404s).
+  delete); still available from the brand row on every page.
 
 | Page | Space | Purpose |
 |---|---|---|
@@ -62,6 +64,7 @@ that opens a settings `st.dialog` on every page:
 | 6. 2. Label | Build | Predict with the default model → sample → embedded annotation UI → export |
 | 7. 3. Train | Build | In-page fine-tuning with live metrics; registers into ⚙ Models |
 | 8. 4. Evaluate | Build | Compare two models on a shared corpus sample (agreement/P/R/Wilson + radar) |
+| 9. Models | Models | Released checkpoint cards (read-only, Default/Fallback badge) + Your models cards (★ set-as-default, download zip, delete, upload-with-validation) + inline training flow |
 
 ### Build stepper state machine
 
@@ -214,6 +217,26 @@ Kimi-style minimal product language (kimi.com aesthetics), light mode only:
   throughout; neutral gridlines `#ECECEF`.
 - **Navigation**: top navigation bar (`st.navigation(position="top")`), no
   sidebar; brand "⚛ CC4Q Workbench" top-left with the one-liner.
+- **Design tokens** (WP1B, exported from `cc4q/app/ui.py`): spacing scale
+  4/8/12/16/24/32 (`SPACING`), radius 10/12 (`RADIUS`), a type scale
+  (`TYPE_SCALE`, caption→h1), and `BADGE_TONES`
+  (neutral/quantum/success/warn); mirrored as `--cc4q-*` CSS variables.
+- **Component library** (WP1B, all in `cc4q/app/ui.py`, Streamlit-native
+  widgets for anything interactive so AppTest can drive pages by label):
+  - `page_header(title, description, action_label=None, action_help=None)`
+    — page title + one-liner + right-aligned black primary action;
+    returns the click.
+  - `section_divider(title, description=None)` — subsection heading with a
+    hairline underneath.
+  - `status_badge(text, tone="neutral")` — pill badge, returns HTML for
+    composition into cards.
+  - `asset_card_grid(items, key_prefix=..., columns=3)` — responsive
+    HTML/CSS card grid (title + badge + meta lines); actions are native
+    buttons/download-buttons rendered in a matching column row beneath each
+    card row. An action is `{"label", "on_click"}` or
+    `{"label", "download": {data, file_name}}`.
+  - `empty_state(title, hint, action_label=None)` — centered glyph block +
+    one big primary CTA; returns the click.
 - Theme delivery is dual, so the palette holds no matter where the app is
   launched from: `.streamlit/config.toml` at the repo root (picked up when
   `streamlit run` is invoked from the repo root) **plus** CSS-variable and
