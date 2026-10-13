@@ -63,6 +63,9 @@ def main():
             page("3. Train", "p_train.py", "🎓", "train"),
             page("4. Evaluate", "p_evaluate.py", "📏", "evaluate"),
         ],
+        "Models": [
+            page("Models", "p_models.py", "🧠", "models"),
+        ],
     }, position="top")
 
     pages.run()
