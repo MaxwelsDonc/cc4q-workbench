@@ -66,3 +66,57 @@ def get_model(label="Prediction model", key="model_select",
         handle = load_models_from(axis_dirs, auto_download=auto_download)
     cache[model_id] = handle
     return handle
+
+
+def resolve_default_handle(auto_download=True):
+    """The global prediction model: registry default if set, else the
+    released checkpoints. Used by pages without a per-page selector."""
+    entries = registry.list_models()
+    default = next((e for e in entries if e["is_default"]), None)
+    if default is None:
+        return load_models(auto_download=auto_download)
+    pkg = registry.package_dir(default["id"])
+    axis_dirs = {a: os.path.join(pkg, a) for a in default["axes"]}
+    return load_models_from(axis_dirs, auto_download=auto_download)
+
+
+@st.dialog("⚙ Models")
+def models_dialog():
+    """Registry management, available from the gear button on every page."""
+    import tempfile
+    upload = st.file_uploader("Upload a model zip (one HF directory per "
+                              "axis: quantum_related, quantum_category, "
+                              "developer_intent)", type=["zip"])
+    if upload is not None:
+        try:
+            entry = registry.register_uploaded_zip(upload)
+            st.success(f"Registered **{entry['name']}**.")
+        except ValueError as exc:
+            st.error(str(exc))
+    entries = registry.list_models()
+    if not entries:
+        st.caption("No custom models — the released checkpoints are the "
+                   "default everywhere.")
+        return
+    for entry in entries:
+        c1, c2, c3, c4 = st.columns([3, 1, 1, 1])
+        star = "★ " if entry["is_default"] else ""
+        c1.markdown(f"{star}**{entry['name']}** — "
+                    f"{', '.join(entry['axes'])}")
+        if not entry["is_default"]:
+            if c2.button("Default", key=f"dlg_def_{entry['id']}"):
+                registry.set_default(entry["id"])
+                st.session_state[_cache_key] = {}
+                st.rerun()
+        tmp = tempfile.NamedTemporaryFile(delete=False, suffix=".zip")
+        tmp.close()
+        registry.zip_package(entry["id"], tmp.name)
+        with open(tmp.name, "rb") as f:
+            c3.download_button("⬇", data=f.read(),
+                               file_name=f"{entry['id']}.zip",
+                               key=f"dlg_dl_{entry['id']}")
+        os.unlink(tmp.name)
+        if c4.button("🗑", key=f"dlg_del_{entry['id']}"):
+            registry.delete(entry["id"])
+            st.session_state[_cache_key] = {}
+            st.rerun()
