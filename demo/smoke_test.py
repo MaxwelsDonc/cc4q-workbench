@@ -260,22 +260,22 @@ def test_packaging():
 
 
 def test_app_rendering():
+    import tempfile
     from streamlit.testing.v1 import AppTest
 
-    at = AppTest.from_file(os.path.join(DEMO_DIR, "app.py"), default_timeout=180)
+    os.environ["CC4Q_WORKSPACE"] = tempfile.mkdtemp(prefix="cc4q_smoke_")
+
+    at = AppTest.from_file(os.path.join(DEMO_DIR, "app.py"),
+                           default_timeout=180)
     at.run()
-    check("app boots to Home", not at.exception, str(at.exception))
-    hero = next((m.value for m in at.markdown
-                 if "From quantum code to labeled" in (m.value or "")), None)
-    check("home hero renders clean typography hero", hero is not None)
+    check("app boots to Workspace", not at.exception, str(at.exception))
     all_md = "\n".join(m.value or "" for m in at.markdown)
-    check("home workflow strip renders (8 primitives)",
+    check("workspace: asset overview renders",
+          all(k in all_md for k in ("Corpora", "Annotations", "Models",
+                                    "Evaluations")))
+    check("workspace: 8-primitive strip kept",
           all(k in all_md for k in ("Build", "Predict", "Annotate",
                                     "Train", "Evaluate", "Visualize")))
-    check("home metric card foregrounds quantum axes",
-          any("Quantum label axes per unit" in (m.value or "") for m in at.markdown))
-    check("home: no honesty info block",
-          not any("Honest output" in (i.value or "") for i in at.info))
     theme_css = "\n".join(m.value or "" for m in at.markdown
                           if "<style>" in (m.value or ""))
     check("theme: Kimi black primary-button + outline secondary rules",
@@ -283,162 +283,97 @@ def test_app_rendering():
           and "border: 1px solid #E5E7EB" in theme_css
           and "--cc4q-quantum: #6C3FC5" in theme_css)
 
-    # Page 2: Analyze Code — click Analyze and verify summary strip + cards.
-    at.switch_page(os.path.join(APP_DIR, "pages", "p_analyze_code.py")).run()
-    check("page renders: analyze-code", not at.exception, str(at.exception))
+    # Corpora: built-in SDK corpora seeded as assets; open one -> dashboard
+    at.switch_page(os.path.join(APP_DIR, "pages", "p_corpora.py")).run()
+    check("page renders: corpora", not at.exception, str(at.exception))
+    if not at.exception:
+        check("corpora: six built-in SDK assets seeded",
+              len([a for a in
+                   __import__("cc4q.workspace", fromlist=["list_assets"])
+                   .list_assets("corpus")]) >= 6)
+        open_btn = next((b for b in at.button if b.label == "Open"), None)
+        if open_btn:
+            open_btn.click().run()
+            ok = (not at.exception
+                  and any("Corpus Built" in (s.value or "")
+                          for s in at.subheader))
+            check("corpora: detail dashboard renders", ok, str(at.exception))
+            at.session_state["corpus_open"] = None
+            at.run()
+
+    # Annotate: empty state, then a persisted session resumes
+    import cc4q.workspace as ws
+    session = ws.create_asset(
+        "annotation_session", name="smoke-session",
+        schema={"text_column": "comment_text", "id_column": "id",
+                "labels": ["quantum", "non-quantum"]},
+        mode="blind", total=2)
+    ws.write_jsonl(session["id"], "items.jsonl", [
+        {"id": "1", "comment_text": "Apply a Hadamard gate."},
+        {"id": "2", "comment_text": "Increment the counter."},
+    ])
+    ws.update_asset(session["id"],
+                    export_path=ws.asset_path(session["id"], "items.jsonl"))
+    at.switch_page(os.path.join(APP_DIR, "pages", "p_annotate.py")).run()
+    check("page renders: annotate", not at.exception, str(at.exception))
+    if not at.exception:
+        resume = next((b for b in at.button if b.label == "Resume"), None)
+        if resume:
+            resume.click().run()
+            ok = (not at.exception and any(
+                "Hadamard" in (t.value or "") for t in at.text))
+            check("annotate: session resumes at current progress", ok,
+                  str(at.exception))
+
+    # Models page (from the visual-system branch)
+    at.switch_page(os.path.join(APP_DIR, "pages", "p_models.py")).run()
+    check("page renders: models", not at.exception, str(at.exception))
+    if not at.exception:
+        check("models: released checkpoints section",
+              any("Quantum relatedness" in (m.value or "") for m in at.markdown))
+
+    # Evaluate: an saved evaluation asset opens its report
+    ev = ws.create_asset(
+        "evaluation", name="smoke-eval", pair=["released", "custom"],
+        corpus="builtin", metrics={"n": 4, "agreement": 0.75,
+                                   "precision": 1.0, "recall": 2/3,
+                                   "wilson95": [0.3, 0.95]}, report_path="")
+    report = os.path.join(ws.asset_path(ev["id"], "", create_dir=True),
+                          "report.md")
+    with open(report, "w") as f:
+        f.write("## smoke-eval\n\nagreement: 75.0%\n")
+    ws.update_asset(ev["id"], report_path=report)
+    at.switch_page(os.path.join(APP_DIR, "pages", "p_evaluate.py")).run()
+    check("page renders: evaluate", not at.exception, str(at.exception))
+    if not at.exception:
+        open_btn = next((b for b in at.button if b.label == "Open"), None)
+        if open_btn:
+            open_btn.click().run()
+            ok = (not at.exception and any(
+                "75.0%" in (m.value or "") for m in at.markdown))
+            check("evaluate: report reopens with metrics", ok,
+                  str(at.exception))
+
+    # Playground: snippet analysis with the default model
+    at.switch_page(os.path.join(APP_DIR, "pages", "p_playground.py")).run()
+    check("page renders: playground", not at.exception, str(at.exception))
     if not at.exception and at.button:
         next(b for b in at.button if b.label == "Analyze").click().run()
         ok = (not at.exception
               and any("quantum-related" in (m.value or "") for m in at.markdown)
               and any("✓ quantum" in (m.value or "") for m in at.markdown))
-        check("analyze-code: summary strip + quantum badges", ok,
-              str(at.exception))
-        rendered = "\n".join(m.value or "" for m in at.markdown)
-        check("analyze-code: no intent badge in UI",
-              "intent ·" not in rendered.lower())
-
-        # non-Python input -> auto-fallback warning + line-by-line labels
-        at.text_area[0].set_value("this is not python at all\n# quantum line")
-        at.run()
-        next(b for b in at.button if b.label == "Analyze").click().run()
-        ok = (not at.exception
-              and any("Not valid Python" in (w.value or "") for w in at.warning)
-              and any("Line-by-line fallback" in (c.value or "") for c in at.caption))
-        check("analyze-code: non-Python auto-fallback", ok, str(at.exception))
-
-        # empty input -> graceful info, no crash
-        at.text_area[0].set_value("")
-        at.run()
-        next(b for b in at.button if b.label == "Analyze").click().run()
-        ok = (not at.exception
-              and any("No comments found" in (i.value or "") for i in at.info))
-        check("analyze-code: empty input handled gracefully", ok,
+        check("playground: snippet analysis labels units", ok,
               str(at.exception))
 
-    # Page 3: Analyze Repository — §1-§3 sections + compare.
-    at.switch_page(os.path.join(APP_DIR, "pages", "p_analyze_repo.py")).run()
-    check("page renders: analyze-repository", not at.exception, str(at.exception))
-    if not at.exception:
-        subheaders = [s.value for s in at.subheader]
-        check("repo: §1 Corpus Built section", any("Corpus Built" in s for s in subheaders))
-        check("repo: §2 Quantum Density Check section",
-              any("Quantum Density Check" in s for s in subheaders))
-        check("repo: §3 Knowledge Profile section",
-              any("Knowledge Profile" in s for s in subheaders))
-        check("repo: density metric shown",
-              any("Comment density" in (m.value or "") for m in at.markdown))
-        check("repo: quantum % metric shown",
-              any("Quantum % of SCCUs" in (m.value or "") for m in at.markdown))
-        check("repo: validation expander text",
-              any("379" in (m.value or "") and "85.0%" in (m.value or "")
-                  for m in at.markdown))
-        labels = [o for sb in at.selectbox for o in sb.options]
-        check("repo: 6 precomputed SDKs",
-              any("qiskit (" in o for o in labels)
-              and any("qiskit-nature" in o for o in labels))
-        sb = at.selectbox[0]
-        other = next(o for o in sb.options if o.startswith("qiskit-nature"))
-        sb.set_value(other).run()
-        check("repo: second SDK renders", not at.exception, str(at.exception))
-        all_md = "\n".join(m.value or "" for m in at.markdown)
-        check("compare: group aggregates (infra vs application)",
-              "Group aggregates" in all_md
-              and "Infrastructure SDKs" in all_md
-              and "Application SDKs" in all_md)
-
-    # Page 4: Explore Corpus — quantum-only default + keyword filter.
-    at.switch_page(os.path.join(APP_DIR, "pages", "p_explore.py")).run()
-    check("page renders: explore-corpus", not at.exception, str(at.exception))
-    if not at.exception:
-        check("explore: quantum-only toggle exists (default off)",
-              len(at.toggle) == 1 and at.toggle[0].value is False)
-        caption_before = next((c.value for c in at.caption
-                               if "units match" in (c.value or "")), "")
-        n_before = int(caption_before.split()[0].replace(",", ""))
-        check("explore: default view is quantum-only",
-              0 < n_before < 17517, caption_before)
-        at.toggle[0].set_value(True).run()
-        caption_after = next((c.value for c in at.caption
-                              if "units match" in (c.value or "")), "")
-        n_after = int(caption_after.split()[0].replace(",", ""))
-        check("explore: toggle adds non-quantum rows", n_after > n_before,
-              f"{n_before} -> {n_after}")
-        check("explore: no intent filter or column in UI",
-              all(getattr(sb, "label", "") != "Developer intent"
-                  for sb in at.selectbox)
-              and len(at.expander) == 1  # only the main "Filters" expander
-              and (not at.dataframe
-                   or "developer_intent" not in list(at.dataframe[0].value.columns)))
-        if at.text_input:
-            at.text_input[0].set_value("entangle").run()
-            ok = (not at.exception and len(at.dataframe) > 0
-                  and any("units match" in (c.value or "") for c in at.caption))
-            check("explore: keyword filter returns rows", ok, str(at.exception))
-
-    # Page 5: Annotate — precomputed source loads, sample draw, embedded UI
-    # Page 5: 2. Label — stepper + precomputed source + embedded UI
-    at.switch_page(os.path.join(APP_DIR, "pages", "p_label.py")).run()
-    check("page renders: label", not at.exception, str(at.exception))
-    if not at.exception:
-        check("label: stepper highlights step 2",
-              any((b.label or "") == "▶ Label"
-                  for b in at.button))
-        sb = next((s for s in at.selectbox
-                   if s.label == "Corpus"), None)
-        if sb:
-            sb.set_value("Precomputed SDK corpus").run()
-            ok = any("records loaded" in (c.value or "") for c in at.caption)
-            check("label: precomputed source loads records", ok)
-            draw = next((b for b in at.button
-                         if b.label == "Draw sample"), None)
-            if draw:
-                draw.click().run()
-                ok = (not at.exception
-                      and any(("✓ " in (b.label or ""))
-                              or (b.label == "quantum") for b in at.button))
-                check("label: sample drawn + embedded UI labels", ok,
-                      str(at.exception))
-
-    # Page 6: 3. Train — empty state, then contract rejection
-    at.switch_page(os.path.join(APP_DIR, "pages", "p_train.py")).run()
-    check("page renders: train", not at.exception, str(at.exception))
-    if not at.exception:
-        check("train: stepper highlights step 3",
-              any((b.label or "") == "▶ Train" for b in at.button))
-        check("train: empty state informs",
-              any("No annotated rows yet" in (i.value or "") for i in at.info))
-    at.session_state["train_stash"] = [{"nothing": "usable"}]
-    at.run()
-    check("train: contract violation rejected with error",
-          not at.exception
-          and any("contract" in (e.value or "").lower()
-                  or "need a text column" in (e.value or "").lower()
-                  for e in at.error), str(at.exception))
-    at.session_state["train_stash"] = None
-
-    # Page 7: 1. Get Data + 4. Evaluate — stepper states render
-    at.switch_page(os.path.join(APP_DIR, "pages", "p_get_data.py")).run()
-    check("page renders: get-data", not at.exception, str(at.exception))
-    if not at.exception:
-        check("get-data: stepper highlights step 1",
-              any((b.label or "") == "▶ Get Data" for b in at.button))
-    at.switch_page(os.path.join(APP_DIR, "pages", "p_evaluate.py")).run()
-    check("page renders: evaluate", not at.exception, str(at.exception))
-    if not at.exception:
-        check("evaluate: stepper highlights step 4",
-              any((b.label or "") == "▶ Evaluate" for b in at.button))
-
-    # Settings dialog: gear button opens it, close returns to the page
-    gear = next((b for b in at.button if b.label == "⚙ Models"), None)
-    if gear:
-        gear.click().run()
-        opened = (not at.exception and any(
-            "Registered" in (m.value or "") or
-            "No custom models" in (c.value or "")
-            for m in at.markdown for c in at.caption))
-        check("settings: Models dialog opens", opened, str(at.exception))
-    else:
-        check("settings: Models dialog opens", False, "gear button missing")
+    # Workspace persistence across a simulated restart: a brand-new
+    # session on the same workspace dir still sees the assets
+    at2 = AppTest.from_file(os.path.join(DEMO_DIR, "app.py"),
+                            default_timeout=180)
+    at2.run()
+    at2.switch_page(os.path.join(APP_DIR, "pages", "p_workspace.py")).run()
+    md2 = "\n".join(m.value or "" for m in at2.markdown)
+    check("workspace: assets survive a session restart",
+          "smoke-session" in md2 and "smoke-eval" in md2, md2[:120])
 
 
 def main():

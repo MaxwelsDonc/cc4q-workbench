@@ -28,6 +28,8 @@ def _results(units, fallback):
 
 def render():
     st.header("Playground")
+    st.caption("Scratch space — "
+               "experiments here are not saved as assets.")
     st.write(
         "Paste a Python snippet. CC4Q extracts its comments and splits them "
         "into sentence-level units (SCCUs). The pipeline labels each unit on "
@@ -70,6 +72,44 @@ def render():
                     "docstring or a comment.")
             return
         _results(units, fallback)
+
+    st.divider()
+    st.subheader("Live repository try-out")
+    st.caption("Scratch space — nothing here is saved. To keep results, "
+               "build a corpus on the Corpora page.")
+    url = st.text_input("GitHub URL",
+                        placeholder="https://github.com/owner/repo",
+                        key="pg_url")
+    if st.button("Analyze repository", type="primary", disabled=not url.strip()):
+        from cc4q.app import repo_live
+        models = model_select.resolve_default_handle()
+        status = st.status("Stage 1/4 — Cloning…", state="running",
+                           expanded=True)
+        last = {"stage": None}
+
+        def progress(stage):
+            nums = {"Cloning": 1, "Extracting": 2, "Segmenting": 3,
+                    "Labeling": 4}
+            if last["stage"] != stage:
+                last["stage"] = stage
+                status.update(label=f"Stage {nums[stage]}/4 — {stage}…",
+                              state="running")
+
+        try:
+            stats, df = repo_live.analyze_live_repo(url, models,
+                                                    progress=progress)
+        except repo_live.RepoRefusedError as exc:
+            status.update(label="Cannot analyze this repository",
+                          state="error")
+            st.warning(str(exc))
+            return
+        except Exception as exc:
+            status.update(label="Analysis failed", state="error")
+            st.error(f"Live analysis failed: {exc}")
+            return
+        status.update(label="Done — all 4 stages complete", state="complete")
+        import cc4q.app.dashboard as dashboard
+        dashboard.render_dashboard(stats, df)
 
     footer()
 

@@ -1,4 +1,4 @@
-"""CC4Q Workbench — Streamlit entry point.
+"""CC4Q Workbench — Streamlit entry point (workspace IA, 6 flat pages).
 
 Run via ``cc4q demo`` / ``cc4q serve``, or from a source checkout with
 ``streamlit run demo/app.py`` (a thin launcher over this module).
@@ -17,6 +17,16 @@ def page(name, fname, icon, url_path, default=False):
                    url_path=url_path, default=default)
 
 
+def _default_model_indicator():
+    """Compact header indicator of the current default model, linking to
+    the Models page."""
+    from cc4q.app import registry
+    entries = registry.list_models()
+    default = next((e for e in entries if e["is_default"]), None)
+    label = default["name"] if default else "Released checkpoints"
+    return label
+
+
 def main():
     st.set_page_config(
         page_title="CC4Q Workbench",
@@ -27,8 +37,6 @@ def main():
 
     apply_theme()
 
-    # Brand block, top-left; gear button opens the Models settings dialog.
-    from cc4q.app.model_select import models_dialog
     b1, b2, b3 = st.columns([2, 2, 1])
     with b1:
         st.markdown(
@@ -44,29 +52,21 @@ def main():
             unsafe_allow_html=True,
         )
     with b3:
-        st.markdown('<div style="height:14px"></div>',
-                    unsafe_allow_html=True)
-        if st.button("⚙ Models", key="models_settings", type="secondary",
-                     use_container_width=False):
-            models_dialog()
+        st.markdown('<div style="height:14px"></div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="cc4q-brand" style="justify-content:flex-end">'
+            f'<span class="cc4q-topnav-note">model: '
+            f'{_default_model_indicator()}</span></div>',
+            unsafe_allow_html=True)
 
-    pages = st.navigation({
-        "Explore": [
-            page("Home", "p_home.py", "🏠", "home", default=True),
-            page("SDK Dashboards", "p_analyze_repo.py", "🗂️", "dashboards"),
-            page("Playground", "p_analyze_code.py", "🧪", "playground"),
-            page("Corpus", "p_explore.py", "🔎", "corpus"),
-        ],
-        "Build": [
-            page("1. Get Data", "p_get_data.py", "⬇️", "build-data"),
-            page("2. Label", "p_label.py", "🏷️", "label"),
-            page("3. Train", "p_train.py", "🎓", "train"),
-            page("4. Evaluate", "p_evaluate.py", "📏", "evaluate"),
-        ],
-        "Models": [
-            page("Models", "p_models.py", "🧠", "models"),
-        ],
-    }, position="top")
+    pages = st.navigation([
+        page("Workspace", "p_workspace.py", "🏠", "workspace", default=True),
+        page("Corpora", "p_corpora.py", "🗂️", "corpora"),
+        page("Annotate", "p_annotate.py", "🏷️", "annotate"),
+        page("Models", "p_models.py", "📦", "models"),
+        page("Evaluate", "p_evaluate.py", "📏", "evaluate"),
+        page("Playground", "p_playground.py", "🧪", "playground"),
+    ], position="top")
 
     pages.run()
 
