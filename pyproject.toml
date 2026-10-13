@@ -17,9 +17,17 @@ dependencies = [
     "tqdm>=4.60",
     "docutils==0.21.2",
     "spacy==3.8.7",
+    "Sphinx==8.2.3",
     "torch>=2.1",
     "transformers>=4.45",
     "typer>=0.12",
+]
+
+[project.optional-dependencies]
+app = [
+    "streamlit>=1.30",
+    "plotly>=5.18",
+    "pandas>=2.0",
 ]
 
 [project.scripts]
@@ -27,3 +35,6 @@ cc4q = "cc4q.cli:main"
 
 [tool.setuptools.packages.find]
 include = ["cc4q*"]
+
+[tool.setuptools.package-data]
+"cc4q.app.data" = ["manifest.json", "units/*.jsonl"]

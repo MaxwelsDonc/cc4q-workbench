@@ -22,6 +22,14 @@ def _repo_root():
     from cc4q.pipeline.paths import REPO_ROOT
     return REPO_ROOT
 
+def _read_records(path):
+    """JSONL or pretty-printed JSON array -> list of records."""
+    with open(path, encoding="utf-8") as f:
+        text = f.read()
+    if text.lstrip().startswith("["):
+        return json.loads(text)
+    return [json.loads(line) for line in text.splitlines() if line.strip()]
+
 
 @app.command("download-models")
 def download_models(check: bool = typer.Option(
@@ -109,8 +117,7 @@ def predict(input_path: str = typer.Option(..., "--input"),
     from cc4q.models.hub import load_models
     from cc4q.predict import predict_corpus
 
-    with open(input_path, encoding="utf-8") as f:
-        records = [json.loads(l) for l in f if l.strip()]
+    records = _read_records(input_path)
     models = load_models(model_dir=models_dir, device=device)
     labeled = predict_corpus(records, models=models, batch=batch)
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
@@ -134,8 +141,7 @@ def sample(input_path: str = typer.Option(..., "--input"),
     """Random / stratified / quota sampling over any JSONL."""
     from cc4q.sample import sample as cc4q_sample
 
-    with open(input_path, encoding="utf-8") as f:
-        records = [json.loads(l) for l in f if l.strip()]
+    records = _read_records(input_path)
     quota_map = json.loads(quotas) if quotas else None
     drawn = cc4q_sample(records, by=by or None, n=n, frac=frac,
                         quotas=quota_map, seed=seed)
@@ -234,13 +240,14 @@ def evaluate(annotations: str = typer.Option(..., "--annotations"),
 @app.command()
 def demo(port: int = typer.Option(8501, "--port")):
     """Launch the CC4Q Workbench Streamlit demo."""
-    app_py = os.path.join(_repo_root(), "demo", "app.py")
-    if not os.path.isfile(app_py):
-        typer.echo(f"[✗] demo app not found at {app_py} "
-                   "(run from a source checkout)", err=True)
+    try:
+        from cc4q.app import MAIN_PATH
+    except ImportError:
+        typer.echo("[✗] the demo needs the app extras: "
+                   "pip install 'cc4q[app]'", err=True)
         raise typer.Exit(1)
     raise typer.Exit(subprocess.call(
-        [sys.executable, "-m", "streamlit", "run", app_py,
+        [sys.executable, "-m", "streamlit", "run", MAIN_PATH,
          "--server.port", str(port)]))
 
 
@@ -249,11 +256,8 @@ def serve(host: str = typer.Option("0.0.0.0", "--host"),
           port: int = typer.Option(8501, "--port"),
           headless: bool = typer.Option(True, "--headless/--no-headless")):
     """Serve the demo app like a deployment (headless, bound to host)."""
-    app_py = os.path.join(_repo_root(), "demo", "app.py")
-    if not os.path.isfile(app_py):
-        typer.echo(f"[✗] demo app not found at {app_py}", err=True)
-        raise typer.Exit(1)
-    cmd = [sys.executable, "-m", "streamlit", "run", app_py,
+    from cc4q.app import MAIN_PATH
+    cmd = [sys.executable, "-m", "streamlit", "run", MAIN_PATH,
            "--server.address", host, "--server.port", str(port)]
     if headless:
         cmd.append("--server.headless")
