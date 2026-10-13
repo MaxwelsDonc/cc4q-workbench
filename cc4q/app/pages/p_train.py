@@ -4,9 +4,11 @@ import json
 import os
 import tempfile
 
+import os
+
 import streamlit as st
 
-from cc4q.app import registry
+from cc4q.app import PAGES_DIR, registry, stepper
 
 TASKS = ("quantum_related", "quantum_category", "developer_intent")
 INTENT_ORDER = ["What", "How-to-use", "How-it-is-done", "Property", "Why",
@@ -73,9 +75,12 @@ class _StreamlitCallback:  # duck-typed transformers TrainerCallback
 
 
 def render():
-    st.header("Train & Evaluate")
+    st.header("3 · Train")
     st.write("Fine-tune a classifier on your annotated data, right in the "
-             "browser — then compare the result against the released model.")
+             "browser — the result registers in ⚙ Models and feeds step 4.")
+
+    if stepper.render_stepper(3):
+        st.rerun()
 
     source = st.radio("Annotated data", [
         "Stashed from the Annotate page", "Upload JSONL / CSV"],
@@ -149,8 +154,9 @@ def _run_training(task, train_records, base_model, epochs, batch_size):
     entry = registry.register(
         name=f"{task}-{epochs}ep", path=out_dir, source="trained")
     st.session_state["model_handle_cache"] = {}
+    st.session_state["build_trained"] = entry["id"]
     st.balloons()
-    st.markdown(f"Registered as **{entry['name']}** in Your Models "
+    st.markdown(f"Registered as **{entry['name']}** in ⚙ Models "
                 f"(axes: {', '.join(entry['axes'])}).")
 
     # auto-evaluate against the released model on the training texts
@@ -171,6 +177,7 @@ def _run_training(task, train_records, base_model, epochs, batch_size):
             res = evaluate(r_preds, t_preds)
         except Exception as exc:
             st.warning(f"Comparison failed: {exc}")
+            st.session_state["build_eval_skipped"] = str(exc)
             return
     st.subheader("Trained vs released (on your training texts)")
     st.markdown(f"| metric | value |\n|---|---|\n"
@@ -179,6 +186,9 @@ def _run_training(task, train_records, base_model, epochs, batch_size):
                 f"| recall | {res['recall']:.1%} |\n"
                 f"| Wilson 95% CI | "
                 f"{res['wilson95'][0]:.1%}–{res['wilson95'][1]:.1%} |")
+    if st.button("Continue to Evaluate →", type="primary",
+                 key="to_evaluate"):
+        st.switch_page(os.path.join(PAGES_DIR, "p_evaluate.py"))
 
 
 def _axis_labels(handle, task, texts):

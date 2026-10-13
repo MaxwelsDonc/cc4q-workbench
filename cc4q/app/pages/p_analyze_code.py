@@ -27,7 +27,7 @@ def _results(units, fallback):
 
 
 def render():
-    st.header("Analyze Code")
+    st.header("Playground")
     st.write(
         "Paste a Python snippet. CC4Q extracts its comments and splits them "
         "into sentence-level units (SCCUs). The pipeline labels each unit on "
@@ -57,7 +57,7 @@ def render():
             return
 
         with st.spinner("Loading classifiers (first run takes a few seconds)"):
-            models = model_select.get_model(key="ac_model")
+            models = model_select.resolve_default_handle()
         with st.spinner("Extracting, segmenting and classifying…"):
             units, parse_error, fallback = analysis.analyze_code(code, models=models)
 

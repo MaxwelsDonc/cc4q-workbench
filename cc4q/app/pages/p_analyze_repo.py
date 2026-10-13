@@ -59,7 +59,7 @@ def _render_live(url, models):
 
 
 def render():
-    st.header("Analyze Repository")
+    st.header("SDK Dashboards")
     st.write(
         "Build a labeled comment corpus from a repository, inspect how much "
         "quantum knowledge it carries and where it lives, then profile the "

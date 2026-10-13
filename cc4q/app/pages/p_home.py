@@ -37,6 +37,28 @@ def render():
             st.markdown(PAPER_CITATION)
 
     st.markdown("<div style='height:14px'></div>", unsafe_allow_html=True)
+
+    ec1, ec2 = st.columns(2)
+    import os
+    from cc4q.app import PAGES_DIR
+    with ec1:
+        st.markdown(
+            '<div class="cc4q-card"><h3>🔎 Explore the ready-made '
+            'corpora</h3><p>Precomputed dashboards for six Qiskit-ecosystem '
+            'SDKs, a paste-a-snippet playground, and 17.5k labeled units to '
+            'filter and download.</p></div>', unsafe_allow_html=True)
+        st.page_link(os.path.join(PAGES_DIR, "p_analyze_repo.py"),
+                     label="Open SDK Dashboards →", use_container_width=True)
+    with ec2:
+        st.markdown(
+            '<div class="cc4q-card"><h3>🛠️ Build your own</h3><p>Four '
+            'guided steps: get data from any repository, label it with the '
+            'models, train your own classifier, and evaluate it.</p></div>',
+            unsafe_allow_html=True)
+        st.page_link(os.path.join(PAGES_DIR, "p_get_data.py"),
+                     label="Start at step 1 · Get Data →",
+                     use_container_width=True)
+
     st.markdown(
         "The pipeline labels every unit on three axes — quantum-relatedness, "
         "quantum category, and developer intent — and the workbench UI "
@@ -66,16 +88,16 @@ def render():
         ("🏷️ Predict", "p_analyze_code.py", "Analyze Code",
          "Label every comment unit on the three CC4Q axes, with the "
          "released or your own models."),
-        ("🎲 Sample", "p_annotate.py", "Annotate",
+        ("🎲 Sample", "p_label.py", "2. Label",
          "Draw a fair subset for human review — random or balanced across "
          "projects and labels."),
-        ("✍️ Annotate", "p_annotate.py", "Annotate",
+        ("✍️ Annotate", "p_label.py", "2. Label",
          "Confirm, fix, or skip model labels in a click-through UI; "
          "exports are train-ready."),
-        ("🎓 Train", "p_train.py", "Train & Evaluate",
+        ("🎓 Train", "p_train.py", "3. Train",
          "Fine-tune a classifier on your annotations, right in the "
          "browser."),
-        ("📏 Evaluate", "p_train.py", "Train & Evaluate",
+        ("📏 Evaluate", "p_evaluate.py", "4. Evaluate",
          "Score agreement, precision, and recall — against humans or "
          "against the released models."),
         ("📊 Visualize", "p_analyze_repo.py", "Analyze Repository",

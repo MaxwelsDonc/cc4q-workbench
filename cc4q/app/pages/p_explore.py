@@ -85,7 +85,7 @@ def _display(out):
 
 
 def render():
-    st.header("Explore Corpus")
+    st.header("Corpus")
     st.write(
         "Browse the labeled SCCUs behind the workbench: the full corpora of "
         "the three newest SDKs (qiskit-machine-learning, qiskit-nature, "
