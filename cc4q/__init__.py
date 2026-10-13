@@ -52,6 +52,8 @@ _LAZY = {
     # sampling + annotation (WP3)
     "sample": "cc4q.sample",
     "annotate": "cc4q.annotate",
+    # workspace persistence (WP4)
+    "workspace": "cc4q.workspace",
 }
 
 __all__ = sorted(_LAZY)
