@@ -40,128 +40,43 @@ quantum-specific comment taxonomy.
 
 ## 3. Information Architecture
 
-Dual-space IA. The top navigation uses `st.navigation` **sections** (streamlit
-1.64 renders top-position sections as two labelled dropdown menus — chosen
-over a segmented-control fallback because it renders cleanly in AppTest and
-the browser and keeps URLs stable), plus a ⚙ Models button in the brand row
-that opens a settings `st.dialog` on every page:
+Workspace IA: a flat six-page navigation, no sections. Every artifact the
+user creates is a **workspace asset** (`cc4q/workspace.py`); pages are
+views over assets.
 
-- **Explore**: Home · SDK Dashboards · Playground · Corpus
-- **Build**: 1. Get Data · 2. Label · 3. Train · 4. Evaluate
-- **Models**: Models — released checkpoints, your model registry, and an
-  inline train-new-model flow (WP1B reference implementation of the
-  workspace IA; the integrator flattens the final 6-page nav)
-- **⚙ Models** — registry dialog (default star, upload zip, download zip,
-  delete); still available from the brand row on every page.
+| Page | Purpose |
+|---|---|
+| 1. Workspace | Overview: per-type asset counts, recent activity, quick-create shortcuts, metrics, 8-primitive strip |
+| 2. Corpora | Corpus assets (six built-in precomputed SDK corpora + user-created); New corpus flow (URL clone+build with >200-file guardrail / local dir / upload; optional predict → labeled asset); Open → three-section dashboard + filter table |
+| 3. Annotate | Annotation session assets (resume at current progress, export, delete); New annotation wizard (corpus asset / upload / predict output → sampling → embedded annotation UI blind/adjudicate → session asset) |
+| 4. Models | Released checkpoints section + user model registry (default star, upload zip, download, delete) + inline Train-new-model flow |
+| 5. Evaluate | Evaluation assets (open report with radar overlay, delete); New evaluation (two models + corpus asset → agreement/P/R/Wilson → saved report) |
+| 6. Playground | Snippet analysis + live-repository try-out — scratch space, nothing is saved |
 
-| Page | Space | Purpose |
-|---|---|---|
-| 1. Home | Explore | Positioning, metrics, two entry cards (Explore the ready-made corpora / Build your own), 8-primitive workflow strip |
-| 2. SDK Dashboards | Explore | Precomputed §1–§3 dashboards + compare + live mode (was Analyze Repository) |
-| 3. Playground | Explore | Paste snippet → labeled cards; uses the global default model (was Analyze Code) |
-| 4. Corpus | Explore | Filter/search/download labeled SCCUs (was Explore Corpus) |
-| 5. 1. Get Data | Build | Clone a repo URL / local dir / upload JSONL → corpus preview |
-| 6. 2. Label | Build | Predict with the default model → sample → embedded annotation UI → export |
-| 7. 3. Train | Build | In-page fine-tuning with live metrics; registers into ⚙ Models |
-| 8. 4. Evaluate | Build | Compare two models on a shared corpus sample (agreement/P/R/Wilson + radar) |
-| 9. Models | Models | Released checkpoint cards (read-only, Default/Fallback badge) + Your models cards (★ set-as-default, download zip, delete, upload-with-validation) + inline training flow |
+Model resolution: registry default (★) → released checkpoints; single-axis
+custom packages compose with the released fallback. A compact model
+indicator sits in the header row of every page.
 
-### Build stepper state machine
+### Workspace model and asset schemas
 
-Each Build page renders a 4-step indicator (Get Data → Label → Train →
-Evaluate); the current step is highlighted, completed steps show ✓ and are
-clickable, future steps are disabled. State: `st.session_state["build_step"]`
-(1-based). Step outputs stash for the next step: `build_corpus` (SCCU
-records) → `build_labeled`/`predict_output` + annotation rows (`train_stash`)
-→ `build_trained` (registry id) → `build_eval` (report). "Continue to …"
-buttons advance via `st.switch_page`.
+Workspace dir: `$CC4Q_WORKSPACE` > `.cc4q_workspace/` beside a source
+checkout (pyproject.toml detection) > `~/.cache/cc4q/workspace/`. An
+`index.json` (atomic tmp+rename writes; corrupted → `index.json.bak` +
+rebuild) lists assets; payloads live under `assets/<type>/<id>/`.
 
-### Model resolution
+- `corpus`: {id, name, source: url|dir|upload|precomputed, sccus,
+  quantum_pct?, labeled, files: {corpus, labeled?}, created_at}
+- `annotation_session`: {id, name, schema, mode, total, labeled_count,
+  export_path?, created_at, updated_at}
+- `evaluation`: {id, name, pair: [model_a, model_b], corpus,
+  metrics: {n, agreement, precision, recall, wilson95}, report_path,
+  created_at}
+- `model`: not duplicated in the workspace index — delegated to
+  `cc4q.app.registry`; the workspace references model ids only.
 
-`cc4q.app.model_select.resolve_default_handle()`: registry default (★ in ⚙
-Models) if set, else the released checkpoints. Single-axis custom packages
-compose with the released fallback for missing axes
-(`cc4q.models.hub.load_models_from`).
 
-### 3.1 Home
 
-- Hero band (purple gradient): name, one-liner, buttons to GitHub repo,
-  companion paper (citation text), demo video (placeholder URL until recorded).
-- Three metric cards: **6 SDKs** · **39,593 SCCUs** · **2 quantum label axes**.
-- Workflow strip: three cards *Build* / *Inspect* / *Profile*, each with a
-  one-line description and a `st.page_link` to the relevant page.
-- Footer: Beihang University, MIT license note, artifact links.
 
-### 3.2 Playground
-
-- Left column: code textarea pre-filled with a Bell-state example (verified
-  clean labels; no `(|00>+|11>)/sqrt(2)` line). Button: **Analyze**.
-- Right column, on result:
-  - Summary strip: `N units · M quantum-related (P%)` — intent is NOT in the
-    summary strip.
-  - One card per SCCU. Badge hierarchy (visual weight in this order):
-    1. **quantum badge** — solid purple `✓ quantum` / gray outline
-       `✗ non-quantum` (largest);
-    2. **quantum category badge** — colored chip (quantum units only).
-  - Card caption: `DOCSTRING · FUNCTION` style entity/type info.
-  - Developer intent is not shown anywhere on this page (data layer only).
-- Model loading: lazy via `st.cache_resource` on first Analyze click; spinner
-  text "Loading classifiers (first run takes a few seconds)". CPU only.
-- Edge states: empty input → info message; non-parseable Python → warning +
-  automatic line-by-line fallback (no manual raw-text mode); missing
-  checkpoints → warning with
-  `python scripts/download_models.py` instructions and disabled button.
-
-### 3.3 SDK Dashboards
-
-Top: two tabs — **Precomputed SDKs** (instant) and **Live repository**.
-
-**Precomputed tab**: dropdown with the six SDKs (qiskit 2.1.0, qiskit-aer
-0.17.2, qiskit-ibm-runtime 0.45.1, qiskit-machine-learning 0.9.1,
-qiskit-nature 0.8, qiskit-algorithms 0.4.0). Selecting one renders the
-three-section dashboard below.
-
-**Live tab**: GitHub URL input. Four-stage progress via `st.status`:
-Cloning → Extracting → Segmenting → Labeling. Guardrail: if the cloned repo
-contains > 200 `.py` files, refuse politely and point to the Docker image for
-large repos. On success, render the same three-section dashboard and mark it
-"model-labeled, unverified".
-
-**Result dashboard — three sections, in order:**
-
-**§1 Corpus Built** *(Build)*
-- Metric cards: Python files / CCPs / SCCUs.
-- Chart: comment type (docstring/block/inline) × entity level
-  (module/class/function) grouped bar chart (plotly).
-- Download button: labeled corpus JSONL.
-
-**§2 Quantum Density Check** *(Inspect)* — mirroring RQ2/RQ3 of the companion
-paper
-- Big-number card: **Quantum %** of SCCUs.
-- Comment density: comment lines / code lines (live mode computes it from the
-  cloned repo; precomputed mode shows the value computed at build time).
-- Heatmap: quantum SCCU share by entity level × comment form.
-
-**§3 Knowledge Profile** *(Profile)* — mirroring RQ6 of the companion paper
-- Radar chart (plotly `Scatterpolar`) over the six quantum categories:
-  Mathematics / Algorithms / Circuit model / Hardware / Software stack /
-  Others, values = share of quantum SCCUs.
-- One-line interpretation hint, e.g. "This SDK's quantum comments concentrate
-  on the circuit model."
-
-**Compare mode** (below the dashboard, both tabs feed it):
-- Select two SDKs (default: qiskit vs qiskit-machine-learning).
-- Overlaid radar charts (two traces, one figure) + Quantum % side-by-side
-  cards. This is the figure that supports the paper's infrastructure-vs-
-  application-layer finding.
-
-### 3.4 Corpus
-
-- Default view: **quantum units only** (toggle to include non-quantum).
-- Filter bar order: quantum category → entity level → comment form → SDK →
-  keyword search. No developer-intent filter (intent is data-layer only, §2).
-- Paginated dataframe (rows-per-page selector), download-filtered-JSONL
-  button.
 
 ## 4. Analysis Specifications
 
@@ -266,7 +181,7 @@ missing checkpoints disable Analyze buttons with instructions, never crash.
 ## 8. Acceptance Criteria
 
 1. `python demo/smoke_test.py --app` passes; headless run returns HTTP 200 on
-   all four pages.
+   all six pages.
 2. Precomputed dashboards for all six SDKs render §1–§3 + compare without
    model checkpoints installed.
 3. Live mode: a small public repo (e.g. this workbench repo) completes all
@@ -276,10 +191,12 @@ missing checkpoints disable Analyze buttons with instructions, never crash.
    (spot-check one SDK).
 5. Compare mode visually reproduces the infra-vs-application gap
    (Quantum % 34.3 vs 26.0 aggregate).
-6. All eight pages render under AppTest; the Annotate page loads a
-   precomputed corpus, draws a sample, and shows the embedded UI; the Train
-   page rejects contract violations with its example-row error; the model
-   selector defaults to the released checkpoints.
+6. All six pages render under AppTest. Workspace assets persist across
+   sessions (restart test); the Corpora page seeds six built-in SDK assets
+   and its Open action renders the §1–§3 dashboard; Annotate resumes a
+   session at current progress; Evaluate reopens a saved report; the
+   Models page rejects contract violations with its example-row error;
+   the header model indicator defaults to the released checkpoints.
 7. No developer-intent UI anywhere — no intent charts, badges, filters, or
    table columns; intent appears only in the data layer (units JSONL,
    manifest, downloads). The third classifier still runs at inference time.
