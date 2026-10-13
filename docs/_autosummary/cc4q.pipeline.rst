@@ -16,6 +16,7 @@ cc4q.pipeline
    extract
    files
    ids
+   metrics
    paths
    segment
    segment_pairs

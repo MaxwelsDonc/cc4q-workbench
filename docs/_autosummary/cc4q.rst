@@ -11,6 +11,7 @@
    :recursive:
 
    annotate
+   app
    cli
    evaluate
    models
