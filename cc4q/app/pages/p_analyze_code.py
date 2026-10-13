@@ -3,7 +3,8 @@
 import streamlit as st
 
 from cc4q.app import analysis  # noqa: E402
-from cc4q.app.model_cache import checkpoints_missing, get_models, missing_checkpoints_warning  # noqa: E402
+from cc4q.app import model_select, registry
+from cc4q.app.model_cache import checkpoints_missing, missing_checkpoints_warning  # noqa: E402
 from cc4q.app.ui import footer, summary_strip, unit_card  # noqa: E402
 
 
@@ -35,7 +36,7 @@ def render():
     )
 
     left, right = st.columns([1, 1], vertical_alignment="top")
-    no_models = bool(checkpoints_missing())
+    no_models = bool(checkpoints_missing()) and not registry.list_models()
 
     with left:
         code = st.text_area("Python source", value=analysis.QISKIT_SNIPPET,
@@ -56,7 +57,7 @@ def render():
             return
 
         with st.spinner("Loading classifiers (first run takes a few seconds)"):
-            models = get_models()
+            models = model_select.get_model(key="ac_model")
         with st.spinner("Extracting, segmenting and classifying…"):
             units, parse_error, fallback = analysis.analyze_code(code, models=models)
 

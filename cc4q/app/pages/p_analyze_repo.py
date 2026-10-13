@@ -4,7 +4,8 @@ import streamlit as st
 
 from cc4q.app import dashboard  # noqa: E402
 from cc4q.app import data_io  # noqa: E402
-from cc4q.app.model_cache import checkpoints_missing, get_models, missing_checkpoints_warning  # noqa: E402
+from cc4q.app import model_select, registry
+from cc4q.app.model_cache import checkpoints_missing, missing_checkpoints_warning  # noqa: E402
 from cc4q.app.ui import footer  # noqa: E402
 
 STAGE_NUM = {"Cloning": 1, "Extracting": 2, "Segmenting": 3, "Labeling": 4}
@@ -24,14 +25,12 @@ def _render_precomputed(sdk, manifest):
     dashboard.render_dashboard(stats, df)
 
 
-def _render_live(url):
+def _render_live(url, models):
     key = f"live_result:{url.strip()}"
     if key in st.session_state:
         stats, df = st.session_state[key]
         dashboard.render_dashboard(stats, df)
         return
-
-    models = get_models()  # cached resource; models load once per session
     status = st.status("Stage 1/4 — Cloning…", state="running", expanded=True)
     last = {"stage": None}
 
@@ -87,13 +86,14 @@ def render():
             placeholder="https://github.com/owner/repo",
             label_visibility="collapsed",
         )
-        no_models = bool(checkpoints_missing())
+        no_models = bool(checkpoints_missing()) and not registry.list_models()
+        models = model_select.get_model(key="ar_model")
         run_live = st.button("Analyze repository", type="primary",
                              disabled=not url.strip() or no_models)
         if no_models:
             missing_checkpoints_warning()
         if run_live and url.strip():
-            _render_live(url)
+            _render_live(url, models)
 
     st.divider()
     st.subheader("Compare mode")

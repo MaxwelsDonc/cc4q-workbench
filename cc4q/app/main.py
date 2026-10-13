@@ -45,7 +45,11 @@ def main():
     pages = st.navigation([
         page("Home", "p_home.py", "🏠", "home", default=True),
         page("Analyze Code", "p_analyze_code.py", "🧪", "analyze-code"),
-        page("Analyze Repository", "p_analyze_repo.py", "🗂️", "analyze-repository"),
+        page("Analyze Repository", "p_analyze_repo.py", "🗂️",
+             "analyze-repository"),
+        page("Annotate", "p_annotate.py", "🏷️", "annotate"),
+        page("Train & Evaluate", "p_train.py", "🎓", "train"),
+        page("Your Models", "p_models.py", "📦", "models"),
         page("Explore Corpus", "p_explore.py", "🔎", "explore-corpus"),
     ], position="top")
 

@@ -54,32 +54,49 @@ def render():
         metric_card("2", "Quantum label axes per unit")
 
     st.markdown("<div style='height:18px'></div>", unsafe_allow_html=True)
-    st.subheader("One workflow, three verbs")
+    st.subheader("Eight primitives, one workflow")
 
     entries = [
         ("🛠️ Build", "p_analyze_repo.py", "Analyze Repository",
-         "Repository → labeled comment corpus: clone, extract comment pairs, "
-         "segment into SCCUs, label on three axes. Precomputed for six SDKs; "
-         "live for any small GitHub repo."),
-        ("🔍 Inspect", "p_analyze_code.py", "Analyze Code",
-         "Quantum-density health check at unit level: paste a snippet and see "
-         "which comments carry quantum knowledge, and where."),
-        ("📡 Profile", "p_analyze_repo.py", "Analyze Repository",
-         "Six-category quantum-knowledge profile of an SDK — what kind of "
-         "quantum knowledge its comments explain — comparable across SDKs."),
+         "Turn a repository into a labeled comment corpus. Precomputed for "
+         "six SDKs; live for any small GitHub repo."),
+        ("🔬 Analyze", "p_analyze_repo.py", "Analyze Repository",
+         "See how much quantum knowledge a corpus carries and where it "
+         "lives — density, heatmaps, profiles."),
+        ("🏷️ Predict", "p_analyze_code.py", "Analyze Code",
+         "Label every comment unit on the three CC4Q axes, with the "
+         "released or your own models."),
+        ("🎲 Sample", "p_annotate.py", "Annotate",
+         "Draw a fair subset for human review — random or balanced across "
+         "projects and labels."),
+        ("✍️ Annotate", "p_annotate.py", "Annotate",
+         "Confirm, fix, or skip model labels in a click-through UI; "
+         "exports are train-ready."),
+        ("🎓 Train", "p_train.py", "Train & Evaluate",
+         "Fine-tune a classifier on your annotations, right in the "
+         "browser."),
+        ("📏 Evaluate", "p_train.py", "Train & Evaluate",
+         "Score agreement, precision, and recall — against humans or "
+         "against the released models."),
+        ("📊 Visualize", "p_analyze_repo.py", "Analyze Repository",
+         "Radar profiles and quantum-residence heatmaps, exportable "
+         "anywhere."),
     ]
-    cols = st.columns(3)
-    for col, (title, target, page_name, blurb) in zip(cols, entries):
-        with col:
-            st.markdown(
-                f'<div class="cc4q-card"><h3>{title}</h3><p>{blurb}</p></div>',
-                unsafe_allow_html=True,
-            )
-            import os
-            from cc4q.app import PAGES_DIR
-            st.page_link(os.path.join(PAGES_DIR, target),
-                         label=f"Open {page_name} →",
-                         use_container_width=True)
+    for row_start in (0, 4):
+        cols = st.columns(4)
+        for col, (title, target, page_name, blurb) in zip(
+                cols, entries[row_start:row_start + 4]):
+            with col:
+                st.markdown(
+                    f'<div class="cc4q-card"><h3>{title}</h3>'
+                    f'<p>{blurb}</p></div>',
+                    unsafe_allow_html=True,
+                )
+                import os
+                from cc4q.app import PAGES_DIR
+                st.page_link(os.path.join(PAGES_DIR, target),
+                             label=f"Open {page_name} →",
+                             use_container_width=True)
 
     footer()
 
