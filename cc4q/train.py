@@ -71,7 +71,7 @@ def _compute_metrics(average):
 
 def train(task, data, output_dir, base_model="bert-base-uncased",
           batch_size=32, epochs=30, max_length=512, test_size=0.2,
-          val_size=0.1, seed=42):
+          val_size=0.1, seed=42, callbacks=None):
     """Fine-tune one CC4Q classifier.
 
     ``task`` is one of quantum_related / quantum_category /
@@ -113,6 +113,7 @@ def train(task, data, output_dir, base_model="bert-base-uncased",
     tokenized_test = split_dataset["test"].map(preprocess, batched=True)
 
     average = "binary" if num_labels == 2 else "macro"
+    trainer_callbacks = list(callbacks or [])
     training_args = TrainingArguments(
         output_dir=output_dir, eval_strategy="epoch", save_strategy="epoch",
         learning_rate=2e-05, per_device_train_batch_size=batch_size,
@@ -123,7 +124,8 @@ def train(task, data, output_dir, base_model="bert-base-uncased",
     trainer = Trainer(model=model, args=training_args,
                       train_dataset=tokenized_train,
                       eval_dataset=tokenized_val,
-                      compute_metrics=_compute_metrics(average))
+                      compute_metrics=_compute_metrics(average),
+                      callbacks=trainer_callbacks or None)
     trainer.train()
     test_results = trainer.evaluate(tokenized_test)
     trainer.save_model(output_dir)

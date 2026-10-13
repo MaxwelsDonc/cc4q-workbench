@@ -182,6 +182,17 @@ class ModelHandle:
         return self._models.keys()
 
 
+def _load_axis(model_dir, name, device):
+    import torch
+    from transformers import BertForSequenceClassification, BertTokenizer
+    path = os.path.join(model_dir, name)
+    tokenizer = BertTokenizer.from_pretrained(path)
+    model = BertForSequenceClassification.from_pretrained(path)
+    model.to(device)
+    model.eval()
+    return tokenizer, model
+
+
 def load_models(model_dir=None, device=None, auto_download=True):
     """Load the three BERT classifiers (eval mode) on the resolved device.
 
@@ -189,9 +200,6 @@ def load_models(model_dir=None, device=None, auto_download=True):
     (SHA256-verified) unless ``auto_download=False``, which raises instead.
     Returns a :class:`ModelHandle`.
     """
-    import torch
-    from transformers import BertForSequenceClassification, BertTokenizer
-
     model_dir = model_dir or default_model_dir()
     missing = missing_checkpoints(model_dir)
     if missing:
@@ -208,12 +216,37 @@ def load_models(model_dir=None, device=None, auto_download=True):
             )
 
     device = resolve_device(device)
+    models = {name: _load_axis(model_dir, name, device)
+              for name in ModelHandle.AXES}
+    return ModelHandle(models, device, model_dir)
+
+
+def load_models_from(axis_dirs, device=None, auto_download=True):
+    """Compose a handle from per-axis model directories.
+
+    ``axis_dirs`` maps axis names ("quantum_related" / "quantum_category" /
+    "developer_intent") to directories; axes not present fall back to the
+    released checkpoints (auto-downloaded unless ``auto_download=False``).
+    Lets user-trained single-axis models plug into the full pipeline.
+    """
+    device = resolve_device(device)
+    released_dir = None
     models = {}
     for name in ModelHandle.AXES:
-        path = os.path.join(model_dir, name)
-        tokenizer = BertTokenizer.from_pretrained(path)
-        model = BertForSequenceClassification.from_pretrained(path)
-        model.to(device)
-        model.eval()
-        models[name] = (tokenizer, model)
-    return ModelHandle(models, device, model_dir)
+        if axis_dirs.get(name):
+            models[name] = _load_axis(axis_dirs[name], "", device) \
+                if os.path.isfile(os.path.join(axis_dirs[name],
+                                               "config.json")) \
+                else _load_axis(axis_dirs[name], name, device)
+        else:
+            if released_dir is None:
+                released_dir = default_model_dir()
+                if missing_checkpoints(released_dir):
+                    if not auto_download:
+                        raise RuntimeError(
+                            f"No model provided for '{name}' and the released "
+                            "checkpoints are missing. Run: cc4q "
+                            "download-models")
+                    ensure_checkpoints(released_dir)
+            models[name] = _load_axis(released_dir, name, device)
+    return ModelHandle(models, device, released_dir or "")
