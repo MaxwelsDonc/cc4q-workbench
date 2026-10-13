@@ -12,7 +12,7 @@ Sources
 * Comment density: recomputed at build time from the pinned repo checkouts
   under ``data/input/`` (auto-cloned at the pinned tags from
   ``REPO_SOURCES``), restricted to each pipeline config's ``include_dirs``.
-  Shared definition with live mode: ``demo/repo_metrics.py``.
+  Shared definition with live mode: ``cc4q/pipeline/metrics.py``.
 
 Both sources are normalised to one lean unit schema (code snippets and line
 numbers are dropped)::
@@ -39,9 +39,11 @@ from collections import Counter
 
 DEMO_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(DEMO_DIR)
-if DEMO_DIR not in sys.path:
-    sys.path.insert(0, DEMO_DIR)
-DATA_DIR = os.path.join(DEMO_DIR, "data")
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+from cc4q.app import DATA_DIR  # noqa: E402
+
 UNITS_DIR = os.path.join(DATA_DIR, "units")
 
 SAMPLE_SIZE = 2000
@@ -184,7 +186,7 @@ def ensure_clone(sdk):
 def density_for(sdk):
     """Comment density over the pinned checkout, restricted to the pipeline's
     include_dirs (whole repo when the config has none)."""
-    from repo_metrics import compute_comment_density
+    from cc4q.pipeline.metrics import compute_comment_density
 
     _, _, include_dirs = REPO_SOURCES[sdk]
     path = ensure_clone(sdk)
@@ -193,7 +195,7 @@ def density_for(sdk):
 
 def python_file_count(sdk):
     """All .py files in the pipeline scope of the pinned checkout."""
-    from repo_metrics import iter_py_files
+    from cc4q.pipeline.metrics import iter_py_files
 
     _, _, include_dirs = REPO_SOURCES[sdk]
     path = ensure_clone(sdk)

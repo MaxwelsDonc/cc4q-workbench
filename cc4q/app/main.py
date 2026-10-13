@@ -1,51 +1,56 @@
-"""CC4Q Workbench — public demo app.
+"""CC4Q Workbench — Streamlit entry point.
 
-Run from the workbench root:
-    streamlit run demo/app.py
+Run via ``cc4q demo`` / ``cc4q serve``, or from a source checkout with
+``streamlit run demo/app.py`` (a thin launcher over this module).
 """
+
+import os
 
 import streamlit as st
 
-from bootstrap import boot
+from cc4q.app import MAIN_PATH, PAGES_DIR
+from cc4q.app.ui import apply_theme
 
-boot()
 
-from ui import apply_theme  # noqa: E402
-
-st.set_page_config(
-    page_title="CC4Q Workbench",
-    page_icon="⚛",
-    layout="wide",
-    initial_sidebar_state="collapsed",
-)
-
-apply_theme()
-
-# Brand block, top-left, above the navigation bar.
-b1, b2 = st.columns([3, 2])
-with b1:
-    st.markdown(
-        '<div class="cc4q-brand"><span class="name">⚛ CC4Q Workbench</span>'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-with b2:
-    st.markdown(
-        '<div class="cc4q-brand" style="justify-content:flex-end">'
-        '<span class="cc4q-topnav-note">Local inference · no data leaves '
-        'your machine</span></div>',
-        unsafe_allow_html=True,
+def main():
+    st.set_page_config(
+        page_title="CC4Q Workbench",
+        page_icon="⚛",
+        layout="wide",
+        initial_sidebar_state="collapsed",
     )
 
-pages = st.navigation([
-    st.Page("pages/p_home.py", title="Home", icon="🏠", url_path="home",
-            default=True),
-    st.Page("pages/p_analyze_code.py", title="Analyze Code", icon="🧪",
-            url_path="analyze-code"),
-    st.Page("pages/p_analyze_repo.py", title="Analyze Repository", icon="🗂️",
-            url_path="analyze-repository"),
-    st.Page("pages/p_explore.py", title="Explore Corpus", icon="🔎",
-            url_path="explore-corpus"),
-], position="top")
+    apply_theme()
 
-pages.run()
+    # Brand block, top-left, above the navigation bar.
+    b1, b2 = st.columns([3, 2])
+    with b1:
+        st.markdown(
+            '<div class="cc4q-brand"><span class="name">⚛ CC4Q '
+            'Workbench</span></div>',
+            unsafe_allow_html=True,
+        )
+    with b2:
+        st.markdown(
+            '<div class="cc4q-brand" style="justify-content:flex-end">'
+            '<span class="cc4q-topnav-note">Local inference · no data '
+            'leaves your machine</span></div>',
+            unsafe_allow_html=True,
+        )
+
+    def page(name, fname, icon, url_path, default=False):
+        return st.Page(os.path.join(PAGES_DIR, fname), title=name, icon=icon,
+                       url_path=url_path, default=default)
+
+    pages = st.navigation([
+        page("Home", "p_home.py", "🏠", "home", default=True),
+        page("Analyze Code", "p_analyze_code.py", "🧪", "analyze-code"),
+        page("Analyze Repository", "p_analyze_repo.py", "🗂️", "analyze-repository"),
+        page("Explore Corpus", "p_explore.py", "🔎", "explore-corpus"),
+    ], position="top")
+
+    pages.run()
+
+
+if __name__ == "__main__":
+    main()

@@ -38,9 +38,20 @@ REQUIRED_FILES = ("config.json", "model.safetensors", "tokenizer_config.json")
 
 
 def default_model_dir():
-    """Default checkpoint location: models_checkpoints/ in the repo root."""
+    """Default checkpoint location.
+
+    Priority: CC4Q_MODEL_DIR env var > ``models_checkpoints/`` next to a
+    source checkout (editable installs keep the repo-local layout) >
+    ``~/.cache/cc4q/models_checkpoints`` for plain wheel installs.
+    """
+    env = os.environ.get("CC4Q_MODEL_DIR")
+    if env:
+        return env
     from cc4q.pipeline.paths import REPO_ROOT
-    return os.path.join(REPO_ROOT, "models_checkpoints")
+    if os.path.isdir(os.path.join(REPO_ROOT, "scripts")):
+        return os.path.join(REPO_ROOT, "models_checkpoints")
+    return os.path.expanduser(os.path.join("~", ".cache", "cc4q",
+                                           "models_checkpoints"))
 
 
 def resolve_device(device=None):

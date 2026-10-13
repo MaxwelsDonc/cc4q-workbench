@@ -1,17 +1,10 @@
 """Lazily cached access to the three BERT classifiers (shared by pages)."""
 
 import os
-import sys
 
 import streamlit as st
 
-DEMO_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(DEMO_DIR)
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-
-from cc4q.models.hub import (default_model_dir, load_models,  # noqa: E402
-                             missing_checkpoints)
+from cc4q.models.hub import default_model_dir, load_models, missing_checkpoints
 
 CKPT_DIR = default_model_dir()
 REQUIRED = ("quantum_related", "quantum_category", "developer_intent")

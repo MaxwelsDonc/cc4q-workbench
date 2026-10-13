@@ -2,13 +2,9 @@
 
 import streamlit as st
 
-from bootstrap import boot
-
-boot()
-
-import cc4q_analysis as analysis  # noqa: E402
-from model_cache import checkpoints_missing, get_models, missing_checkpoints_warning  # noqa: E402
-from ui import footer, summary_strip, unit_card  # noqa: E402
+from cc4q.app import analysis  # noqa: E402
+from cc4q.app.model_cache import checkpoints_missing, get_models, missing_checkpoints_warning  # noqa: E402
+from cc4q.app.ui import footer, summary_strip, unit_card  # noqa: E402
 
 
 def _results(units, fallback):

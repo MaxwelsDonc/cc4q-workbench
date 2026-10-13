@@ -148,14 +148,14 @@ developer_intent (6)`.
 
 ## 5. Data Layer
 
-- `demo/data/manifest.json` — per-SDK stats + all distributions needed by §1–§3
+- `cc4q/app/data/manifest.json` — per-SDK stats + all distributions needed by §1–§3
   (computed at build time by `demo/build_demo_data.py`).
-- `demo/data/units/<sdk>.jsonl` — lean SCCU records for Explore (full for the
+- `cc4q/app/data/units/<sdk>.jsonl` — lean SCCU records for Explore (full for the
   three new SDKs; 2,000-row seed-42 samples for the original three; code
   snippets dropped).
 - Live mode computes the same manifest structure in-session and caches it in
   `st.session_state`.
-- Total `demo/data/` budget: ≤ 25 MB (currently ~6.6 MB).
+- Total precomputed-data budget: ≤ 25 MB (currently ~6.6 MB).
 
 ## 6. Visual Design
 
@@ -186,7 +186,7 @@ Kimi-style minimal product language (kimi.com aesthetics), light mode only:
 - Theme delivery is dual, so the palette holds no matter where the app is
   launched from: `.streamlit/config.toml` at the repo root (picked up when
   `streamlit run` is invoked from the repo root) **plus** CSS-variable and
-  component overrides injected by `demo/ui.py` (covers launches from any
+  component overrides injected by `cc4q/app/ui.py` (covers launches from any
   other working directory, where Streamlit does not discover the project
   config and would otherwise fall back to the default red #FF4B4B).
 
@@ -202,7 +202,7 @@ demo/
 ├── data_io.py          # manifest/units loading (cached)
 ├── model_cache.py      # lazy model loading + missing-checkpoint warning
 ├── ui.py               # theme CSS, cards, chips, plotly layout helpers
-├── build_demo_data.py  # regenerates demo/data/
+├── demo/build_demo_data.py  # regenerates cc4q/app/data/
 └── smoke_test.py       # data checks + AppTest page tests
 ```
 

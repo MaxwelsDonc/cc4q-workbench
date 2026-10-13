@@ -25,9 +25,10 @@ import sys
 
 DEMO_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(DEMO_DIR)
-for path in (DEMO_DIR, os.path.join(DEMO_DIR, "pages"), PROJECT_ROOT):
-    if path not in sys.path:
-        sys.path.insert(0, path)
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
+from cc4q.app import APP_DIR  # noqa: E402
 
 FAILURES = []
 
@@ -43,7 +44,7 @@ def check(name, condition, detail=""):
 
 
 def test_snippet_pipeline(with_models):
-    import cc4q_analysis as analysis
+    from cc4q.app import analysis
 
     units, error, fallback = analysis.analyze_code(analysis.QISKIT_SNIPPET)
     check("(a) default snippet parses without fallback",
@@ -85,8 +86,8 @@ def test_precomputed_data():
     import pandas as pd
     import plotly.graph_objects as go
 
-    import dashboard
-    import data_io
+    from cc4q.app import dashboard
+    from cc4q.app import data_io
 
     manifest = data_io.load_manifest()
     repos = sorted(manifest["repos"])
@@ -166,7 +167,7 @@ def test_precomputed_data():
           f"got {original_ccps}")
 
     # (§8.4) density spot-check: direct recomputation on the pinned clone
-    from repo_metrics import compute_comment_density
+    from cc4q.pipeline.metrics import compute_comment_density
     sdk = "qiskit-machine-learning"
     clone = os.path.join(PROJECT_ROOT, "data", "input", sdk)
     if os.path.isdir(clone):
@@ -192,7 +193,7 @@ def test_precomputed_data():
           and abs(app - 0.260) < 0.001, str(app))
 
     # (§8.6) no intent charts anywhere: dashboard must not touch intent data
-    with open(os.path.join(DEMO_DIR, "dashboard.py"), encoding="utf-8") as f:
+    with open(os.path.join(APP_DIR, "dashboard.py"), encoding="utf-8") as f:
         dashboard_src = f.read()
     check("(6) dashboard.py has no intent analysis",
           "intent_counts" not in dashboard_src
@@ -282,7 +283,7 @@ def test_app_rendering():
           and "--cc4q-quantum: #6C3FC5" in theme_css)
 
     # Page 2: Analyze Code — click Analyze and verify summary strip + cards.
-    at.switch_page("pages/p_analyze_code.py").run()
+    at.switch_page(os.path.join(APP_DIR, "pages", "p_analyze_code.py")).run()
     check("page renders: analyze-code", not at.exception, str(at.exception))
     if not at.exception and at.button:
         at.button[0].click().run()
@@ -314,7 +315,7 @@ def test_app_rendering():
               str(at.exception))
 
     # Page 3: Analyze Repository — §1-§3 sections + compare.
-    at.switch_page("pages/p_analyze_repo.py").run()
+    at.switch_page(os.path.join(APP_DIR, "pages", "p_analyze_repo.py")).run()
     check("page renders: analyze-repository", not at.exception, str(at.exception))
     if not at.exception:
         subheaders = [s.value for s in at.subheader]
@@ -345,7 +346,7 @@ def test_app_rendering():
               and "Application SDKs" in all_md)
 
     # Page 4: Explore Corpus — quantum-only default + keyword filter.
-    at.switch_page("pages/p_explore.py").run()
+    at.switch_page(os.path.join(APP_DIR, "pages", "p_explore.py")).run()
     check("page renders: explore-corpus", not at.exception, str(at.exception))
     if not at.exception:
         check("explore: quantum-only toggle exists (default off)",

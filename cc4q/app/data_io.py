@@ -1,7 +1,8 @@
-"""Loading and aggregation for the committed demo dataset (demo/data/).
+"""Loading and aggregation for the committed precomputed demo dataset
+(cc4q/app/data/, shipped as package data).
 
-The app reads ONLY from demo/data/ for precomputed content; nothing here
-touches data/output/ or the TOSEM release at runtime.
+The app reads ONLY from that directory for precomputed content; nothing
+here touches data/output/ or the TOSEM release at runtime.
 """
 
 import json
@@ -10,8 +11,9 @@ import os
 import pandas as pd
 import streamlit as st
 
-DEMO_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(DEMO_DIR, "data")
+from cc4q.app import DATA_DIR as _PKG_DATA  # package data dir
+
+DATA_DIR = _PKG_DATA
 UNITS_DIR = os.path.join(DATA_DIR, "units")
 MANIFEST_PATH = os.path.join(DATA_DIR, "manifest.json")
 

@@ -2,11 +2,7 @@
 
 import streamlit as st
 
-from bootstrap import boot
-
-boot()
-
-from ui import footer, metric_card  # noqa: E402
+from cc4q.app.ui import footer, metric_card  # noqa: E402
 
 GITHUB_URL = "https://github.com/MaxwelsDonc/cc4q-workbench"
 PAPER_CITATION = ('"Code Comments for Quantum Software Development Kits: '
@@ -61,14 +57,14 @@ def render():
     st.subheader("One workflow, three verbs")
 
     entries = [
-        ("🛠️ Build", "pages/p_analyze_repo.py", "Analyze Repository",
+        ("🛠️ Build", "p_analyze_repo.py", "Analyze Repository",
          "Repository → labeled comment corpus: clone, extract comment pairs, "
          "segment into SCCUs, label on three axes. Precomputed for six SDKs; "
          "live for any small GitHub repo."),
-        ("🔍 Inspect", "pages/p_analyze_code.py", "Analyze Code",
+        ("🔍 Inspect", "p_analyze_code.py", "Analyze Code",
          "Quantum-density health check at unit level: paste a snippet and see "
          "which comments carry quantum knowledge, and where."),
-        ("📡 Profile", "pages/p_analyze_repo.py", "Analyze Repository",
+        ("📡 Profile", "p_analyze_repo.py", "Analyze Repository",
          "Six-category quantum-knowledge profile of an SDK — what kind of "
          "quantum knowledge its comments explain — comparable across SDKs."),
     ]
@@ -79,7 +75,10 @@ def render():
                 f'<div class="cc4q-card"><h3>{title}</h3><p>{blurb}</p></div>',
                 unsafe_allow_html=True,
             )
-            st.page_link(target, label=f"Open {page_name} →",
+            import os
+            from cc4q.app import PAGES_DIR
+            st.page_link(os.path.join(PAGES_DIR, target),
+                         label=f"Open {page_name} →",
                          use_container_width=True)
 
     footer()

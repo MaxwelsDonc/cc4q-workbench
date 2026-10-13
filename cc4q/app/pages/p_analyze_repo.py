@@ -2,14 +2,10 @@
 
 import streamlit as st
 
-from bootstrap import boot
-
-boot()
-
-import dashboard  # noqa: E402
-import data_io  # noqa: E402
-from model_cache import checkpoints_missing, get_models, missing_checkpoints_warning  # noqa: E402
-from ui import footer  # noqa: E402
+from cc4q.app import dashboard  # noqa: E402
+from cc4q.app import data_io  # noqa: E402
+from cc4q.app.model_cache import checkpoints_missing, get_models, missing_checkpoints_warning  # noqa: E402
+from cc4q.app.ui import footer  # noqa: E402
 
 STAGE_NUM = {"Cloning": 1, "Extracting": 2, "Segmenting": 3, "Labeling": 4}
 VALIDATION_TEXT = (

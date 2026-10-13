@@ -20,6 +20,8 @@ _LAZY = {
     "id_generator": "cc4q.pipeline.ids",
     "read_config": "cc4q.pipeline.config",
     "clone_repo": "cc4q.pipeline.download",
+    "compute_comment_density": "cc4q.pipeline.metrics",
+    "quantum_residence": "cc4q.pipeline.metrics",
 }
 
 

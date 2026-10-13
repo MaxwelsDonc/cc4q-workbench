@@ -5,22 +5,14 @@ cc4q.pipeline / cc4q.predict / cc4q.models.hub; this module keeps the demo's
 historic import surface (QISKIT_SNIPPET, analyze_code, load_models, DEVICE)
 and is importable without Streamlit for smoke tests:
 
-    from demo.cc4q_analysis import analyze_code, load_models
+    from cc4q.app.analysis import analyze_code, load_models
     models = load_models()
     units, error, fallback = analyze_code(QISKIT_SNIPPET, models)
 """
 
-import os
-import sys
-
-DEMO_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(DEMO_DIR)
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-
-import cc4q.predict as _predict                        # noqa: E402,F401
-from cc4q.models.hub import load_models, resolve_device  # noqa: E402,F401
-from cc4q.predict import (analyze_snippet, classify_units, extract_units,  # noqa: E402,F401
+import cc4q.predict as _predict  # noqa: F401
+from cc4q.models.hub import load_models, resolve_device  # noqa: F401
+from cc4q.predict import (analyze_snippet, classify_units, extract_units,  # noqa: F401
                           raw_text_units)
 
 # historic API name used by the pages and smoke tests

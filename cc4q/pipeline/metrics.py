@@ -1,5 +1,5 @@
-"""Repository-level metrics shared by the live pipeline and the demo-data
-build. No heavy imports (no torch/streamlit) so build_demo_data.py can use it.
+"""Repository-level metrics shared by the live pipeline, the demo app, and
+the demo-data build. No heavy imports (no torch/streamlit).
 
 Comment density definition (mirrors RQ2 of the companion paper):
 ``comment lines / code lines`` over the repository checkout, restricted to

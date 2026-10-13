@@ -16,8 +16,8 @@ from cc4q.viz.charts import (
     radar_figure as _radar_figure,
     type_entity_figure as _type_entity_chart,
 )
-from data_io import units_to_jsonl_bytes
-from ui import metric_card, plotly_layout
+from cc4q.app.data_io import units_to_jsonl_bytes
+from cc4q.app.ui import metric_card, plotly_layout
 
 
 def _styled(fig):

@@ -17,15 +17,9 @@ import tempfile
 import pandas as pd
 import yaml
 
-DEMO_DIR = os.path.dirname(os.path.abspath(__file__))
-PROJECT_ROOT = os.path.dirname(DEMO_DIR)
-if DEMO_DIR not in sys.path:
-    sys.path.insert(0, DEMO_DIR)
-if PROJECT_ROOT not in sys.path:
-    sys.path.insert(0, PROJECT_ROOT)
-
-from cc4q_analysis import classify_sccu_records  # noqa: E402
-from repo_metrics import compute_comment_density, quantum_residence  # noqa: E402
+from cc4q.app.analysis import classify_sccu_records
+from cc4q.pipeline.metrics import compute_comment_density, quantum_residence
+from cc4q.pipeline.paths import REPO_ROOT as PROJECT_ROOT
 
 MAX_PY_FILES = 200
 CLONE_TIMEOUT = 180
@@ -74,8 +68,18 @@ def analyze_live_repo(url, models, progress=None):
     """Full live pipeline. ``progress(stage_name)`` is called between stages.
 
     Returns (stats_dict, units_df) with the same shapes the precomputed
-    dashboard consumes.
+    dashboard consumes. Requires a source checkout (or the Docker image):
+    live mode shells out to the pipeline scripts under scripts/.
     """
+    pipeline_script = os.path.join(PROJECT_ROOT, "scripts",
+                                   "02_extract_code_comment_pairs.py")
+    if not os.path.isfile(pipeline_script):
+        raise RepoRefusedError(
+            "Live repository analysis needs the pipeline scripts, which "
+            "ship with a source checkout or the Docker image - install "
+            "from git or use Docker for live mode. Precomputed dashboards "
+            "and the corpus explorer work everywhere."
+        )
     repo_slug, clone_url = parse_github_url(url)
     repo_name = repo_slug.split("/")[-1]
     workdir = tempfile.mkdtemp(prefix="cc4q_live_")
