@@ -82,6 +82,21 @@ def apply_theme():
         .stApp a { color: #1A1A1A; text-decoration: underline;
                    text-underline-offset: 2px; }
         .stApp a:hover { color: #000000; }
+        /* Top-navigation lives in the app header, outside .stApp's first
+           paint of page CSS - force readable link colors so a cold load
+           never shows white-on-white nav links. */
+        header[data-testid="stHeader"] a,
+        [data-testid="stNavigation"] a,
+        [data-testid="stAppViewContainer"] nav a {
+            color: #1A1A1A !important;
+        }
+        header[data-testid="stHeader"] [aria-current="page"],
+        [data-testid="stNavigation"] [aria-current="page"] {
+            color: #1A1A1A !important;
+        }
+        /* tighten the band under the top nav */
+        .stApp .block-container { padding-top: 1.6rem; }
+        .cc4q-brand { padding: 4px 0 2px 0; }
         h1, h2, h3 { color: #1A1A1A; letter-spacing: -0.01em; font-weight: 700; }
         h3 { font-weight: 650; }
         /* Primary buttons: Kimi signature black */

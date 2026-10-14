@@ -22,3 +22,6 @@ docs/_build/
 
 # setuptools build artifacts
 build/
+
+# Default local workspace (created at runtime; CC4Q_WORKSPACE overrides)
+.cc4q_workspace/

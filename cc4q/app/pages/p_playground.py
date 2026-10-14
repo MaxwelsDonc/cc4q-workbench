@@ -5,7 +5,7 @@ import streamlit as st
 from cc4q.app import analysis  # noqa: E402
 from cc4q.app import model_select, registry
 from cc4q.app.model_cache import checkpoints_missing, missing_checkpoints_warning  # noqa: E402
-from cc4q.app.ui import footer, summary_strip, unit_card  # noqa: E402
+from cc4q.app.ui import footer, page_header, summary_strip, unit_card  # noqa: E402
 
 
 def _results(units, fallback):
@@ -27,14 +27,14 @@ def _results(units, fallback):
 
 
 def render():
-    st.header("Playground")
-    st.caption("Scratch space — "
-               "experiments here are not saved as assets.")
+    page_header(
+        "Playground",
+        "Scratch space — experiments here are not saved as assets. Paste a "
+        "Python snippet; CC4Q extracts its comments and splits them into "
+        "sentence-level units (SCCUs), then labels each unit on three axes — "
+        "quantum-relatedness, quantum category, and developer intent.")
     st.write(
-        "Paste a Python snippet. CC4Q extracts its comments and splits them "
-        "into sentence-level units (SCCUs). The pipeline labels each unit on "
-        "three axes — quantum-relatedness, quantum category, and developer "
-        "intent — and this view foregrounds the two quantum axes."
+        "This view foregrounds the two quantum axes."
     )
 
     left, right = st.columns([1, 1], vertical_alignment="top")

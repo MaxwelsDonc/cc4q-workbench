@@ -20,14 +20,15 @@ def _type_card(type_, count, updated):
     label, page_file, _ = TYPE_META[type_]
     col = st.container()
     with col:
+        meta = ""
+        if updated:
+            meta = f'<div class="meta-line">{updated}</div>'
         st.markdown(
             f'<div class="cc4q-asset-card"><h3>{label}</h3>'
             f'<div class="meta-line"><b>{count}</b> asset'
             f'{"s" if count != 1 else ""}</div>'
-            f'<div class="meta-line">{updated or "—"}</div></div>',
+            f'{meta}</div>',
             unsafe_allow_html=True)
-        st.page_link(os.path.join(PAGES_DIR, page_file),
-                     label=f"Open {label} →", use_container_width=True)
 
 
 def render():
@@ -91,7 +92,8 @@ def render():
                     f'<div class="cc4q-asset-card"><h3>{title}</h3></div>',
                     unsafe_allow_html=True)
                 st.page_link(_os.path.join(PAGES_DIR, page_file),
-                             label="Open →", use_container_width=True)
+                             label=f"{title.split(' ', 1)[1]} →",
+                             use_container_width=True)
 
     st.divider()
     cols = st.columns(3)

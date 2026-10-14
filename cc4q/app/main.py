@@ -37,7 +37,7 @@ def main():
 
     apply_theme()
 
-    b1, b2, b3 = st.columns([2, 2, 1])
+    b1, b2 = st.columns([1, 1])
     with b1:
         st.markdown(
             '<div class="cc4q-brand"><span class="name">⚛ CC4Q '
@@ -46,18 +46,18 @@ def main():
         )
     with b2:
         st.markdown(
-            '<div class="cc4q-brand" style="justify-content:flex-end">'
-            '<span class="cc4q-topnav-note">Local inference · no data '
-            'leaves your machine</span></div>',
-            unsafe_allow_html=True,
-        )
-    with b3:
-        st.markdown('<div style="height:14px"></div>', unsafe_allow_html=True)
-        st.markdown(
-            f'<div class="cc4q-brand" style="justify-content:flex-end">'
+            '<div class="cc4q-brand" style="justify-content:flex-end;'
+            'gap:18px"><span class="cc4q-topnav-note">Local inference · '
+            'no data leaves your machine</span>'
             f'<span class="cc4q-topnav-note">model: '
             f'{_default_model_indicator()}</span></div>',
-            unsafe_allow_html=True)
+            unsafe_allow_html=True,
+        )
+
+    # Seed built-in SDK corpus assets once at startup (not lazily inside
+    # the Corpora page) so the Workspace overview is coherent on first paint.
+    from cc4q.app.pages.p_corpora import _seed_builtins
+    _seed_builtins()
 
     pages = st.navigation([
         page("Workspace", "p_workspace.py", "🏠", "workspace", default=True),
