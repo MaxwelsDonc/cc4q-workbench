@@ -24,8 +24,9 @@ from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
 
 import cc4q.workspace as ws
-from cc4q.app import DATA_DIR, registry
 from cc4q.evaluate import cohen_kappa, evaluate, wilson_ci
+from cc4q import registry
+from cc4q.web import DATA_DIR
 from cc4q.models.hub import (
     checkpoint_complete,
     default_model_dir,
@@ -766,8 +767,7 @@ def _run_pipeline_job(job_id, source_type, target, ref, name, run_predict, model
         job["stage_name"] = f"Stage 3/4 · Sphinx-Aware Docstring Segmentation ({len(ccp_records)} CCPs)"
         job["progress"] = 0.65
 
-        from cc4q.predict import _segment_record
-        from demo.build_demo_data import _compact_snippet
+        from cc4q.predict import _segment_record, compact_snippet as _compact_snippet
 
         sccus = []
         for rec in ccp_records:

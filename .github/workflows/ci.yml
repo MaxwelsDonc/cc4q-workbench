@@ -78,11 +78,10 @@ jobs:
       - name: Demo smoke tests (data mode, no checkpoints)
         run: python demo/smoke_test.py
 
-      - name: Streamlit boot check
+      - name: Web workbench boot check (cc4q serve + curl)
         shell: bash
         run: |
-          streamlit run demo/app.py --server.port 8502 --server.headless true \
-            > streamlit_boot.log 2>&1 &
+          cc4q serve --host 127.0.0.1 --port 8502 > cc4q_serve.log 2>&1 &
           APP_PID=$!
           ok=""
           for i in $(seq 1 30); do
@@ -91,12 +90,12 @@ jobs:
             sleep 2
           done
           kill $APP_PID 2>/dev/null || true
-          cat streamlit_boot.log
+          cat cc4q_serve.log
           if [ "$ok" != "200" ]; then
-            echo "Streamlit boot check failed (last HTTP code: '$code')"
+            echo "cc4q serve boot check failed (last HTTP code: '$code')"
             exit 1
           fi
-          echo "Streamlit boot check OK (HTTP 200)"
+          echo "cc4q serve boot check OK (HTTP 200)"
 
   docker:
     name: Docker images (CPU run + GPU build)

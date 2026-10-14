@@ -121,6 +121,40 @@ def predict_labels(texts, models, batch=32):
     return qr, categories
 
 
+def compact_snippet(code_snippet, comment_text, max_lines=32, max_chars=1200):
+    """Extract a concise, readable window of code_snippet around the comment."""
+    if not code_snippet:
+        return ""
+    lines = code_snippet.splitlines()
+    if len(lines) <= max_lines and len(code_snippet) <= max_chars:
+        return code_snippet.strip()
+
+    probe = (comment_text or "").strip()[:36]
+    hit_idx = 0
+    if probe:
+        for i, line in enumerate(lines):
+            if probe.lower() in line.lower():
+                hit_idx = i
+                break
+
+    if hit_idx <= 12:
+        selected = lines[:max_lines]
+        if len(lines) > max_lines:
+            selected.append("    # ... [truncated] ...")
+    else:
+        header = lines[:3]
+        start = max(3, hit_idx - 6)
+        end = min(len(lines), start + (max_lines - 5))
+        selected = header + ["    # ..."] + lines[start:end]
+        if end < len(lines):
+            selected.append("    # ... [truncated] ...")
+
+    out = "\n".join(selected).strip()
+    if len(out) > max_chars:
+        out = out[:max_chars].rsplit("\n", 1)[0] + "\n    # ... [truncated] ..."
+    return out
+
+
 def _segment_record(record):
     """Split one CommentRecord into sentence-level comment units with full AST metadata."""
     from cc4q.pipeline.segment.block import segment_block_comment

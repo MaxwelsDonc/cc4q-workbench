@@ -16,7 +16,7 @@ Asset types:
   ``pair`` = [model_a, model_b], ``corpus``,
   ``metrics`` = {n, agreement, precision, recall, wilson95},
   ``report_path``.
-- ``model`` — NOT stored here; models live in ``cc4q.app.registry`` and
+- ``model`` — NOT stored here; models live in ``cc4q.registry`` and
   are referenced by id (see :func:`list_models`).
 
 Directory resolution: ``$CC4Q_WORKSPACE`` > ``.cc4q_workspace/`` next to a
@@ -235,5 +235,5 @@ def read_jsonl(path):
 def list_models():
     """Model assets are delegated to the user model registry — the
     workspace only references model ids. Returns the registry entries."""
-    from cc4q.app.registry import list_models as registry_list
+    from cc4q.registry import list_models as registry_list
     return registry_list()

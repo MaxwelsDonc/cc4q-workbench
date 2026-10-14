@@ -1,6 +1,10 @@
-# Extra dependencies for demo/ beyond the workbench requirements.txt
+# Extra dependencies for demo/ + interactive CLI sessions beyond the
+# workbench requirements.txt. The Web Workbench itself (cc4q serve) only
+# needs pyproject's runtime deps — this file is for:
+#   * `python demo/smoke_test.py` (httpx/starlette TestClient come from pyproject)
+#   * `cc4q annotate` interactive sessions, which still launch the
+#     standalone generic-schema annotation app (cc4q/annotate, Streamlit).
 streamlit>=1.30
-plotly>=5.18
 pandas>=2.0
 PyYAML>=6.0
 torch>=2.0

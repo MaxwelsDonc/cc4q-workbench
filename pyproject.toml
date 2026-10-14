@@ -21,14 +21,15 @@ dependencies = [
     "torch>=2.1",
     "transformers>=4.45",
     "typer>=0.12",
-]
-
-[project.optional-dependencies]
-app = [
+    # Web Workbench server (cc4q serve / cc4q demo)
     "starlette>=0.30",
     "uvicorn>=0.20",
     "httpx>=0.25",
     "python-multipart>=0.0.9",
+]
+
+[project.optional-dependencies]
+app = [
     "pandas>=2.0",
 ]
 
@@ -39,5 +40,4 @@ cc4q = "cc4q.cli:main"
 include = ["cc4q*"]
 
 [tool.setuptools.package-data]
-"cc4q.app.data" = ["manifest.json", "units/*.jsonl"]
-"cc4q.web" = ["static/*", "static/**/*"]
+"cc4q.web" = ["static/*", "static/**/*", "data/manifest.json", "data/units/*.jsonl"]
