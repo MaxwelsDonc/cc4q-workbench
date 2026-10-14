@@ -15,7 +15,7 @@ For ICSE Tool Demonstration & Artifact Reviewers, CC4Q Workbench supports three 
 
 ### Tier 1 · 30-Second Instant Exploration (No Model Download Required)
 
-All precomputed corpora across **6 Qiskit-ecosystem SDKs (39,593 labeled sentence units)** and the **379-unit human-verified unseen-SDK transfer benchmark** are bundled directly in the repository (`cc4q/app/data/`, ~23 MB) with full Python source-code context (`code_snippet` + line numbers).
+All precomputed corpora across **6 Qiskit-ecosystem SDKs (39,593 labeled sentence units)** and the **379-unit human-verified unseen-SDK transfer benchmark** are bundled directly in the repository (`cc4q/web/data/`, ~23 MB) with full Python source-code context (`code_snippet` + line numbers).
 
 ```bash
 git clone https://github.com/MaxwelsDonc/cc4q-workbench.git
@@ -167,7 +167,7 @@ cc4q demo --host 127.0.0.1 --port 8501
 
 ## 📊 Empirical Benchmark Summary (6 Quantum SDKs)
 
-All six corpora below are pre-indexed in the workbench (`cc4q/app/data/`) and reproducible from pinned release tags (`config/*.yaml`):
+All six corpora below are pre-indexed in the workbench (`cc4q/web/data/`) and reproducible from pinned release tags (`config/*.yaml`):
 
 | SDK Repository | Pinned Release | Stack Layer | Python Files | Extracted CCPs | Segmented SCCUs | Quantum SCCUs | Quantum Share (%) | Comment Density |
 | :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -191,7 +191,7 @@ cc4q-workbench/
 │   ├── pipeline/          # Stage 1–3: LibCST AST extraction, ~30 Sphinx-directive shims, spaCy segmentation
 │   ├── models/            # SHA256-verified checkpoint downloader & lazy BERT ModelHandle loader
 │   ├── web/               # Starlette/Uvicorn REST API (server.py) + Modern SPA Frontend (static/)
-│   ├── app/data/          # Precomputed manifest.json + source-enriched unit corpora (units/*.jsonl)
+│   ├── web/data/          # Precomputed manifest.json + source-enriched unit corpora (units/*.jsonl)
 │   ├── predict.py         # Two-stage quantum inference with softmax confidence probabilities
 │   ├── train.py           # HuggingFace Trainer wrapper with warm-start & automatic schema normalization
 │   ├── evaluate.py        # Agreement, Cohen's kappa, Precision/Recall/F1, Wilson 95% CI, confusion matrix
