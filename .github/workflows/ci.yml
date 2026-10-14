@@ -240,16 +240,24 @@ jobs:
         run: sphinx-build -b html docs docs/_build -W
 
   assets:
-    name: Checkpoint release assets reachable
+    name: Checkpoint release assets reachable + SHA256-verified
     runs-on: ubuntu-latest
     steps:
-      - name: Check ccq-checkpoints v0.2.0 asset URLs
+      - name: Download and hash-verify ccq-checkpoints v0.2.0 assets
         run: |
           base="https://github.com/MaxwelsDonc/cc4q-checkpoints/releases/download/v0.2.0"
+          cat > expected.txt <<'EOF'
+          3a519c5173f323f735434065d248b50bc58a8a36d0ce6f59f6f21196b10f7bdd  quantum_related.tar.gz
+          de17c00707c23adcb8818844e84a1acb0b03486cb655999e8513989ab3c81b32  quantum_category.tar.gz
+          6799ef37acf0235c6ba426d526127acfd9477c30b71c6f106a624692a3171294  bert-base-uncased.tar.gz
+          EOF
+          sed -i 's/^ *//' expected.txt
           failed=0
           for asset in quantum_related.tar.gz quantum_category.tar.gz bert-base-uncased.tar.gz; do
             code=$(curl -sIL -o /dev/null -w "%{http_code}" --max-time 60 "$base/$asset")
             echo "$asset -> HTTP $code"
-            if [ "$code" != "200" ]; then failed=1; fi
+            if [ "$code" != "200" ]; then failed=1; continue; fi
+            curl -sL --retry 3 --max-time 600 -o "$asset" "$base/$asset"
           done
+          sha256sum -c expected.txt || failed=1
           exit $failed
