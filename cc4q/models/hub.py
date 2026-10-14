@@ -21,11 +21,11 @@ BASE_URL = f"https://github.com/{RELEASE_REPO}/releases/download/{RELEASE}"
 CHECKPOINTS = {
     "quantum_related.tar.gz": (
         "quantum_related",
-        "3a519c5173f323f735434065d248b50bc58a8a36d0ce6f59f6f21196b10f7bdd",
+        "3033b2ca6d6acb3075b638b07daf63280aa00784f578b1c7113d4adb1ce70309",
     ),
     "quantum_category.tar.gz": (
         "quantum_category",
-        "de17c00707c23adcb8818844e84a1acb0b03486cb655999e8513989ab3c81b32",
+        "54cc6056171e497ddb66bf9fa995ca63238a46d53b9f475fa4806f8fcbe5d734",
     ),
 }
 
@@ -33,7 +33,7 @@ CHECKPOINTS = {
 BASE_MODEL = {
     "bert-base-uncased.tar.gz": (
         "bert-base-uncased",
-        "6799ef37acf0235c6ba426d526127acfd9477c30b71c6f106a624692a3171294",
+        "dc4c12a087cf2b282d33d23ea47140db287f706c53da68facb8a749a4b13fa2c",
     ),
 }
 
