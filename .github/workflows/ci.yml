@@ -111,18 +111,22 @@ jobs:
           echo "cc4q serve boot check OK (index + /api/overview HTTP 200)"
 
   docker:
-    name: Docker images (CPU run + GPU build)
+    name: Docker image (build + run + in-container pipeline)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build CPU image
-        run: docker build -t cc4q-workbench:test-cpu .
+      - name: Free disk space (Linux runners)
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL 2>/dev/null || true
+
+      - name: Build image
+        run: docker build -t cc4q-workbench:test .
 
       - name: Run CPU image and check HTTP 200 (no checkpoints)
         run: |
           docker run -d --name cc4q -p 8501:8501 \
-            -e CC4Q_SKIP_MODEL_DOWNLOAD=1 cc4q-workbench:test-cpu
+            -e CC4Q_SKIP_MODEL_DOWNLOAD=1 cc4q-workbench:test
           ok=""
           for i in $(seq 1 45); do
             code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8501/ || true)
@@ -137,13 +141,10 @@ jobs:
           fi
           echo "Container HTTP check OK (HTTP 200)"
 
-      - name: Pipeline CLI inside the CPU container
+      - name: Pipeline CLI inside the container
         run: |
-          docker run --rm --entrypoint bash cc4q-workbench:test-cpu -c \
+          docker run --rm --entrypoint bash cc4q-workbench:test -c \
             "python scripts/02_extract_code_comment_pairs.py config/examples.yaml && python scripts/03_segment_comments.py config/examples.yaml"
-
-      - name: Build GPU image (build-only, no GPU runtime needed)
-        run: docker build --build-arg TORCH_CHANNEL=cu126 -t cc4q-workbench:test-gpu .
 
   pytest:
     name: pytest suite (${{ matrix.os }})

@@ -46,14 +46,13 @@ cc4q demo                     # Launch full interactive workbench at http://127.
 ### Tier 3 · All-in-One Docker Container
 
 ```bash
-# CPU build & run (exposes Web Workbench on http://localhost:8501)
+# Build & run (exposes the Web Workbench on http://localhost:8501)
 docker build -t cc4q-workbench .
 docker run --rm -p 8501:8501 cc4q-workbench
-
-# Optional GPU build & run (CUDA 12.6)
-docker build --build-arg TORCH_CHANNEL=cu126 -t cc4q-workbench:gpu .
-docker run --rm --gpus all -p 8501:8501 cc4q-workbench:gpu
 ```
+
+(The image is single-flavor and CPU-based; every push is build- and
+run-verified by CI, so no manual Docker verification is needed.)
 
 ---
 
@@ -202,7 +201,7 @@ cc4q-workbench/
 ├── exp/                   # Unseen-SDK generalization results & 379-unit human verification benchmark
 ├── model/                 # TOSEM gold training datasets for Task 1 (quantum_related) & Task 2 (quantum_category)
 ├── tests/                 # Automated pytest suite (pipeline, workspace, registry, sampling, models)
-├── Dockerfile             # Self-contained CPU/GPU container image
+├── Dockerfile             # Self-contained container image (build/run-verified by CI)
 └── pyproject.toml         # Package metadata and dependencies
 ```
 
