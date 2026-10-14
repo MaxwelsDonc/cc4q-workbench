@@ -21,9 +21,6 @@ JSONL, one record per line:
    * - ``quantum_category``
      - ``text``
      - int ``0``..``5``
-   * - ``developer_intent``
-     - ``text``
-     - int ``0``..``5``
 
 The label indices follow the category order documented in
 :doc:`../data-contracts`. Violations raise a ``ValueError`` that names the

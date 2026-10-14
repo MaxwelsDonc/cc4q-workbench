@@ -2,12 +2,10 @@ Predict with released or custom models
 ======================================
 
 ``cc4q.predict_corpus`` labels SCCU records (pipeline stage-03 output, one
-JSON object with a ``comment_text`` field per line) on the three CC4Q
-axes:
+JSON object with a ``comment_text`` field per line) on the two-stage
+Quantum-Specific axes:
 
-* ``quantum_related`` -- 0/1, is the unit quantum related?
-* ``developer_intent`` -- one of What / How-to-use / How-it-is-done /
-  Property / Why / Others.
+* ``quantum_related`` -- 0/1, is the unit quantum-specific?
 * ``quantum_category`` -- one of the six quantum-knowledge categories, or
   ``null`` for non-quantum units.
 

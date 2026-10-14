@@ -60,4 +60,5 @@ The same steps in Python:
     print(result["agreement"])
 
 To try the full web workbench from a source checkout, see the repository
-README (``streamlit run demo/app.py``).
+README (``cc4q serve`` — or ``cc4q demo`` for the same server with the
+reviewer quick-start defaults).

@@ -14,15 +14,18 @@ One JSON object per line:
       "comment_type": "docstring",
       "comment_text": "This class can be used ...",
       "quantum_related": 1,
-      "developer_intent": "What",
       "quantum_category": "Quantum circuit model"
     }
 
 Label vocabularies
 ------------------
 
-Developer intent (6): ``What``, ``How-to-use``, ``How-it-is-done``,
-``Property``, ``Why``, ``Others``.
+Two-stage Quantum-Specific taxonomy (v2.0). Task 1 decides whether a unit
+is quantum-specific at all; Task 2 applies only to quantum units (the
+retired ``developer_intent`` axis of v1 is gone — see the repository
+README for the rationale).
+
+Quantum relatedness (2): ``quantum``, ``non-quantum``.
 
 Quantum category (6): ``Mathematics for quantum information``,
 ``Quantum algorithms``, ``Quantum circuit model``, ``Quantum hardware``,
@@ -35,9 +38,8 @@ Training record per task
 ------------------------
 
 * ``quantum_related``: ``{"comment": str, "label": 0|1}``
-* ``quantum_category`` / ``developer_intent``:
-  ``{"text": str, "label": 0..5}`` with indices following the orders above
-  (intent: What=0 .. Others=5; category: Mathematics=0 .. Others=5).
+* ``quantum_category``: ``{"text": str, "label": 0..5}`` with indices
+  following the category order above (Mathematics=0 .. Others=5).
 
 Annotation schema
 -----------------

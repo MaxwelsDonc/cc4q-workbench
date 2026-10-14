@@ -78,24 +78,37 @@ jobs:
       - name: Demo smoke tests (data mode, no checkpoints)
         run: python demo/smoke_test.py
 
+      - name: Install the cc4q package (console script for cc4q serve)
+        run: python -m pip install -e .
+
       - name: Web workbench boot check (cc4q serve + curl)
         shell: bash
         run: |
+          # Fresh env: no checkpoints, no user models. The server must boot
+          # on the precomputed demo data alone.
+          export CC4Q_SKIP_MODEL_DOWNLOAD=1
           cc4q serve --host 127.0.0.1 --port 8502 > cc4q_serve.log 2>&1 &
           APP_PID=$!
-          ok=""
+          ok_index="" ok_api=""
           for i in $(seq 1 30); do
             code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8502/ || true)
-            if [ "$code" = "200" ]; then ok="$code"; break; fi
+            if [ "$code" = "200" ]; then ok_index="$code"; break; fi
             sleep 2
           done
+          if [ "$ok_index" = "200" ]; then
+            for i in $(seq 1 15); do
+              code=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8502/api/overview || true)
+              if [ "$code" = "200" ]; then ok_api="$code"; break; fi
+              sleep 2
+            done
+          fi
           kill $APP_PID 2>/dev/null || true
           cat cc4q_serve.log
-          if [ "$ok" != "200" ]; then
-            echo "cc4q serve boot check failed (last HTTP code: '$code')"
+          if [ "$ok_index" != "200" ] || [ "$ok_api" != "200" ]; then
+            echo "cc4q serve boot check failed (index='$ok_index' api='$ok_api')"
             exit 1
           fi
-          echo "cc4q serve boot check OK (HTTP 200)"
+          echo "cc4q serve boot check OK (index + /api/overview HTTP 200)"
 
   docker:
     name: Docker images (CPU run + GPU build)
