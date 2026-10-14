@@ -3,7 +3,7 @@
 The checkpoints ship as release assets of the public ccq-checkpoints
 repository because they are too large for git:
 
-    https://github.com/MaxwelsDonc/cc4q-checkpoints/releases/tag/v0.1.0
+    https://github.com/MaxwelsDonc/cc4q-checkpoints/releases/tag/v0.2.0
 
 Usage (from the workbench root, Python >= 3.11, no extra deps):
 
@@ -28,6 +28,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--check", action="store_true",
                         help="verify only; exit 1 if any checkpoint is missing")
+    parser.add_argument("--with-base", action="store_true",
+                        help="also fetch the bert-base-uncased base model "
+                             "(only needed for from-scratch fine-tuning)")
     args = parser.parse_args()
 
     missing = missing_checkpoints()
@@ -39,7 +42,7 @@ def main():
         print("OK: all model checkpoints present.")
         return
 
-    still_missing = ensure_checkpoints()
+    still_missing = ensure_checkpoints(with_base=args.with_base)
     if still_missing:
         print(f"FAILED: still missing {', '.join(still_missing)}")
         sys.exit(1)

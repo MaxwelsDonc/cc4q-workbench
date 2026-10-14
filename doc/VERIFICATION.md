@@ -90,8 +90,8 @@ cc4q download-models
 cc4q download-models --check
 ```
 **Expected**: download of **two** checkpoints (~835 MB total, SHA256-verified);
-`--check` prints OK. (The release page may list a third legacy asset — it is not
-downloaded and not used.)
+`--check` prints OK. An optional third asset (`bert-base-uncased.tar.gz`, for
+from-scratch fine-tuning) is fetched with `python scripts/download_models.py --with-base`.
 
 - [ ] **2.1** Tab 2 → load preset **“Bell State & Entanglement Circuit”** and click
 `⚡ Extract, Segment & Classify Quantum Comments`.
@@ -209,8 +209,8 @@ The verifier should NOT fail the verification for these (already tracked):
 
 1. Corpus Explorer group labels render tight, e.g. `APPLICATION LAYER (NEW SDKS)26.0%`
    (missing space) — cosmetic.
-2. The GitHub release page lists a third legacy checkpoint (`developer_intent`) that is
-   no longer used by the tool — retained for provenance only.
+2. The legacy `v0.1.0` release is retained for provenance; the tool uses `v0.2.0`
+   (two-stage checkpoints + optional bert-base). Do not verify against v0.1.0.
 
 ---
 

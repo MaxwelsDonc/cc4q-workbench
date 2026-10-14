@@ -14,18 +14,26 @@ import urllib.error
 import urllib.request
 
 RELEASE_REPO = "MaxwelsDonc/cc4q-checkpoints"
-RELEASE = "v0.1.0"
+RELEASE = "v0.2.0"
 BASE_URL = f"https://github.com/{RELEASE_REPO}/releases/download/{RELEASE}"
 
-# Primary quantum checkpoints
+# Primary quantum checkpoints (required for inference)
 CHECKPOINTS = {
     "quantum_related.tar.gz": (
         "quantum_related",
-        "a9df9441e0abea67dae5ce580d21f102de6b5f7ea88cb96e967d9ba4a55ec6b2",
+        "3a519c5173f323f735434065d248b50bc58a8a36d0ce6f59f6f21196b10f7bdd",
     ),
     "quantum_category.tar.gz": (
         "quantum_category",
-        "64ab092d012e50d6539c869c870db55defb8174d688c7b1acfd2950f00c6e64d",
+        "de17c00707c23adcb8818844e84a1acb0b03486cb655999e8513989ab3c81b32",
+    ),
+}
+
+# Optional base model for from-scratch fine-tuning (not needed for inference)
+BASE_MODEL = {
+    "bert-base-uncased.tar.gz": (
+        "bert-base-uncased",
+        "6799ef37acf0235c6ba426d526127acfd9477c30b71c6f106a624692a3171294",
     ),
 }
 
@@ -97,10 +105,18 @@ def _download(asset, dest_path):
             ) from exc
 
 
-def ensure_checkpoints(model_dir=None, verbose=True):
-    """Download + verify + extract any missing checkpoint."""
+def ensure_checkpoints(model_dir=None, verbose=True, with_base=False):
+    """Download + verify + extract any missing checkpoint.
+
+    with_base=True additionally fetches the bert-base-uncased base model
+    (only needed for from-scratch fine-tuning, not for inference).
+    """
     model_dir = model_dir or default_model_dir()
     missing = missing_checkpoints(model_dir)
+    if with_base:
+        for asset, (name, _sha) in BASE_MODEL.items():
+            if not checkpoint_complete(model_dir, name):
+                missing.append(f"base:{name}")
     if not missing:
         if verbose:
             print(f"All quantum checkpoints already present in {model_dir}")
@@ -109,8 +125,11 @@ def ensure_checkpoints(model_dir=None, verbose=True):
     os.makedirs(model_dir, exist_ok=True)
     tmpdir = tempfile.mkdtemp(prefix="cc4q_models_")
     try:
-        for asset, (name, expected_sha) in CHECKPOINTS.items():
-            if name not in missing:
+        wanted = dict(CHECKPOINTS)
+        if with_base:
+            wanted.update(BASE_MODEL)
+        for asset, (name, expected_sha) in wanted.items():
+            if checkpoint_complete(model_dir, name):
                 continue
             archive = os.path.join(tmpdir, asset)
             if verbose:
@@ -134,7 +153,12 @@ def ensure_checkpoints(model_dir=None, verbose=True):
     finally:
         shutil.rmtree(tmpdir, ignore_errors=True)
 
-    return missing_checkpoints(model_dir)
+    still = missing_checkpoints(model_dir)
+    if with_base:
+        for asset, (name, _sha) in BASE_MODEL.items():
+            if not checkpoint_complete(model_dir, name):
+                still.append(name)
+    return still
 
 
 class ModelHandle:

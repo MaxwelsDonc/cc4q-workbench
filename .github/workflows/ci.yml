@@ -243,11 +243,11 @@ jobs:
     name: Checkpoint release assets reachable
     runs-on: ubuntu-latest
     steps:
-      - name: Check ccq-checkpoints v0.1.0 asset URLs
+      - name: Check ccq-checkpoints v0.2.0 asset URLs
         run: |
-          base="https://github.com/MaxwelsDonc/cc4q-checkpoints/releases/download/v0.1.0"
+          base="https://github.com/MaxwelsDonc/cc4q-checkpoints/releases/download/v0.2.0"
           failed=0
-          for asset in quantum_related.tar.gz quantum_category.tar.gz developer_intent.tar.gz; do
+          for asset in quantum_related.tar.gz quantum_category.tar.gz bert-base-uncased.tar.gz; do
             code=$(curl -sIL -o /dev/null -w "%{http_code}" --max-time 60 "$base/$asset")
             echo "$asset -> HTTP $code"
             if [ "$code" != "200" ]; then failed=1; fi
