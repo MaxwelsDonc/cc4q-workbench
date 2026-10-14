@@ -13,7 +13,7 @@ import tempfile
 import urllib.error
 import urllib.request
 
-RELEASE_REPO = "MaxwelsDonc/cc4q-checkpoints"
+RELEASE_REPO = "MaxwelsDonc/cc4q-workbench"
 RELEASE = "v0.2.0"
 BASE_URL = f"https://github.com/{RELEASE_REPO}/releases/download/{RELEASE}"
 

@@ -243,9 +243,9 @@ jobs:
     name: Checkpoint release assets reachable + SHA256-verified
     runs-on: ubuntu-latest
     steps:
-      - name: Download and hash-verify ccq-checkpoints v0.2.0 assets
+      - name: Download and hash-verify cc4q-workbench v0.2.0 assets
         run: |
-          base="https://github.com/MaxwelsDonc/cc4q-checkpoints/releases/download/v0.2.0"
+          base="https://github.com/MaxwelsDonc/cc4q-workbench/releases/download/v0.2.0"
           cat > expected.txt <<'EOF'
           3a519c5173f323f735434065d248b50bc58a8a36d0ce6f59f6f21196b10f7bdd  quantum_related.tar.gz
           de17c00707c23adcb8818844e84a1acb0b03486cb655999e8513989ab3c81b32  quantum_category.tar.gz

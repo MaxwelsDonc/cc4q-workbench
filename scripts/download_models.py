@@ -1,9 +1,9 @@
 """Download and verify the CC4Q model checkpoints (CLI).
 
-The checkpoints ship as release assets of the public ccq-checkpoints
-repository because they are too large for git:
+The checkpoints ship as release assets of this repository (they are too
+large for git):
 
-    https://github.com/MaxwelsDonc/cc4q-checkpoints/releases/tag/v0.2.0
+    https://github.com/MaxwelsDonc/cc4q-workbench/releases/tag/v0.2.0
 
 Usage (from the workbench root, Python >= 3.11, no extra deps):
 
