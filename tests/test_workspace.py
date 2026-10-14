@@ -173,7 +173,7 @@ def test_persistence_across_calls(space):
 
 def test_model_delegation(monkeypatch, tmp_path):
     monkeypatch.setenv("CC4Q_WORKSPACE", str(tmp_path / "ws"))
-    from cc4q.app import registry
+    from cc4q import registry
     called = {}
 
     def fake_list(root=None):

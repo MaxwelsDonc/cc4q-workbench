@@ -1,391 +1,310 @@
-"""Smoke tests for the CC4Q Workbench demo (design doc §8).
+"""API-level smoke suite for the CC4Q Web Workbench (Starlette server).
 
-Run from the workbench root (with .venv activated):
+Replaces the retired Streamlit AppTest suite. Boots the app in-process via
+starlette's TestClient against a throwaway CC4Q_WORKSPACE and walks the same
+surface a user touches in the SPA:
 
-    python demo/smoke_test.py            # data-level checks (fast)
-    python demo/smoke_test.py --models   # also run the BERT classifiers
-    python demo/smoke_test.py --app      # also run AppTest page rendering
+  * GET  /                        -> SPA index.html
+  * GET  /api/overview            -> 6 SDKs, 39,593 SCCUs, layer aggregates
+  * GET  /api/corpora/<id>/units  -> unit rows for the Corpus Explorer
+  * POST /api/inspect             -> two-stage live classification   [models]
+  * POST /api/pipeline/build      -> 4-stage build job lifecycle (local dir)
+  * GET  /api/annotations, POST   -> session create / label / export / delete
+  * POST /api/models/train        -> validation path (<12 rows rejected)
+  * GET  /api/models              -> released-checkpoint registry info
+  * POST /api/evaluations/run     -> model-vs-model agreement          [models]
+  * spot-check                    -> seeded 379-unit session agrees 85.0%
 
-Acceptance criteria covered:
-  1. --app passes; headless HTTP 200 on all four pages (checked separately
-     by the operator / CI with `streamlit run` + curl)
-  2. Precomputed dashboards for all six SDKs render §1-§3 + compare without
-     model checkpoints (this file never loads models for (b)-(d))
-  3. Live mode: covered by manual E2E (small repo completes 4 stages;
-     >200-file repo refused) — helpers tested here
-  4. Density values in §2 match a direct recomputation on the cloned repos
-  5. Compare aggregates reproduce the infra-vs-application gap
-     (Quantum % 34.3 vs 26.0)
-  6. Developer intent is absent from the UI entirely (cards, filters, table
-     columns) but present in the data layer (units JSONL, manifest, downloads)
+Checks marked [models] need the released checkpoints (models_checkpoints/);
+they are skipped automatically when absent, or forced with --models.
+
+Runs standalone (``python demo/smoke_test.py [--models]``) and under pytest
+(``tests/test_web_api.py`` drives the same check functions).
 """
 
+import json
 import os
 import sys
+import tempfile
+import time
 
 DEMO_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = os.path.dirname(DEMO_DIR)
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
-from cc4q.app import APP_DIR  # noqa: E402
-
 FAILURES = []
 
 
-def check(name, condition, detail=""):
-    status = "PASS" if condition else "FAIL"
-    line = f"[{status}] {name}" + (f" - {detail}" if detail and not condition else "")
-    # stay printable even on cp1252/ascii consoles (Windows runners)
-    print(line.encode(sys.stdout.encoding or "utf-8", "replace").decode(
-        sys.stdout.encoding or "utf-8", "replace"))
-    if not condition:
-        FAILURES.append(name)
+def check(name, ok, detail=""):
+    print(f"[{'PASS' if ok else 'FAIL'}] {name}"
+          + (f" — {detail}" if detail and not ok else ""))
+    if not ok:
+        FAILURES.append(f"{name}: {detail}")
 
 
-def test_snippet_pipeline(with_models):
-    from cc4q.app import analysis
+# ---------------------------------------------------------------- client
 
-    units, error, fallback = analysis.analyze_code(analysis.QISKIT_SNIPPET)
-    check("(a) default snippet parses without fallback",
-          error is None and not fallback, str(error))
-    check("(a) snippet yields comment units", len(units) >= 5,
-          f"got {len(units)}")
-    check("(a) no mislabel-prone math comment in snippet",
-          "sqrt(2)" not in analysis.QISKIT_SNIPPET)
-    # non-Python input auto-falls back to line-by-line classification
-    junk = "this is not python at all\n# another plain line\nquantum stuff"
-    units, error, fallback = analysis.analyze_code(junk)
-    check("(a) non-Python input auto-falls back with warning",
-          error is not None and fallback, f"error={error} fallback={fallback}")
-    check("(a) fallback still yields labeled units", len(units) >= 2,
-          f"got {len(units)}")
-    # empty input is graceful (no units, no crash)
-    units, error, fallback = analysis.analyze_code("   \n  ")
-    check("(a) empty input is graceful", units == [] and not fallback,
-          f"units={len(units)}")
-    if not with_models:
+_CLIENT = None
+
+
+def get_client():
+    """Shared TestClient on a fresh throwaway workspace."""
+    global _CLIENT
+    if _CLIENT is None:
+        from starlette.testclient import TestClient
+        from cc4q.web.server import app
+        os.environ["CC4Q_WORKSPACE"] = tempfile.mkdtemp(prefix="cc4q_smoke_")
+        os.environ.setdefault("CC4Q_SKIP_MODEL_DOWNLOAD", "1")
+        _CLIENT = TestClient(app)
+    return _CLIENT
+
+
+def checkpoints_available():
+    from cc4q.models.hub import default_model_dir, missing_checkpoints
+    return not missing_checkpoints(default_model_dir())
+
+
+# ---------------------------------------------------------------- checks
+
+def test_index_and_static():
+    c = get_client()
+    r = c.get("/")
+    check("index: SPA served", r.status_code == 200
+          and "CC4Q Workbench" in r.text)
+    r2 = c.get("/static/app.js")
+    check("static: app.js served", r2.status_code == 200
+          and len(r2.text) > 1000)
+
+
+def test_overview_numbers():
+    """The headline numbers the SPA renders: 6 SDKs, 39,593 SCCUs, and the
+    SCCU-weighted quantum shares (34.3% infrastructure / 26.0% application)."""
+    c = get_client()
+    d = c.get("/api/overview").json()
+    repos = d["manifest"]["repos"]
+    check("overview: six SDK corpora", len(repos) == 6,
+          f"got {len(repos)}")
+    total = sum(info["sccus"] for info in repos.values())
+    check("overview: 39,593 SCCUs", total == 39593, f"got {total}")
+
+    def weighted(layer):
+        num = sum(i["sccus"] * i["quantum_proportion"]
+                  for i in repos.values() if i["layer"] == layer)
+        den = sum(i["sccus"] for i in repos.values() if i["layer"] == layer)
+        return num / den if den else 0.0
+
+    infra, app_ = weighted("infrastructure"), weighted("application")
+    check("overview: infrastructure layer 34.3%",
+          round(infra * 100, 1) == 34.3, f"got {infra * 100:.1f}%")
+    check("overview: application layer 26.0%",
+          round(app_ * 100, 1) == 26.0, f"got {app_ * 100:.1f}%")
+    corpora = d["corpora"]
+    check("overview: 6 built-in corpus assets seeded",
+          sum(1 for a in corpora if a.get("builtin")) == 6)
+    check("overview: model registry reports two released tasks",
+          len(d["models"]["released"]) == 2)
+    check("overview: taxonomy is two-stage (no developer_intent)",
+          "developer_intent" not in json.dumps(d["taxonomy"]))
+
+
+def test_corpus_units():
+    c = get_client()
+    d = c.get("/api/overview").json()
+    nid = next(a["id"] for a in d["corpora"] if a.get("sdk") == "qiskit-nature")
+    units = c.get(f"/api/corpora/{nid}/units").json()
+    rows = units.get("units") or units.get("records") or []
+    check("corpus units: qiskit-nature rows returned", len(rows) > 0)
+    if rows:
+        r0 = rows[0]
+        check("corpus units: two-stage fields present",
+              "quantum_related" in r0 and "quantum_category" in r0)
+        check("corpus units: no developer_intent field",
+              "developer_intent" not in r0)
+    dl = c.get(f"/api/corpora/{nid}/download")
+    check("corpus download: JSONL attachment", dl.status_code == 200
+          and len(dl.text) > 0)
+
+
+def test_build_job_lifecycle():
+    """Local-directory build (no Stage-4 labeling -> fast, model-free)."""
+    c = get_client()
+    target = os.path.join(PROJECT_ROOT, "examples", "tiny_repo")
+    r = c.post("/api/pipeline/build", json={
+        "source_type": "dir", "target": target,
+        "name": "tiny-quantum-demo", "run_predict": False,
+    })
+    check("build: job accepted", r.status_code == 200, r.text)
+    job_id = r.json()["job_id"]
+    final = None
+    for _ in range(75):
+        final = c.get(f"/api/pipeline/jobs/{job_id}").json()
+        if final["status"] in ("completed", "done", "failed", "error"):
+            break
+        time.sleep(0.4)
+    check("build: job completes", final["status"] in ("completed", "done"),
+          f"status={final.get('status')} error={final.get('error')}")
+    if final["status"] in ("completed", "done"):
+        d = c.get("/api/overview").json()
+        custom = [a for a in d["corpora"] if not a.get("builtin")]
+        check("build: corpus asset registered", len(custom) >= 1)
+        if custom:
+            units = c.get(f"/api/corpora/{custom[0]['id']}/units").json()
+            rows = units.get("units") or units.get("records") or []
+            check("build: built corpus has SCCU units", len(rows) > 0,
+                  f"got {len(rows)}")
+
+
+def test_annotation_lifecycle():
+    c = get_client()
+    d = c.get("/api/overview").json()
+    cid = next(a["id"] for a in d["corpora"]
+               if a.get("sdk") == "qiskit-algorithms")
+    r = c.post("/api/annotations", json={
+        "name": "smoke-session", "corpus_id": cid,
+        "sample_size": 8, "mode": "blind", "seed": 7,
+    })
+    check("annotation: session created", r.status_code == 200, r.text)
+    sid = r.json()["session"]["id"]
+    try:
+        det = c.get(f"/api/annotations/{sid}").json()
+        check("annotation: items sampled", len(det["items"]) == 8,
+              f"got {len(det.get('items', []))}")
+
+        r1 = c.post(f"/api/annotations/{sid}/label",
+                    json={"index": 0, "human_quantum_related": True,
+                          "human_quantum_category": "Quantum circuit model"})
+        r2 = c.post(f"/api/annotations/{sid}/label",
+                    json={"index": 1, "human_quantum_related": False})
+        check("annotation: labels recorded",
+              r1.status_code == 200 and r2.status_code == 200)
+        m = c.get(f"/api/annotations/{sid}").json()["metrics"]
+        check("annotation: metrics count 2 labeled",
+              m["labeled_count"] == 2, f"got {m.get('labeled_count')}")
+        check("annotation: agreement computed",
+              m["agreement"] is not None and 0.0 <= m["agreement"] <= 1.0)
+
+        exp = c.get(f"/api/annotations/{sid}/export")
+        rows = [json.loads(l) for l in exp.text.splitlines() if l.strip()]
+        check("annotation: full export has 2 rows", len(rows) == 2)
+        exp_t = c.get(f"/api/annotations/{sid}/export",
+                      params={"task": "quantum_related"})
+        train_rows = [json.loads(l) for l in exp_t.text.splitlines()
+                      if l.strip()]
+        # canonical training rows: {text, label:int} for every labeled item
+        check("annotation: quantum_related train export",
+              len(train_rows) == 2
+              and all(isinstance(r.get("label"), int) for r in train_rows))
+    finally:
+        c.delete(f"/api/annotations/{sid}")
+    gone = c.get(f"/api/annotations/{sid}")
+    check("annotation: session deleted", gone.status_code == 404)
+
+
+def test_models_info_and_train_validation():
+    c = get_client()
+    # released-checkpoint catalog lives on /api/overview; /api/models is the
+    # trainer/registry view (training sources + jobs + user models)
+    d = c.get("/api/overview").json()
+    released = {m["id"] for m in d["models"]["released"]}
+    check("models: two released tasks", released ==
+          {"quantum_related", "quantum_category"}, f"got {released}")
+    info = c.get("/api/models").json()
+    check("models: training sources expose both tasks",
+          set(info.get("training_sources", {}).get("gold", {})) ==
+          {"quantum_related", "quantum_category"})
+    # validation path: fewer than 12 labeled rows must be rejected cleanly
+    r = c.post("/api/models/train", json={
+        "task": "quantum_related", "source_type": "upload",
+        "records": [{"text": f"note {i}", "label": "quantum"}
+                    for i in range(3)],
+    })
+    check("models: train rejects <12 rows with 400",
+          r.status_code == 400 and "12" in r.json().get("error", ""),
+          f"status={r.status_code} body={r.text[:200]}")
+    bad = c.post("/api/models/train", json={"task": "developer_intent"})
+    check("models: retired intent task rejected",
+          bad.status_code == 400)
+    missing = c.get("/api/models/train/doesnotexist")
+    check("models: unknown train job 404", missing.status_code == 404)
+
+
+def test_spotcheck_agreement():
+    """The seeded TOSEM spot-check session must report 85.0% human-model
+    agreement (Task 1) — the number the SPA shows in Annotation Studio."""
+    c = get_client()
+    sessions = c.get("/api/annotations").json()["sessions"]
+    spot = next((s for s in sessions if s.get("builtin_spotcheck")), None)
+    check("spot-check: seeded session present", spot is not None)
+    if spot:
+        det = c.get(f"/api/annotations/{spot['id']}").json()
+        check("spot-check: 379 units", len(det["items"]) == 379,
+              f"got {len(det.get('items', []))}")
+        agree = det["metrics"].get("agreement")
+        # the SPA displays one decimal (85.0%); the raw ratio is 0.8496…
+        check("spot-check: 85.0% agreement", agree is not None
+              and round(agree * 100, 1) == 85.0, f"got {agree}")
+
+
+def test_inspect_and_evaluate():
+    """Live two-stage classification + model-vs-model evaluation.
+    Requires the released checkpoints (--models or auto-detected)."""
+    if not checkpoints_available():
+        print("[SKIP] inspect/evaluate: checkpoints not on disk")
         return
-    models = analysis.load_models()
-    units, _, _ = analysis.analyze_code(analysis.QISKIT_SNIPPET, models=models)
-    labeled = all("developer_intent" in u and "quantum_related" in u
-                  and "quantum_category" in u for u in units)
-    check("(a) every unit labeled on all three axes", labeled)
-    quantum = [u for u in units if u["quantum_related"]]
-    check("(a) Bell-state snippet has quantum-labeled units", len(quantum) > 0,
-          f"quantum={len(quantum)}/{len(units)}")
-    for u in quantum:
-        check("(a) quantum units carry a category",
-              bool(u["quantum_category"]), u["text"][:60])
-        break
-    bad = [u for u in units if "sqrt(2)" in u["text"]]
-    check("(a) no '|00>'/'sqrt(2)' unit present to mislabel", not bad)
+    c = get_client()
+    r = c.post("/api/inspect", json={
+        "code": 'def f():\n    """Construct the Bell-state quantum circuit."""\n'
+                '    pass  # apply a Hadamard gate to the first qubit\n'})
+    check("inspect: two-stage units returned", r.status_code == 200,
+          r.text[:200])
+    if r.status_code == 200:
+        units = r.json().get("units") or r.json().get("sccus") or []
+        check("inspect: units classified on both axes", len(units) > 0 and all(
+            "quantum_related" in u and "quantum_category" in u
+            for u in units))
+    d = c.get("/api/overview").json()
+    cid = next(a["id"] for a in d["corpora"] if a.get("sdk") == "qiskit-aer")
+    ev = c.post("/api/evaluations/run", json={
+        "model_a": "released", "model_b": "released",
+        "corpus_id": cid, "max_units": 60,
+    })
+    check("evaluate: run completes", ev.status_code == 200, ev.text[:300])
+    if ev.status_code == 200:
+        body = ev.json()
+        check("evaluate: identical models agree 100%",
+              body["agreement"] == 1.0 and body["kappa"] == 1.0,
+              f"got agreement={body.get('agreement')}")
+        check("evaluate: kappa + Wilson CI present",
+              "wilson95" in body and len(body["wilson95"]) == 2)
 
 
-def test_precomputed_data():
-    import pandas as pd
-    import plotly.graph_objects as go
-
-    from cc4q.app import dashboard
-    from cc4q.app import data_io
-
-    manifest = data_io.load_manifest()
-    repos = sorted(manifest["repos"])
-    check("(b) manifest has 6 repos", len(repos) == 6, str(repos))
-    expected = {"qiskit", "qiskit-aer", "qiskit-ibm-runtime",
-                "qiskit-machine-learning", "qiskit-nature", "qiskit-algorithms"}
-    check("(b) expected SDK set", set(repos) == expected, str(set(repos) ^ expected))
-
-    frames = {}
-    for sdk in repos:
-        stats = manifest["repos"][sdk]
-        df = data_io.load_units_df(sdk)
-        frames[sdk] = df
-        if stats.get("sampled"):
-            ok = (len(df) == stats.get("sample_size", 2000)
-                  and stats["sccus"] > stats.get("sample_size", 0))
-        else:
-            ok = (stats["sccus"] > 0 and stats["quantum_sccus"] > 0
-                  and len(df) == stats["sccus"])
-        check(f"(b) {sdk}: stats/units consistent", ok,
-              f"sccus={stats['sccus']} rows={len(df)}")
-
-        # corpus hierarchy: every CCP yields >= 1 SCCU, so ccps < sccus
-        check(f"(b) {sdk}: ccps < sccus",
-              0 < stats["ccps"] < stats["sccus"],
-              f"ccps={stats['ccps']} sccus={stats['sccus']}")
-
-        # python_files is populated; for the pipeline-built SDKs it must also
-        # cover every file referenced by the corpus (the original gold corpus
-        # was built from a slightly different commit of qiskit-ibm-runtime,
-        # so its referenced-file count can exceed the pinned tag's file count)
-        pf = stats.get("python_files") or 0
-        if stats.get("sampled"):
-            ok = pf > 0
-            if stats["files"] > pf:
-                print(f"  [note] {sdk}: corpus references {stats['files']} files "
-                      f"> {pf} .py files in the pinned tag (release-corpus "
-                      f"provenance, tolerated)")
-        else:
-            ok = pf > 0 and pf >= stats["files"]
-        check(f"(b) {sdk}: python_files populated", ok,
-              f"python_files={stats.get('python_files')} files={stats['files']}")
-
-        # §2: comment density present and sane
-        dens = stats.get("comment_density", {})
-        check(f"(b) {sdk}: density present",
-              dens.get("comment_lines", 0) > 0 and dens.get("code_lines", 0) > 0
-              and 0 < dens.get("value", 0) < 1,
-              str(dens))
-
-        # §2: quantum residence table sums to quantum SCCUs
-        res = stats.get("quantum_ctype_by_entity", {})
-        res_total = sum(sum(e.values()) for e in res.values())
-        check(f"(b) {sdk}: quantum residence sums to quantum SCCUs",
-              res_total == stats["quantum_sccus"],
-              f"{res_total} vs {stats['quantum_sccus']}")
-        shares = data_io.quantum_residence_frame(stats)
-        check(f"(b) {sdk}: residence frame 3xN",
-              shares.shape[0] == 3 and shares.shape[1] >= 1)
-
-        # §1/§3 charts build
-        fig = dashboard._type_entity_chart(stats)
-        check(f"(b) {sdk}: type×entity figure builds", len(fig.data) >= 1)
-        fig = dashboard._quantum_residence_heatmap(stats)
-        check(f"(b) {sdk}: residence heatmap builds",
-              isinstance(fig, go.Figure) and len(fig.data) == 1)
-        fig = dashboard._radar_figure([(sdk, stats)], title="test")
-        check(f"(b) {sdk}: radar builds with 1 trace",
-              isinstance(fig, go.Figure)
-              and isinstance(fig.data[0], go.Scatterpolar))
-
-    # original-3 CCP counts derive from the gold file's pair ids and must
-    # sum to the paper's total of 12,812 CCPs
-    original_ccps = sum(manifest["repos"][s]["ccps"]
-                        for s in ("qiskit", "qiskit-aer", "qiskit-ibm-runtime"))
-    check("(b) original-3 CCPs sum == 12,812", original_ccps == 12812,
-          f"got {original_ccps}")
-
-    # (§8.4) density spot-check: direct recomputation on the pinned clone
-    from cc4q.pipeline.metrics import compute_comment_density
-    sdk = "qiskit-machine-learning"
-    clone = os.path.join(PROJECT_ROOT, "data", "input", sdk)
-    if os.path.isdir(clone):
-        direct = compute_comment_density(clone, ["qiskit_machine_learning"])
-        stored = manifest["repos"][sdk]["comment_density"]
-        check("(4) density matches direct recomputation",
-              direct["comment_lines"] == stored["comment_lines"]
-              and direct["code_lines"] == stored["code_lines"],
-              f"direct={direct} stored={stored}")
-    else:
-        # clones under data/input are gitignored dev artifacts; CI checks
-        # the committed values instead of recomputing them
-        print(f"  [note] (4) density spot-check skipped: pinned clone not "
-              f"present at {clone} (CI/dev-artifact environment)")
-
-    # (§8.5) group aggregates: infrastructure 34.3% vs application 26.0%
-    groups = manifest.get("groups", {})
-    infra = groups.get("infrastructure", {}).get("quantum_proportion")
-    app = groups.get("application", {}).get("quantum_proportion")
-    check("(5) infrastructure aggregate ≈ 34.3%", infra is not None
-          and abs(infra - 0.343) < 0.001, str(infra))
-    check("(5) application aggregate ≈ 26.0%", app is not None
-          and abs(app - 0.260) < 0.001, str(app))
-
-    # (§8.6) no intent charts anywhere: dashboard must not touch intent data
-    with open(os.path.join(APP_DIR, "dashboard.py"), encoding="utf-8") as f:
-        dashboard_src = f.read()
-    check("(6) dashboard.py has no intent analysis",
-          "intent_counts" not in dashboard_src
-          and "INTENT_ORDER" not in dashboard_src)
-
-    # (c) compare mode: overlaid radar + aggregates
-    a = manifest["repos"]["qiskit"]
-    b = manifest["repos"]["qiskit-machine-learning"]
-    fig = dashboard._radar_figure([(a["sdk"], a), (b["sdk"], b)], title="test")
-    check("(c) compare radar overlays 2 traces", len(fig.data) == 2)
-    check("(c) quantum proportion differs across SDKs",
-          a["quantum_proportion"] != b["quantum_proportion"])
-
-    # (d) explore corpus + default quantum-only logic
-    all_df = pd.concat(frames.values(), ignore_index=True)
-    check("(d) explore corpus row count",
-          len(all_df) == manifest["total_demo_units"],
-          f"{len(all_df)} vs {manifest['total_demo_units']}")
-    q_only = all_df[all_df["quantum_related"]]
-    check("(d) quantum-only default has rows", 0 < len(q_only) < len(all_df),
-          f"{len(q_only)} of {len(all_df)}")
-    kw = all_df[all_df["comment_text"].str.contains("entangle", case=False,
-                                                    na=False)]
-    check("(d) keyword filter returns rows", len(kw) > 0, f"got {len(kw)}")
-    f = all_df[(all_df["sdk"] == "qiskit-nature")
-               & (all_df["quantum_category"] == "Mathematics for quantum information")
-               & (all_df["code_entity_type"] == "function")]
-    check("(d) combined filters return rows", len(f) > 0, f"got {len(f)}")
-    q = all_df[all_df["quantum_related"]
-               & all_df["quantum_category"].notna()]
-    check("(d) quantum units have categories", len(q) > 0)
-
-    # quantum-specific data layer check
-    check("(d-data) quantum columns present in units",
-          "quantum_related" in all_df.columns
-          and "quantum_category" in all_df.columns)
+ALL_CHECKS = [
+    test_index_and_static,
+    test_overview_numbers,
+    test_corpus_units,
+    test_build_job_lifecycle,
+    test_annotation_lifecycle,
+    test_models_info_and_train_validation,
+    test_spotcheck_agreement,
+    test_inspect_and_evaluate,
+]
 
 
-def test_packaging():
-    """Single unified Dockerfile: TORCH_CHANNEL build-arg, no forced device."""
-    dockerfile = os.path.join(PROJECT_ROOT, "Dockerfile")
-    check("(pkg) Dockerfile exists", os.path.isfile(dockerfile))
-    check("(pkg) no separate Dockerfile.gpu",
-          not os.path.isfile(os.path.join(PROJECT_ROOT, "Dockerfile.gpu")))
-    if os.path.isfile(dockerfile):
-        with open(dockerfile, encoding="utf-8") as f:
-            src = f.read()
-        upper = src.upper()
-        check("(pkg) Dockerfile has TORCH_CHANNEL build-arg",
-              "ARG TORCH_CHANNEL" in upper)
-        check("(pkg) Dockerfile does not force CC4Q_DEVICE via ENV",
-              "ENV CC4Q_DEVICE" not in upper)
-        check("(pkg) Dockerfile installs torch from the pytorch index",
-              "download.pytorch.org/whl/" in src)
-        check("(pkg) Dockerfile uses the TORCH_CHANNEL var in the index URL "
-              "(no hardcoded/invalid channel)",
-              "whl/${TORCH_CHANNEL}" in src and "whl/gpu" not in src.lower())
-
-
-def test_app_rendering():
-    import tempfile
-    from streamlit.testing.v1 import AppTest
-
-    os.environ["CC4Q_WORKSPACE"] = tempfile.mkdtemp(prefix="cc4q_smoke_")
-
-    at = AppTest.from_file(os.path.join(DEMO_DIR, "app.py"),
-                           default_timeout=180)
-    at.run()
-    check("app boots to Workspace", not at.exception, str(at.exception))
-    all_md = "\n".join(m.value or "" for m in at.markdown)
-    check("workspace: asset overview renders",
-          all(k in all_md for k in ("Corpora", "Annotations", "Models",
-                                    "Evaluations")))
-    check("workspace: 8-primitive strip kept",
-          all(k in all_md for k in ("Build", "Predict", "Annotate",
-                                    "Train", "Evaluate", "Visualize")))
-    theme_css = "\n".join(m.value or "" for m in at.markdown
-                          if "<style>" in (m.value or ""))
-    check("theme: Kimi black primary-button + outline secondary rules",
-          "background-color: #1A1A1A" in theme_css
-          and "border: 1px solid #E5E7EB" in theme_css
-          and "--cc4q-quantum: #6C3FC5" in theme_css)
-
-    # Corpora: built-in SDK corpora seeded as assets; open one -> dashboard
-    at.switch_page(os.path.join(APP_DIR, "pages", "p_corpora.py")).run()
-    check("page renders: corpora", not at.exception, str(at.exception))
-    if not at.exception:
-        check("corpora: six built-in SDK assets seeded",
-              len([a for a in
-                   __import__("cc4q.workspace", fromlist=["list_assets"])
-                   .list_assets("corpus")]) >= 6)
-        open_btn = next((b for b in at.button if b.label == "Open"), None)
-        if open_btn:
-            open_btn.click().run()
-            ok = (not at.exception
-                  and any("Corpus Built" in (s.value or "")
-                          for s in at.subheader))
-            check("corpora: detail dashboard renders", ok, str(at.exception))
-            at.session_state["corpus_open"] = None
-            at.run()
-
-    # Annotate: empty state, then a persisted session resumes
-    import cc4q.workspace as ws
-    session = ws.create_asset(
-        "annotation_session", name="smoke-session",
-        schema={"text_column": "comment_text", "id_column": "id",
-                "labels": ["quantum", "non-quantum"]},
-        mode="blind", total=2)
-    ws.write_jsonl(session["id"], "items.jsonl", [
-        {"id": "1", "comment_text": "Apply a Hadamard gate."},
-        {"id": "2", "comment_text": "Increment the counter."},
-    ])
-    ws.update_asset(session["id"],
-                    export_path=ws.asset_path(session["id"], "items.jsonl"))
-    at.switch_page(os.path.join(APP_DIR, "pages", "p_annotate.py")).run()
-    check("page renders: annotate", not at.exception, str(at.exception))
-    if not at.exception:
-        resume = next((b for b in at.button if b.label == "Resume"), None)
-        if resume:
-            resume.click().run()
-            ok = (not at.exception and any(
-                "Hadamard" in (t.value or "") for t in at.text))
-            check("annotate: session resumes at current progress", ok,
-                  str(at.exception))
-
-    # Models page (from the visual-system branch)
-    at.switch_page(os.path.join(APP_DIR, "pages", "p_models.py")).run()
-    check("page renders: models", not at.exception, str(at.exception))
-    if not at.exception:
-        check("models: released checkpoints section",
-              any("Quantum relatedness" in (m.value or "") for m in at.markdown))
-
-    # Evaluate: an saved evaluation asset opens its report
-    ev = ws.create_asset(
-        "evaluation", name="smoke-eval", pair=["released", "custom"],
-        corpus="builtin", metrics={"n": 4, "agreement": 0.75,
-                                   "precision": 1.0, "recall": 2/3,
-                                   "wilson95": [0.3, 0.95]}, report_path="")
-    report = os.path.join(ws.asset_path(ev["id"], "", create_dir=True),
-                          "report.md")
-    with open(report, "w") as f:
-        f.write("## smoke-eval\n\nagreement: 75.0%\n")
-    ws.update_asset(ev["id"], report_path=report)
-    at.switch_page(os.path.join(APP_DIR, "pages", "p_evaluate.py")).run()
-    check("page renders: evaluate", not at.exception, str(at.exception))
-    if not at.exception:
-        open_btn = next((b for b in at.button if b.label == "Open"), None)
-        if open_btn:
-            open_btn.click().run()
-            ok = (not at.exception and any(
-                "75.0%" in (m.value or "") for m in at.markdown))
-            check("evaluate: report reopens with metrics", ok,
-                  str(at.exception))
-
-    # Playground: snippet analysis with the default model
-    at.switch_page(os.path.join(APP_DIR, "pages", "p_playground.py")).run()
-    check("page renders: playground", not at.exception, str(at.exception))
-    if not at.exception and at.button:
-        next(b for b in at.button if b.label == "Analyze").click().run()
-        ok = (not at.exception
-              and any("quantum-related" in (m.value or "") for m in at.markdown)
-              and any("✓ quantum" in (m.value or "") for m in at.markdown))
-        check("playground: snippet analysis labels units", ok,
-              str(at.exception))
-
-    # Workspace persistence across a simulated restart: a brand-new
-    # session on the same workspace dir still sees the assets
-    at2 = AppTest.from_file(os.path.join(DEMO_DIR, "app.py"),
-                            default_timeout=180)
-    at2.run()
-    at2.switch_page(os.path.join(APP_DIR, "pages", "p_workspace.py")).run()
-    md2 = "\n".join(m.value or "" for m in at2.markdown)
-    check("workspace: assets survive a session restart",
-          "smoke-session" in md2 and "smoke-eval" in md2, md2[:120])
-
-
-def main():
-    with_models = "--models" in sys.argv
-    with_app = "--app" in sys.argv or with_models
-
-    test_snippet_pipeline(with_models)
-    test_precomputed_data()
-    test_packaging()
-    if with_app:
-        test_app_rendering()
-
-    print()
+def main(with_models=False):
+    if with_models:
+        os.environ["CC4Q_SKIP_MODEL_DOWNLOAD"] = "0"
+    for fn in ALL_CHECKS:
+        print(f"\n=== {fn.__name__} ===")
+        fn()
+    print(f"\n{'-' * 50}")
     if FAILURES:
-        print(f"{len(FAILURES)} FAILURE(S): {FAILURES}")
+        print(f"{len(FAILURES)} smoke check(s) FAILED:")
+        for f in FAILURES:
+            print(f"  - {f}")
         sys.exit(1)
     print("All smoke tests passed.")
 
 
 if __name__ == "__main__":
-    main()
+    main(with_models="--models" in sys.argv[1:])

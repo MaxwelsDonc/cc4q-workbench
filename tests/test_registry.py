@@ -6,7 +6,7 @@ import os
 
 import pytest
 
-from cc4q.app import registry
+from cc4q import registry
 
 
 def _fake_package(root, name, axes=("quantum_related",)):
@@ -55,7 +55,7 @@ def test_delete(tmp_path):
 
 def test_zip_roundtrip(tmp_path):
     pkg = _fake_package(str(tmp_path), "m", axes=("quantum_related",
-                                                  "developer_intent"))
+                                                  "quantum_category"))
     entry = registry.register("m", pkg, root=str(tmp_path))
     dest = str(tmp_path / "out.zip")
     registry.zip_package(entry["id"], dest, root=str(tmp_path))
@@ -63,4 +63,4 @@ def test_zip_roundtrip(tmp_path):
     with zipfile.ZipFile(dest) as zf:
         names = zf.namelist()
     assert any(n.startswith("quantum_related/") for n in names)
-    assert any(n.startswith("developer_intent/") for n in names)
+    assert any(n.startswith("quantum_category/") for n in names)

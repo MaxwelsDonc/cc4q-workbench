@@ -1,12 +1,14 @@
-"""Model-default resolution tests: registry default beats released; single-axis
-packages compose with released fallback (mocked loaders — no torch)."""
+"""Model-resolution tests for the web server: registry default beats
+released; single-axis packages compose with released fallback (mocked
+loaders — no torch). Two-stage axes only (quantum_related, quantum_category);
+the retired developer_intent axis is rejected by the registry."""
 
 import json
 import os
 
 import pytest
 
-import cc4q.app.model_select as ms
+import cc4q.web.server as server
 
 
 def _fake_package(root, name, axes):
@@ -19,7 +21,13 @@ def _fake_package(root, name, axes):
     return pkg
 
 
-def test_released_when_registry_empty(tmp_path, monkeypatch):
+@pytest.fixture
+def clean_cache(monkeypatch):
+    monkeypatch.setattr(server, "_MODEL_CACHE", {})
+    return server._MODEL_CACHE
+
+
+def test_released_when_registry_empty(tmp_path, monkeypatch, clean_cache):
     monkeypatch.setenv("CC4Q_USER_MODELS", str(tmp_path))
     seen = {}
 
@@ -27,16 +35,19 @@ def test_released_when_registry_empty(tmp_path, monkeypatch):
         seen["which"] = "released"
         return "HANDLE-RELEASED"
 
-    monkeypatch.setattr(ms, "load_models", fake_released)
-    assert ms.resolve_default_handle() == "HANDLE-RELEASED"
+    monkeypatch.setattr(server, "load_models", fake_released)
+    handle, model_id = server._resolve_model_handle("default")
+    assert handle == "HANDLE-RELEASED"
+    assert model_id == "released"
     assert seen["which"] == "released"
 
 
-def test_registry_default_wins_and_composes(tmp_path, monkeypatch):
+def test_registry_default_wins_and_composes(tmp_path, monkeypatch,
+                                             clean_cache):
     monkeypatch.setenv("CC4Q_USER_MODELS", str(tmp_path))
     pkg = _fake_package(str(tmp_path), "m", axes=("quantum_related",))
-    entry = ms.registry.register("m", pkg, root=str(tmp_path))
-    monkeypatch.setattr(ms.registry, "registry_root", lambda: str(tmp_path))
+    server.registry.register("m", pkg, root=str(tmp_path))
+    monkeypatch.setattr(server.registry, "registry_root", lambda: str(tmp_path))
 
     seen = {}
 
@@ -44,22 +55,24 @@ def test_registry_default_wins_and_composes(tmp_path, monkeypatch):
         seen["axis_dirs"] = axis_dirs
         return "HANDLE-COMPOSED"
 
-    monkeypatch.setattr(ms, "load_models_from", fake_from)
-    assert ms.resolve_default_handle() == "HANDLE-COMPOSED"
+    monkeypatch.setattr(server, "load_models_from", fake_from)
+    handle, model_id = server._resolve_model_handle("default")
+    assert handle == "HANDLE-COMPOSED"
+    assert model_id == "m"
     assert set(seen["axis_dirs"]) == {"quantum_related"}
 
 
-def test_non_default_entry_not_used(tmp_path, monkeypatch):
+def test_non_default_entry_not_used(tmp_path, monkeypatch, clean_cache):
     monkeypatch.setenv("CC4Q_USER_MODELS", str(tmp_path))
     pkg = _fake_package(str(tmp_path), "m", axes=("quantum_related",))
-    ms.registry.register("m", pkg, root=str(tmp_path))
+    server.registry.register("m", pkg, root=str(tmp_path))
     # not the default (another model holds the star)
-    pkg2 = _fake_package(str(tmp_path), "n", axes=("developer_intent",))
-    ms.registry.register("n", pkg2, root=str(tmp_path))
-    ms.registry.set_default(
-        ms.registry.list_models(root=str(tmp_path))[1]["id"],
+    pkg2 = _fake_package(str(tmp_path), "n", axes=("quantum_category",))
+    server.registry.register("n", pkg2, root=str(tmp_path))
+    server.registry.set_default(
+        server.registry.list_models(root=str(tmp_path))[1]["id"],
         root=str(tmp_path))
-    monkeypatch.setattr(ms.registry, "registry_root", lambda: str(tmp_path))
+    monkeypatch.setattr(server.registry, "registry_root", lambda: str(tmp_path))
 
     seen = {}
 
@@ -67,6 +80,15 @@ def test_non_default_entry_not_used(tmp_path, monkeypatch):
         seen["axes"] = sorted(axis_dirs)
         return "HANDLE"
 
-    monkeypatch.setattr(ms, "load_models_from", fake_from)
-    ms.resolve_default_handle()
-    assert seen["axes"] == ["developer_intent"]
+    monkeypatch.setattr(server, "load_models_from", fake_from)
+    server._resolve_model_handle("default")
+    assert seen["axes"] == ["quantum_category"]
+
+
+def test_retired_intent_axis_rejected(tmp_path):
+    """The developer_intent axis was removed in the two-stage taxonomy:
+    packages carrying only it no longer register."""
+    pkg = _fake_package(str(tmp_path), "legacy",
+                        axes=("developer_intent",))
+    with pytest.raises(ValueError, match="does not look like"):
+        server.registry.register("legacy", pkg, root=str(tmp_path))
