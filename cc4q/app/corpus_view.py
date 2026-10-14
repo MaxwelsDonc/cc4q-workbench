@@ -12,7 +12,8 @@ def corpus_stats(records):
     from collections import Counter
     n = len(records)
     nq = sum(1 for r in records if r.get("quantum_related"))
-    intent = Counter(r.get("developer_intent", "Others") for r in records)
+    # intent removed
+    intent = {}
     cat = Counter(r["quantum_category"] for r in records
                   if r.get("quantum_related") and r.get("quantum_category"))
     ctype_entity, quantum_ctype = {}, {}

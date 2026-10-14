@@ -40,12 +40,13 @@ RUN pip install --no-cache-dir -r requirements.txt -r requirements-demo.txt \
     && python -m spacy download en_core_web_sm
 
 COPY . .
+RUN pip install --no-cache-dir -e .
 
 RUN chmod +x docker-entrypoint.sh
 
 EXPOSE 8501
 
-# Default: the Streamlit demo. Override with e.g.
-#   docker run --entrypoint python cc4q-workbench scripts/02_extract_code_comment_pairs.py config/examples.yaml
+# Default: the CC4Q Web Workbench (Starlette/Uvicorn). Override with e.g.
+#   docker run --entrypoint cc4q cc4q-workbench build --repo examples/tiny_repo --output-dir /tmp/out
 ENTRYPOINT ["./docker-entrypoint.sh"]
-CMD ["streamlit", "run", "demo/app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+CMD ["cc4q", "serve", "--host", "0.0.0.0", "--port", "8501"]

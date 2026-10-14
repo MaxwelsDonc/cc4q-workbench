@@ -3,7 +3,7 @@
 A small JSON index over a directory of user-provided model packages. Each
 package is a directory in the same layout as ``models_checkpoints/``: one
 sub-directory per label axis it provides (``quantum_related`` /
-``quantum_category`` / ``developer_intent``), each a Hugging Face model
+``quantum_category``), each a Hugging Face model
 directory. Packages may provide a single axis (e.g. a freshly trained
 classifier); missing axes fall back to the released checkpoints at
 prediction time.
@@ -19,7 +19,7 @@ import zipfile
 
 from cc4q.pipeline.paths import REPO_ROOT
 
-AXES = ("quantum_related", "quantum_category", "developer_intent")
+AXES = ("quantum_related", "quantum_category")
 
 
 def registry_root():

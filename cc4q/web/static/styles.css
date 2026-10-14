@@ -1,0 +1,273 @@
+/* CC4Q Workbench — Modern Academic & Developer Studio Theme */
+:root {
+  --bg-app: #F8FAFC;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F1F5F9;
+  --border-subtle: #E2E8F0;
+  --border-strong: #CBD5E1;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --quantum-primary: #6D28D9;
+  --quantum-light: #F3E8FF;
+  --quantum-border: #DDD6FE;
+  --accent-blue: #2563EB;
+  --accent-emerald: #059669;
+  --accent-amber: #D97706;
+  --accent-rose: #E11D48;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--bg-app);
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+code, pre, .font-mono {
+  font-family: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94A3B8;
+}
+
+/* Cards & Surfaces */
+.cc-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.03);
+}
+
+.cc-card-hover {
+  transition: all 0.15s ease;
+}
+.cc-card-hover:hover {
+  border-color: #C4B5FD;
+  box-shadow: 0 4px 12px rgba(109, 40, 217, 0.06);
+}
+
+/* Navigation Tabs */
+.nav-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.nav-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-subtle);
+}
+.nav-tab.active {
+  color: var(--quantum-primary);
+  background: #F5F3FF;
+  border-color: #DDD6FE;
+  font-weight: 600;
+}
+
+/* Step number pill inside nav tab */
+.nav-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  background: #E2E8F0;
+  color: #475569;
+}
+.nav-tab.active .nav-step {
+  background: var(--quantum-primary);
+  color: #FFFFFF;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.badge-quantum {
+  background: #F3E8FF;
+  color: #6D28D9;
+  border: 1px solid #DDD6FE;
+}
+.badge-nonquantum {
+  background: #F1F5F9;
+  color: #475569;
+  border: 1px solid #E2E8F0;
+}
+.badge-infra {
+  background: #EFF6FF;
+  color: #1D4ED8;
+  border: 1px solid #BFDBFE;
+}
+.badge-app {
+  background: #ECFDF5;
+  color: #047857;
+  border: 1px solid #A7F3D0;
+}
+
+/* Category color pills */
+.cat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+/* Unit list item in Explorer */
+.unit-row {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: background 0.12s ease;
+  border-left: 3px solid transparent;
+}
+.unit-row:hover {
+  background: #F8FAFC;
+}
+.unit-row.selected {
+  background: #F5F3FF;
+  border-left-color: var(--quantum-primary);
+}
+
+/* Code viewer block */
+.code-viewer {
+  background: #0F172A;
+  color: #E2E8F0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 12.5px;
+  line-height: 1.6;
+  overflow-x: auto;
+  border: 1px solid #1E293B;
+}
+.code-line-highlight {
+  background: rgba(139, 92, 246, 0.28);
+  border-left: 3px solid #A78BFA;
+  display: block;
+  margin: 0 -16px;
+  padding: 0 13px;
+}
+
+/* Keyboard shortcut keycap */
+.kbd-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 6px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: #334155;
+  background: #F8FAFC;
+  border: 1px solid #CBD5E1;
+  border-bottom-width: 2px;
+  border-radius: 5px;
+}
+
+/* Primary & Secondary Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #0F172A;
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #0F172A;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-primary:hover:not(:disabled) {
+  background: #1E293B;
+}
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-quantum {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #6D28D9;
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #5B21B6;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-quantum:hover:not(:disabled) {
+  background: #5B21B6;
+}
+.btn-quantum:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #FFFFFF;
+  color: #334155;
+  font-weight: 500;
+  font-size: 13px;
+  padding: 7px 13px;
+  border-radius: 8px;
+  border: 1px solid #CBD5E1;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.btn-outline:hover:not(:disabled) {
+  background: #F8FAFC;
+  border-color: #94A3B8;
+}

@@ -5,11 +5,13 @@
     "qiskit-machine-learning": {
       "sdk": "qiskit-machine-learning",
       "version": "0.9.1",
+      "layer": "application",
       "source": "cc4q-pipeline",
       "sampled": false,
       "python_files": 123,
       "files": 123,
       "ccps": 1663,
+      "sccps": 3140,
       "sccus": 3140,
       "quantum_sccus": 704,
       "quantum_proportion": 0.2242,
@@ -17,14 +19,6 @@
         "comment_lines": 2450,
         "code_lines": 14281,
         "value": 0.1716
-      },
-      "intent_counts": {
-        "What": 1735,
-        "How-to-use": 165,
-        "How-it-is-done": 380,
-        "Property": 299,
-        "Why": 121,
-        "Others": 440
       },
       "category_counts": {
         "Mathematics for quantum information": 80,
@@ -81,11 +75,13 @@
     "qiskit-nature": {
       "sdk": "qiskit-nature",
       "version": "0.8",
+      "layer": "application",
       "source": "cc4q-pipeline",
       "sampled": false,
       "python_files": 175,
       "files": 175,
       "ccps": 2037,
+      "sccps": 4842,
       "sccus": 4842,
       "quantum_sccus": 1379,
       "quantum_proportion": 0.2848,
@@ -93,14 +89,6 @@
         "comment_lines": 3023,
         "code_lines": 23902,
         "value": 0.1265
-      },
-      "intent_counts": {
-        "What": 2639,
-        "How-to-use": 312,
-        "How-it-is-done": 491,
-        "Property": 562,
-        "Why": 211,
-        "Others": 627
       },
       "category_counts": {
         "Mathematics for quantum information": 398,
@@ -157,11 +145,13 @@
     "qiskit-algorithms": {
       "sdk": "qiskit-algorithms",
       "version": "0.4.0",
+      "layer": "application",
       "source": "cc4q-pipeline",
       "sampled": false,
       "python_files": 152,
       "files": 152,
       "ccps": 1802,
+      "sccps": 3535,
       "sccus": 3535,
       "quantum_sccus": 915,
       "quantum_proportion": 0.2588,
@@ -169,14 +159,6 @@
         "comment_lines": 2612,
         "code_lines": 16829,
         "value": 0.1552
-      },
-      "intent_counts": {
-        "What": 1945,
-        "How-to-use": 156,
-        "How-it-is-done": 428,
-        "Property": 340,
-        "Why": 176,
-        "Others": 490
       },
       "category_counts": {
         "Mathematics for quantum information": 103,
@@ -232,6 +214,7 @@
     "qiskit": {
       "sdk": "qiskit",
       "version": "2.1.0",
+      "layer": "infrastructure",
       "source": "tosem-release",
       "sampled": true,
       "sample_size": 2000,
@@ -246,14 +229,6 @@
         "comment_lines": 14826,
         "code_lines": 117733,
         "value": 0.1259
-      },
-      "intent_counts": {
-        "What": 11537,
-        "How-to-use": 1680,
-        "How-it-is-done": 2565,
-        "Property": 2435,
-        "Why": 1245,
-        "Others": 2508
       },
       "category_counts": {
         "Mathematics for quantum information": 1256,
@@ -311,6 +286,7 @@
     "qiskit-aer": {
       "sdk": "qiskit-aer",
       "version": "0.17.2",
+      "layer": "infrastructure",
       "source": "tosem-release",
       "sampled": true,
       "sample_size": 2000,
@@ -325,14 +301,6 @@
         "comment_lines": 1499,
         "code_lines": 13177,
         "value": 0.1138
-      },
-      "intent_counts": {
-        "What": 1318,
-        "How-to-use": 209,
-        "How-it-is-done": 290,
-        "Property": 305,
-        "Why": 69,
-        "Others": 177
       },
       "category_counts": {
         "Mathematics for quantum information": 96,
@@ -388,6 +356,7 @@
     "qiskit-ibm-runtime": {
       "sdk": "qiskit-ibm-runtime",
       "version": "0.45.1",
+      "layer": "infrastructure",
       "source": "tosem-release",
       "sampled": true,
       "sample_size": 2000,
@@ -402,14 +371,6 @@
         "comment_lines": 3486,
         "code_lines": 16587,
         "value": 0.2102
-      },
-      "intent_counts": {
-        "What": 2129,
-        "How-to-use": 191,
-        "How-it-is-done": 350,
-        "Property": 339,
-        "Why": 145,
-        "Others": 584
       },
       "category_counts": {
         "Mathematics for quantum information": 17,
@@ -473,7 +434,15 @@
       ],
       "sccus": 28076,
       "quantum_sccus": 9617,
-      "quantum_proportion": 0.3425
+      "quantum_proportion": 0.3425,
+      "category_counts": {
+        "Mathematics for quantum information": 1369,
+        "Quantum algorithms": 230,
+        "Quantum circuit model": 4054,
+        "Quantum hardware": 971,
+        "Quantum software framework": 2821,
+        "Others": 172
+      }
     },
     "application": {
       "sdks": [
@@ -483,7 +452,15 @@
       ],
       "sccus": 11517,
       "quantum_sccus": 2998,
-      "quantum_proportion": 0.2603
+      "quantum_proportion": 0.2603,
+      "category_counts": {
+        "Mathematics for quantum information": 581,
+        "Quantum algorithms": 198,
+        "Quantum circuit model": 695,
+        "Quantum hardware": 322,
+        "Quantum software framework": 1023,
+        "Others": 179
+      }
     }
   },
   "total_demo_units": 17517

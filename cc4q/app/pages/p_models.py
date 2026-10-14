@@ -16,7 +16,7 @@ from cc4q.app import registry
 from cc4q.app.ui import (asset_card_grid, empty_state, page_header,
                          section_divider)
 
-TASKS = ("quantum_related", "quantum_category", "developer_intent")
+TASKS = ("quantum_related", "quantum_category")
 INTENT_ORDER = ["What", "How-to-use", "How-it-is-done", "Property", "Why",
                 "Others"]
 CATEGORY_ORDER = ["Mathematics for quantum information", "Quantum algorithms",
@@ -75,7 +75,7 @@ def _to_training_records(rows, task):
     train page)."""
     text_col = "comment" if task == "quantum_related" else "text"
     canonical = CATEGORY_ORDER if task == "quantum_category" else \
-        INTENT_ORDER if task == "developer_intent" else None
+        None
     out = []
     for i, r in enumerate(rows, 1):
         text = r.get(text_col) or r.get("comment_text") or r.get("text")
@@ -331,7 +331,7 @@ def render():
 
     upload = st.file_uploader(
         "Upload a model zip (one Hugging Face directory per axis: "
-        "quantum_related, quantum_category, developer_intent)", type=["zip"],
+        "quantum_related, quantum_category)", type=["zip"],
         key="models_upload")
     if upload is not None:
         try:

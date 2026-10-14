@@ -1,16 +1,14 @@
-"""Human-vs-model agreement evaluation (generalizes exp/score_spotcheck.py).
+"""Human-vs-model and model-vs-model agreement evaluation.
 
-``evaluate`` compares aligned human and model label sequences and returns
-agreement / precision / recall plus a Wilson 95% CI; ``evaluate_files``
-joins a spot-check annotation file (CSV or JSONL) with a model answer key
-(JSONL), excluding calibration-contaminated ids by default.
+Computes agreement, Cohen's kappa, precision, recall, F1, Wilson 95% CI,
+and confusion breakdown.
 """
 
 import csv
 import json
 import math
 import os
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 
 def wilson_ci(k, n, z=1.96):
@@ -23,8 +21,23 @@ def wilson_ci(k, n, z=1.96):
     return center - half, center + half
 
 
+def cohen_kappa(pairs):
+    """Compute Cohen's kappa over a list of (label_a, label_b) pairs."""
+    n = len(pairs)
+    if n == 0:
+        return float("nan")
+    p_o = sum(1 for a, b in pairs if a == b) / n
+    counts_a = Counter(a for a, _ in pairs)
+    counts_b = Counter(b for _, b in pairs)
+    labels = set(counts_a) | set(counts_b)
+    p_e = sum((counts_a[lbl] / n) * (counts_b[lbl] / n) for lbl in labels)
+    if abs(1.0 - p_e) < 1e-12:
+        return 1.0
+    return (p_o - p_e) / (1.0 - p_e)
+
+
 def _as_pairs(human_labels, model_labels):
-    if isinstance(human_labels, dict):  # id -> label mappings
+    if isinstance(human_labels, dict):
         ids = [i for i in human_labels if i in model_labels]
         return [(human_labels[i], model_labels[i]) for i in ids]
     return list(zip(human_labels, model_labels))
@@ -33,17 +46,24 @@ def _as_pairs(human_labels, model_labels):
 def evaluate(human_labels, model_labels):
     """Compare aligned label sequences (or id->label dicts).
 
-    The positive class is whichever label appears as the model's
-    "quantum" prediction — pass the label set explicitly via the dict form
-    if ambiguous. Returns a dict with n, agreement (fraction), precision,
-    recall, wilson95 (lo, hi), per_label counts, and the raw pairs.
+    Returns a dict with n, agreement, kappa, precision, recall, f1,
+    wilson95 (lo, hi), confusion counts, labels, and raw pairs.
     """
     pairs = _as_pairs(human_labels, model_labels)
     n = len(pairs)
     if n == 0:
-        return {"n": 0, "agreement": float("nan"), "precision": float("nan"),
-                "recall": float("nan"), "wilson95": (float("nan"), float("nan")),
-                "labels": [], "pairs": []}
+        return {
+            "n": 0,
+            "agreement": float("nan"),
+            "kappa": float("nan"),
+            "precision": float("nan"),
+            "recall": float("nan"),
+            "f1": float("nan"),
+            "wilson95": (float("nan"), float("nan")),
+            "confusion": {"tp": 0, "fp": 0, "fn": 0, "tn": 0},
+            "labels": [],
+            "pairs": [],
+        }
 
     model_labels_seen = sorted({m for _, m in pairs})
     positive = "quantum" if "quantum" in model_labels_seen else model_labels_seen[0]
@@ -51,15 +71,21 @@ def evaluate(human_labels, model_labels):
     tp = sum(1 for h, m in pairs if m == positive and h == positive)
     fp = sum(1 for h, m in pairs if m == positive and h != positive)
     fn = sum(1 for h, m in pairs if m != positive and h == positive)
+    tn = sum(1 for h, m in pairs if m != positive and h != positive)
     prec = tp / (tp + fp) if (tp + fp) else float("nan")
     rec = tp / (tp + fn) if (tp + fn) else float("nan")
+    f1 = (2 * prec * rec / (prec + rec)) if (prec + rec) and not math.isnan(prec) and not math.isnan(rec) else float("nan")
     lo, hi = wilson_ci(agree, n)
+    kappa = cohen_kappa(pairs)
     return {
         "n": n,
         "agreement": agree / n,
+        "kappa": kappa,
         "precision": prec,
         "recall": rec,
+        "f1": f1,
         "wilson95": (lo, hi),
+        "confusion": {"tp": tp, "fp": fp, "fn": fn, "tn": tn},
         "labels": sorted({h for h, _ in pairs} | {m for _, m in pairs}),
         "pairs": pairs,
     }
@@ -68,15 +94,7 @@ def evaluate(human_labels, model_labels):
 def evaluate_files(csv_path=None, jsonl_path=None, key_path=None,
                    id_join="no", contaminated=None,
                    human_values=("quantum", "non-quantum")):
-    """Spot-check evaluation from files.
-
-    Reads annotations from ``csv_path`` (preferred; needs a ``human_label``
-    column) or ``jsonl_path``, joins with the model answer key (JSONL with
-    ``id_join`` and a model-label column inferable from the data) on
-    ``id_join``, skips rows whose human label is not in ``human_values``,
-    and drops ids in ``contaminated``. Returns the :func:`evaluate` dict
-    plus per-repo breakdown under "by_repo".
-    """
+    """Spot-check evaluation from files."""
     if key_path is None:
         raise ValueError("key_path (model answer key JSONL) is required")
     if csv_path is None and jsonl_path is None:
@@ -96,17 +114,31 @@ def evaluate_files(csv_path=None, jsonl_path=None, key_path=None,
 
     contaminated = {str(c) for c in (contaminated or [])}
     pairs_by_repo = defaultdict(list)
+    disagreements = []
     skipped = excluded = 0
     for r in annotations:
         h = str(r.get("human_label", "")).strip().lower()
         if h not in human_values:
             skipped += 1
             continue
-        if str(r[id_join]) in contaminated:
+        rid = str(r[id_join])
+        if rid in contaminated:
             excluded += 1
             continue
-        pairs_by_repo[r.get("repo", "overall")].append(
-            (h, key[str(r[id_join])]))
+        m = key[rid]
+        repo = r.get("repo", "overall")
+        pairs_by_repo[repo].append((h, m))
+        if h != m:
+            disagreements.append({
+                "no": rid,
+                "id": r.get("id", rid),
+                "repo": repo,
+                "comment_type": r.get("comment_type", ""),
+                "code_entity_type": r.get("code_entity_type", ""),
+                "comment_text": r.get("comment_text", ""),
+                "human_label": h,
+                "model_label": m,
+            })
 
     all_pairs = [p for pairs in pairs_by_repo.values() for p in pairs]
     result = evaluate([h for h, _ in all_pairs], [m for _, m in all_pairs])
@@ -114,6 +146,7 @@ def evaluate_files(csv_path=None, jsonl_path=None, key_path=None,
         repo: evaluate([h for h, _ in pairs], [m for _, m in pairs])
         for repo, pairs in sorted(pairs_by_repo.items())
     }
+    result["disagreements"] = disagreements
     result["skipped"] = skipped
     result["excluded"] = excluded
     return result

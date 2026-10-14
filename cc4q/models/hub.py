@@ -1,9 +1,8 @@
 """Model hub: checkpoint download/verification and lazy classifier loading.
 
-Checkpoints ship as release assets of the public cc4q-checkpoints
-repository (too large for git):
-
-    https://github.com/MaxwelsDonc/cc4q-checkpoints/releases/tag/v0.1.0
+Focuses on the two Quantum-Specific classifiers:
+  - ``quantum_related`` (Binary: Quantum-Specific vs. Non-Quantum)
+  - ``quantum_category`` (6-Class Quantum Knowledge Taxonomy)
 """
 
 import hashlib
@@ -18,7 +17,7 @@ RELEASE_REPO = "MaxwelsDonc/cc4q-checkpoints"
 RELEASE = "v0.1.0"
 BASE_URL = f"https://github.com/{RELEASE_REPO}/releases/download/{RELEASE}"
 
-# asset name -> (checkpoint dir name, SHA256 of the .tar.gz)
+# Primary quantum checkpoints
 CHECKPOINTS = {
     "quantum_related.tar.gz": (
         "quantum_related",
@@ -28,22 +27,13 @@ CHECKPOINTS = {
         "quantum_category",
         "64ab092d012e50d6539c869c870db55defb8174d688c7b1acfd2950f00c6e64d",
     ),
-    "developer_intent.tar.gz": (
-        "developer_intent",
-        "603b81a7a6345c821d751cbe0333e31e84de6419b079d9a79a1efa4fb36d525b",
-    ),
 }
 
 REQUIRED_FILES = ("config.json", "model.safetensors", "tokenizer_config.json")
 
 
 def default_model_dir():
-    """Default checkpoint location.
-
-    Priority: CC4Q_MODEL_DIR env var > ``models_checkpoints/`` next to a
-    source checkout (editable installs keep the repo-local layout) >
-    ``~/.cache/cc4q/models_checkpoints`` for plain wheel installs.
-    """
+    """Default checkpoint location."""
     env = os.environ.get("CC4Q_MODEL_DIR")
     if env:
         return env
@@ -55,12 +45,7 @@ def default_model_dir():
 
 
 def resolve_device(device=None):
-    """Resolve the inference device.
-
-    Priority: ``device`` argument > CC4Q_DEVICE env override > CUDA if
-    available > CPU. MPS is never selected automatically (it hangs with
-    torch 2.14 on the development machine); opt in via CC4Q_DEVICE=mps.
-    """
+    """Resolve the inference device."""
     import torch
     forced = (device or os.environ.get("CC4Q_DEVICE", "")).strip().lower()
     if forced:
@@ -103,7 +88,7 @@ def _download(asset, dest_path):
             f"- check https://github.com/{RELEASE_REPO}/releases"
         ) from exc
     except Exception:
-        try:  # one retry for transient network errors
+        try:
             _download_once(asset, dest_path)
         except urllib.error.HTTPError as exc:
             raise RuntimeError(
@@ -113,13 +98,12 @@ def _download(asset, dest_path):
 
 
 def ensure_checkpoints(model_dir=None, verbose=True):
-    """Download + verify + extract any missing checkpoint. Returns the list
-    of checkpoint names still missing afterwards ([] on success)."""
+    """Download + verify + extract any missing checkpoint."""
     model_dir = model_dir or default_model_dir()
     missing = missing_checkpoints(model_dir)
     if not missing:
         if verbose:
-            print(f"All checkpoints already present in {model_dir}")
+            print(f"All quantum checkpoints already present in {model_dir}")
         return []
 
     os.makedirs(model_dir, exist_ok=True)
@@ -154,13 +138,9 @@ def ensure_checkpoints(model_dir=None, verbose=True):
 
 
 class ModelHandle:
-    """The three fine-tuned classifiers plus the device they live on.
+    """The fine-tuned quantum classifiers plus the device they live on."""
 
-    Attribute and item access both work: ``handle.quantum_related`` and
-    ``handle["quantum_related"]`` return ``(tokenizer, model)`` tuples.
-    """
-
-    AXES = ("quantum_related", "quantum_category", "developer_intent")
+    AXES = ("quantum_related", "quantum_category")
 
     def __init__(self, models, device, model_dir):
         self._models = dict(models)
@@ -168,7 +148,7 @@ class ModelHandle:
         self.model_dir = model_dir
 
     def __getattr__(self, name):
-        if name in self.AXES:
+        if name in self._models:
             return self._models[name]
         raise AttributeError(name)
 
@@ -183,9 +163,8 @@ class ModelHandle:
 
 
 def _load_axis(model_dir, name, device):
-    import torch
     from transformers import BertForSequenceClassification, BertTokenizer
-    path = os.path.join(model_dir, name)
+    path = os.path.join(model_dir, name) if name else model_dir
     tokenizer = BertTokenizer.from_pretrained(path)
     model = BertForSequenceClassification.from_pretrained(path)
     model.to(device)
@@ -194,19 +173,14 @@ def _load_axis(model_dir, name, device):
 
 
 def load_models(model_dir=None, device=None, auto_download=True):
-    """Load the three BERT classifiers (eval mode) on the resolved device.
-
-    When checkpoints are missing they are auto-downloaded from the release
-    (SHA256-verified) unless ``auto_download=False``, which raises instead.
-    Returns a :class:`ModelHandle`.
-    """
+    """Load the two Quantum BERT classifiers (eval mode) on the resolved device."""
     model_dir = model_dir or default_model_dir()
     missing = missing_checkpoints(model_dir)
     if missing:
         if not auto_download:
             raise RuntimeError(
                 f"Missing model checkpoints: {', '.join(missing)}. "
-                f"Run: python scripts/download_models.py"
+                f"Run: cc4q download-models"
             )
         still = ensure_checkpoints(model_dir)
         if still:
@@ -222,13 +196,7 @@ def load_models(model_dir=None, device=None, auto_download=True):
 
 
 def load_models_from(axis_dirs, device=None, auto_download=True):
-    """Compose a handle from per-axis model directories.
-
-    ``axis_dirs`` maps axis names ("quantum_related" / "quantum_category" /
-    "developer_intent") to directories; axes not present fall back to the
-    released checkpoints (auto-downloaded unless ``auto_download=False``).
-    Lets user-trained single-axis models plug into the full pipeline.
-    """
+    """Compose a handle from per-axis model directories, falling back to released checkpoints."""
     device = resolve_device(device)
     released_dir = None
     models = {}

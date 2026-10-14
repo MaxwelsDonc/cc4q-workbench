@@ -86,7 +86,7 @@ def models_dialog():
     import tempfile
     upload = st.file_uploader("Upload a model zip (one HF directory per "
                               "axis: quantum_related, quantum_category, "
-                              "developer_intent)", type=["zip"])
+                              "quantum_category)", type=["zip"])
     if upload is not None:
         try:
             entry = registry.register_uploaded_zip(upload)

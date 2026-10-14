@@ -161,7 +161,7 @@ def _build_result(repo_name, n_py, n_ccps, records, comment_density=None):
             "code_entity_type": r.get("code_entity_type", ""),
             "comment_text": r.get("comment_text", ""),
             "quantum_related": bool(r.get("quantum_related")),
-            "developer_intent": r.get("developer_intent", "Others"),
+            
             "quantum_category": r.get("quantum_category"),
         })
     df = pd.DataFrame(rows)
@@ -185,7 +185,7 @@ def _build_result(repo_name, n_py, n_ccps, records, comment_density=None):
         "quantum_sccus": n_quantum,
         "quantum_proportion": round(n_quantum / n, 4) if n else 0.0,
         "comment_density": comment_density or {"comment_lines": 0, "code_lines": 0, "value": 0.0},
-        "intent_counts": (df["developer_intent"].value_counts().to_dict() if n else {}),
+        "intent_counts": {},
         "category_counts": (df[df["quantum_related"]]["quantum_category"]
                             .value_counts().to_dict() if n else {}),
         "ctype_by_entity": ctype_by_entity,

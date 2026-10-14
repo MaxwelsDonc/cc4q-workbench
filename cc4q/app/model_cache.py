@@ -7,7 +7,7 @@ import streamlit as st
 from cc4q.models.hub import default_model_dir, load_models, missing_checkpoints
 
 CKPT_DIR = default_model_dir()
-REQUIRED = ("quantum_related", "quantum_category", "developer_intent")
+REQUIRED = ("quantum_related", "quantum_category")
 
 
 def checkpoints_missing():

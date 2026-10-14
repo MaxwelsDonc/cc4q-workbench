@@ -219,23 +219,17 @@ def test_precomputed_data():
                                                     na=False)]
     check("(d) keyword filter returns rows", len(kw) > 0, f"got {len(kw)}")
     f = all_df[(all_df["sdk"] == "qiskit-nature")
-               & (all_df["developer_intent"] == "Why")
-               & (all_df["code_entity_type"] == "class")]
+               & (all_df["quantum_category"] == "Mathematics for quantum information")
+               & (all_df["code_entity_type"] == "function")]
     check("(d) combined filters return rows", len(f) > 0, f"got {len(f)}")
     q = all_df[all_df["quantum_related"]
                & all_df["quantum_category"].notna()]
     check("(d) quantum units have categories", len(q) > 0)
 
-    # intent stays in the DATA layer: units schema + manifest distributions
-    check("(d-data) intent column present in units",
-          "developer_intent" in all_df.columns
-          and all_df["developer_intent"].notna().all())
-    intent_total = sum(sum(manifest["repos"][s]["intent_counts"].values())
-                       for s in repos)
-    full_sccus = sum(manifest["repos"][s]["sccus"] for s in repos)
-    check("(d-data) manifest intent_counts populated",
-          intent_total == full_sccus,
-          f"intent_total={intent_total} full_sccus={full_sccus}")
+    # quantum-specific data layer check
+    check("(d-data) quantum columns present in units",
+          "quantum_related" in all_df.columns
+          and "quantum_category" in all_df.columns)
 
 
 def test_packaging():
