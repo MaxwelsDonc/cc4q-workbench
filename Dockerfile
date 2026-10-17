@@ -26,7 +26,7 @@ RUN pip install --no-cache-dir --upgrade pip \
         "torch==2.14.0"
 
 COPY requirements.txt demo/requirements-demo.txt ./
-RUN pip install --no-cache-dir -r requirements.txt -r demo/requirements-demo.txt \
+RUN pip install --no-cache-dir -r requirements.txt -r requirements-demo.txt \
     && python -m spacy download en_core_web_sm
 
 COPY . .

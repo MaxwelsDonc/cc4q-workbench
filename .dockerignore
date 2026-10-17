@@ -20,3 +20,7 @@ scripts/log
 
 # Local Streamlit state
 .streamlit/secrets.toml
+
+# Runtime artifacts (created inside the container at runtime)
+user_models
+.cc4q_workspace
