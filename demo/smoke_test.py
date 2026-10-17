@@ -230,20 +230,29 @@ def test_models_info_and_train_validation():
 
 
 def test_spotcheck_agreement():
-    """The seeded TOSEM spot-check session must report 85.0% human-model
-    agreement (Task 1) — the number the SPA shows in Annotation Studio."""
+    """The seeded demo session is the *Unseen SDKs Labeling Demo*: 361 unlabeled
+    units (noise rows dropped) with source context, ready for blind human
+    labeling. The UI intentionally exposes no human-vs-model agreement — that
+    study is verified via the CLI (`cc4q evaluate`, see VERIFICATION.md 3.4)."""
     c = get_client()
     sessions = c.get("/api/annotations").json()["sessions"]
     spot = next((s for s in sessions if s.get("builtin_spotcheck")), None)
     check("spot-check: seeded session present", spot is not None)
     if spot:
         det = c.get(f"/api/annotations/{spot['id']}").json()
-        check("spot-check: 379 units", len(det["items"]) == 379,
+        check("spot-check: 361 units", len(det["items"]) == 361,
               f"got {len(det.get('items', []))}")
+        labeled = [i for i in det["items"]
+                   if i.get("human_quantum_related") is not None]
+        check("spot-check: blind (no human labels)", len(labeled) == 0,
+              f"got {len(labeled)} pre-labeled")
+        with_snippet = [i for i in det["items"] if (i.get("code_snippet") or "").strip()]
+        check("spot-check: source context attached",
+              len(with_snippet) == len(det["items"]),
+              f"only {len(with_snippet)}/{len(det['items'])} have code snippets")
         agree = det["metrics"].get("agreement")
-        # the SPA displays one decimal (85.0%); the raw ratio is 0.8496…
-        check("spot-check: 85.0% agreement", agree is not None
-              and round(agree * 100, 1) == 85.0, f"got {agree}")
+        check("spot-check: no agreement metric exposed (blind UI)",
+              agree is None, f"got {agree}")
 
 
 def test_inspect_and_evaluate():

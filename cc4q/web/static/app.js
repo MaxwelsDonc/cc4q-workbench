@@ -5,6 +5,7 @@ const STATE = {
   overview: null,
   activeCorpusId: "qiskit",
   activeCorpusStats: null,
+  explorerMode: "overview", // "overview" (benchmark landing) | "sdk" (single-corpus dashboard)
   units: [],
   unitsTotal: 0,
   unitsOffset: 0,
@@ -99,14 +100,25 @@ window.addEventListener("resize", () => {
   Object.values(STATE.charts).forEach((c) => c && c.resize());
 });
 
+// Charts rendered inside a collapsed <details> (e.g. the Tab 1 radar toggle) have
+// zero size until the fold opens — resize them when any disclosure toggles.
+document.addEventListener("toggle", (e) => {
+  if (e.target && e.target.tagName === "DETAILS") {
+    setTimeout(() => {
+      Object.values(STATE.charts).forEach((c) => c && c.resize());
+    }, 60);
+  }
+}, true);
+
 // ======================== INITIALIZATION & NAVIGATION ========================
 
 async function initApp() {
   await refreshOverview();
-  await selectCorpus(STATE.activeCorpusId);
+  showBenchmarkOverview();
   populateInspectorPresets();
   renderGuidelinesReference();
   setupKeyboardShortcuts();
+  setupAdvancedOptionsSummary();
 }
 
 async function refreshOverview() {
@@ -124,7 +136,6 @@ async function refreshOverview() {
 
   renderExplorerSidebar();
   populateCompareSelects();
-  populateModelSelects();
 }
 
 function switchTab(tabId) {
@@ -132,7 +143,7 @@ function switchTab(tabId) {
   document.querySelectorAll("#main-nav .nav-tab").forEach((btn) => {
     btn.classList.toggle("active", btn.dataset.tab === tabId);
   });
-  ["explorer", "inspector", "annotate", "models"].forEach((id) => {
+  ["explorer", "inspector", "builder", "annotate", "models"].forEach((id) => {
     const sec = document.getElementById(`view-${id}`);
     if (sec) sec.classList.toggle("hidden", id !== tabId);
   });
@@ -141,11 +152,6 @@ function switchTab(tabId) {
     setTimeout(() => {
       Object.values(STATE.charts).forEach((c) => c && c.resize());
     }, 60);
-  } else if (tabId === "inspector") {
-    const unitsEl = document.getElementById("inspector-units-container");
-    if (!unitsEl.innerHTML.trim()) {
-      runLiveCodeInspect();
-    }
   } else if (tabId === "annotate") {
     initAnnotationStudio();
   } else if (tabId === "models") {
@@ -162,13 +168,24 @@ function renderExplorerSidebar() {
   const customGroup = document.getElementById("sidebar-custom-group");
   const customEl = document.getElementById("sidebar-custom-list");
 
+  // Benchmark Overview item: active highlight (D1)
+  const overviewItem = document.getElementById("sidebar-overview-item");
+  if (overviewItem) {
+    const isOverview = STATE.explorerMode === "overview";
+    overviewItem.className = `px-3 py-2 rounded-lg cursor-pointer transition flex items-center justify-between border mb-3 ${
+      isOverview
+        ? "bg-violet-50 border-violet-300 text-violet-950 font-semibold"
+        : "bg-white border-transparent hover:bg-slate-50 text-slate-700"
+    }`;
+  }
+
   const infra = corpora.filter((c) => c.builtin && c.layer === "infrastructure");
   const appl = corpora.filter((c) => c.builtin && c.layer === "application");
   const custom = corpora.filter((c) => !c.builtin);
 
   const renderItem = (c) => {
     const key = c.sdk || c.id;
-    const isActive = STATE.activeCorpusId === key || STATE.activeCorpusId === c.id;
+    const isActive = STATE.explorerMode === "sdk" && (STATE.activeCorpusId === key || STATE.activeCorpusId === c.id);
     const qPct = c.quantum_pct !== null && c.quantum_pct !== undefined ? `${(c.quantum_pct * 100).toFixed(1)}%` : "unlabeled";
     return `
       <div onclick="selectCorpus('${esc(c.id)}')"
@@ -200,9 +217,152 @@ function renderExplorerSidebar() {
 
 async function selectCorpus(corpusId) {
   STATE.activeCorpusId = corpusId;
+  STATE.explorerMode = "sdk";
   STATE.unitsOffset = 0;
+  updateExplorerModePanels();
   renderExplorerSidebar();
   await loadCorpusUnitsAndDashboard();
+}
+
+// ======================== BENCHMARK OVERVIEW (D1) ========================
+
+function getManifestRepos() {
+  return ((STATE.overview || {}).manifest || {}).repos || {};
+}
+
+// Pure-front-end aggregation over manifest repos of one architecture layer.
+// Pass layer === null to aggregate across every repo (both layers).
+function aggregateLayerStats(layer) {
+  const repos = getManifestRepos();
+  const agg = {
+    layer: layer || "all",
+    sdk: layer || "All SDKs",
+    python_files: 0,
+    ccps: 0,
+    sccus: 0,
+    quantum_sccus: 0,
+    category_counts: {},
+    ctype_by_entity: {},
+    quantum_ctype_by_entity: {},
+    comment_density: { comment_lines: 0, code_lines: 0, value: 0 },
+  };
+  const ctypes = ["docstring", "block", "inline"];
+  const entities = ["module", "class", "function"];
+  Object.values(repos).forEach((r) => {
+    if (layer && r.layer !== layer) return;
+    agg.python_files += r.python_files || r.files || 0;
+    agg.ccps += r.ccps || 0;
+    agg.sccus += r.sccus || 0;
+    agg.quantum_sccus += r.quantum_sccus || 0;
+    agg.comment_density.comment_lines += ((r.comment_density || {}).comment_lines) || 0;
+    agg.comment_density.code_lines += ((r.comment_density || {}).code_lines) || 0;
+    CATEGORY_ORDER.forEach((c) => {
+      agg.category_counts[c] = (agg.category_counts[c] || 0) + ((r.category_counts || {})[c] || 0);
+    });
+    ctypes.forEach((ct) => {
+      entities.forEach((en) => {
+        agg.quantum_ctype_by_entity[ct] = agg.quantum_ctype_by_entity[ct] || {};
+        agg.quantum_ctype_by_entity[ct][en] =
+          (agg.quantum_ctype_by_entity[ct][en] || 0) + ((((r.quantum_ctype_by_entity || {})[ct]) || {})[en] || 0);
+        agg.ctype_by_entity[ct] = agg.ctype_by_entity[ct] || {};
+        agg.ctype_by_entity[ct][en] =
+          (agg.ctype_by_entity[ct][en] || 0) + ((((r.ctype_by_entity || {})[ct]) || {})[en] || 0);
+      });
+    });
+  });
+  agg.quantum_proportion = agg.sccus > 0 ? agg.quantum_sccus / agg.sccus : 0;
+  agg.comment_density.value =
+    agg.comment_density.code_lines > 0 ? agg.comment_density.comment_lines / agg.comment_density.code_lines : 0;
+  return agg;
+}
+
+// Aggregate across every manifest repo (infrastructure + application layers).
+function aggregateAllStats() {
+  return aggregateLayerStats(null);
+}
+
+function updateExplorerModePanels() {
+  const isOverview = STATE.explorerMode === "overview";
+  document.getElementById("explorer-inspector-panel").classList.toggle("hidden", isOverview);
+  document.getElementById("explorer-overview-placeholder").classList.toggle("hidden", !isOverview);
+  document.getElementById("overview-sdk-table-card").classList.toggle("hidden", !isOverview);
+  // Compare SDKs is a benchmark-overview action only — hidden in single-SDK dashboards
+  document.getElementById("btn-toggle-compare").classList.toggle("hidden", !isOverview);
+}
+
+function showBenchmarkOverview() {
+  STATE.explorerMode = "overview";
+  updateExplorerModePanels();
+  renderExplorerSidebar();
+
+  const all = aggregateAllStats();
+
+  // Header
+  document.getElementById("exp-corpus-title").textContent = "TOSEM Benchmark Overview";
+  const badge = document.getElementById("exp-corpus-badge");
+  badge.className = "badge badge-infra";
+  badge.textContent = `${Object.keys(getManifestRepos()).length} SDKs`;
+  document.getElementById("exp-corpus-source").textContent = "Aggregated from manifest";
+  document.getElementById("exp-corpus-subtitle").textContent =
+    "Collective results across all 6 SDKs — 3 infrastructure (TOSEM benchmark) + 3 application (analyzed with this workbench) · Pick an SDK below (or in the sidebar) to drill into its sentences.";
+
+  // KPI cards (reuse the same slots as the single-SDK dashboard)
+  document.getElementById("kpi-quantum-pct").textContent = `${(all.quantum_proportion * 100).toFixed(1)}%`;
+  document.getElementById("kpi-quantum-count").textContent = `${all.quantum_sccus.toLocaleString()} quantum sentences`;
+  document.getElementById("kpi-sccus").textContent = all.sccus.toLocaleString();
+  document.getElementById("kpi-files").textContent = all.python_files.toLocaleString();
+  document.getElementById("kpi-ccps").textContent = all.ccps.toLocaleString();
+
+  // Third card slot: overall comment density across all repos (same metric as single-SDK dashboards)
+  document.getElementById("kpi-density").textContent = all.comment_density.value.toFixed(3);
+  document.getElementById("kpi-density-lines").textContent =
+    all.comment_density.code_lines > 0
+      ? `${all.comment_density.comment_lines.toLocaleString()} / ${all.comment_density.code_lines.toLocaleString()} LOC`
+      : "comment / code lines";
+
+  // Aggregate charts (reuses the single-SDK renderers)
+  renderRadarAndCategoryBars(all, { clickable: false });
+  renderResidenceChart();
+  renderOverviewSdkTable();
+}
+
+function renderOverviewSdkTable() {
+  const tbody = document.getElementById("overview-sdk-table");
+  if (!tbody) return;
+  const repos = getManifestRepos();
+  const fmt = (n) => (n || 0).toLocaleString();
+
+  const sdkRow = (r) => `
+    <tr onclick="selectCorpus('${esc(r.sdk)}')" class="cursor-pointer hover:bg-violet-50/60 border-b border-slate-100 transition"
+        title="Open ${esc(r.sdk)} dashboard">
+      <td class="py-2 pr-3 font-semibold text-slate-800 font-mono">${esc(r.sdk)}</td>
+      <td class="py-2 pr-3"><span class="badge ${r.layer === "infrastructure" ? "badge-infra" : "badge-app"}">${r.layer === "infrastructure" ? "Infrastructure" : "Application"}</span></td>
+      <td class="py-2 pr-3 text-right font-mono text-slate-600">${fmt(r.python_files || r.files)}</td>
+      <td class="py-2 pr-3 text-right font-mono text-slate-600">${fmt(r.ccps)}</td>
+      <td class="py-2 pr-3 text-right font-mono text-slate-600">${fmt(r.sccus)}</td>
+      <td class="py-2 pr-3 text-right font-mono font-semibold ${r.layer === "infrastructure" ? "text-blue-700" : "text-emerald-700"}">${((r.quantum_proportion || 0) * 100).toFixed(1)}%</td>
+      <td class="py-2 text-right font-mono text-slate-600">${(((r.comment_density || {}).value) || 0).toFixed(3)}</td>
+    </tr>`;
+
+  const subtotalRow = (layer, agg, n) => `
+    <tr class="border-b border-slate-200 bg-slate-50/80 font-bold text-slate-800">
+      <td class="py-2 pr-3" colspan="2">${layer === "infrastructure" ? "Infrastructure subtotal" : "Application subtotal"} (${n} SDKs)</td>
+      <td class="py-2 pr-3 text-right font-mono">${fmt(agg.python_files)}</td>
+      <td class="py-2 pr-3 text-right font-mono">${fmt(agg.ccps)}</td>
+      <td class="py-2 pr-3 text-right font-mono">${fmt(agg.sccus)}</td>
+      <td class="py-2 pr-3 text-right font-mono text-violet-700">${(agg.quantum_proportion * 100).toFixed(1)}%</td>
+      <td class="py-2 text-right font-mono">${agg.comment_density.value.toFixed(3)}</td>
+    </tr>`;
+
+  let html = "";
+  ["infrastructure", "application"].forEach((layer) => {
+    const items = Object.values(repos).filter((r) => r.layer === layer);
+    items.forEach((r) => {
+      html += sdkRow(r);
+    });
+    if (items.length) html += subtotalRow(layer, aggregateLayerStats(layer), items.length);
+  });
+  tbody.innerHTML = html;
 }
 
 async function loadCorpusUnitsAndDashboard() {
@@ -259,8 +419,8 @@ function renderCorpusKPIs(asset, stats) {
       : stats.source === "cc4q-pipeline"
       ? "CC4Q Pipeline (full corpus)"
       : "User Workspace Corpus";
-
-  document.getElementById("exp-download-link").href = `/api/corpora/${encodeURIComponent(asset.id)}/download`;
+  // Subtitle is benchmark-overview copy only — don't leave it stale in single-SDK mode
+  document.getElementById("exp-corpus-subtitle").textContent = "";
 
   document.getElementById("kpi-files").textContent = (stats.python_files || stats.files || 0).toLocaleString();
   document.getElementById("kpi-ccps").textContent = (stats.ccps || stats.sccus || 0).toLocaleString();
@@ -276,7 +436,9 @@ function renderCorpusKPIs(asset, stats) {
     sl > 0 ? `${cl.toLocaleString()} / ${sl.toLocaleString()} LOC` : "comment / code lines";
 }
 
-function renderRadarAndCategoryBars(stats) {
+function renderRadarAndCategoryBars(stats, opts) {
+  opts = opts || {};
+  const clickable = opts.clickable !== false; // benchmark-overview bars are display-only
   const catCounts = stats.category_counts || {};
   const qTotal = Math.max(1, stats.quantum_sccus || 1);
   const shares = CATEGORY_ORDER.map((c) => ((catCounts[c] || 0) / qTotal) * 100);
@@ -320,10 +482,12 @@ function renderRadarAndCategoryBars(stats) {
     const cnt = catCounts[cat] || 0;
     const pct = ((cnt / qTotal) * 100).toFixed(1);
     const meta = CATEGORY_META[cat];
-    const isSelected = activeCat === cat;
+    const isSelected = clickable && activeCat === cat;
     return `
-      <div onclick="filterByCategory('${esc(cat)}')"
-        class="p-1.5 rounded-lg cursor-pointer transition border ${
+      <div ${clickable ? `onclick="filterByCategory('${esc(cat)}')"` : ""}
+        class="p-1.5 rounded-lg transition border ${
+          clickable ? "cursor-pointer " : "cursor-default opacity-95 "
+        }${
           isSelected ? "bg-violet-50 border-violet-300" : "border-transparent hover:bg-slate-50"
         }">
         <div class="flex items-center justify-between text-xs mb-1">
@@ -331,7 +495,7 @@ function renderRadarAndCategoryBars(stats) {
             <span style="width:8px;height:8px;border-radius:2px;background:${meta.color};"></span>
             ${esc(meta.short)}
           </span>
-          <span class="font-mono text-slate-600">${pct}% <span class="text-slate-400">(${cnt})</span></span>
+          <span class="font-mono text-slate-600">${pct}% <span class="text-slate-400">(${cnt.toLocaleString()})</span></span>
         </div>
         <div class="w-full h-1.5 bg-slate-100 rounded-full overflow-hidden">
           <div style="width:${Math.min(100, pct)}%;background:${meta.color};" class="h-full rounded-full"></div>
@@ -342,6 +506,7 @@ function renderRadarAndCategoryBars(stats) {
 }
 
 function filterByCategory(cat) {
+  if (STATE.explorerMode !== "sdk") return; // benchmark overview bars are display-only
   const sel = document.getElementById("filter-category");
   if (sel.value === cat) {
     sel.value = "";
@@ -353,7 +518,14 @@ function filterByCategory(cat) {
 }
 
 function renderResidenceChart() {
-  const stats = STATE.activeCorpusStats;
+  if (STATE.explorerMode === "overview") {
+    renderResidenceChartForStats(aggregateAllStats(), false);
+  } else {
+    renderResidenceChartForStats(STATE.activeCorpusStats, true);
+  }
+}
+
+function renderResidenceChartForStats(stats, interactive) {
   if (!stats) return;
   const mode = document.getElementById("heatmap-mode").value;
   const ctypes = ["docstring", "block", "inline"];
@@ -376,17 +548,19 @@ function renderResidenceChart() {
   const chart = getChart("chart-residence");
   if (!chart) return;
   chart.off("click");
-  chart.on("click", (params) => {
-    if (params && params.data) {
-      const [, , , ct, ent] = params.data;
-      document.getElementById("filter-ctype").value = ct;
-      document.getElementById("filter-etype").value = ent;
-      if (mode !== "all_count") {
-        document.getElementById("filter-quantum").value = "quantum";
+  if (interactive) {
+    chart.on("click", (params) => {
+      if (params && params.data) {
+        const [, , , ct, ent] = params.data;
+        document.getElementById("filter-ctype").value = ct;
+        document.getElementById("filter-etype").value = ent;
+        if (mode !== "all_count") {
+          document.getElementById("filter-quantum").value = "quantum";
+        }
+        resetAndLoadUnits();
       }
-      resetAndLoadUnits();
-    }
-  });
+    });
+  }
 
   chart.setOption({
     tooltip: {
@@ -394,7 +568,7 @@ function renderResidenceChart() {
         const [, , val, ct, ent, raw] = p.data;
         return `<b>${ct} × ${ent}</b><br/>Count: ${raw.toLocaleString()} SCCUs${
           mode === "quantum_share" ? ` (${val}% of quantum)` : ""
-        }<br/><span style="color:#A78BFA">Click to filter inspector</span>`;
+        }<br/><span style="color:#A78BFA">${interactive ? "Click to filter inspector" : "Select an SDK to enable filtering"}</span>`;
       },
     },
     grid: { left: 75, right: 20, top: 15, bottom: 32 },
@@ -465,7 +639,7 @@ function renderExplorerUnitsList() {
             </div>
             <span class="text-[11px] font-mono text-slate-400">${esc(u.comment_type)} · ${esc(u.code_entity_type)}</span>
           </div>
-          <div class="text-xs text-slate-800 font-medium line-clamp-2 leading-relaxed">${esc(u.comment_text)}</div>
+          <div class="text-[13px] text-slate-800 font-medium line-clamp-2 leading-relaxed">${esc(u.comment_text)}</div>
           <div class="text-[11px] font-mono text-slate-400 truncate mt-1">${esc(u.file)}</div>
         </div>
       `;
@@ -509,7 +683,7 @@ function renderExplorerUnitDetail(idx) {
           <span>SEGMENTED COMMENT UNIT (SCCU)</span>
           <span>${esc(cLines)}</span>
         </div>
-        <p class="text-sm font-semibold text-slate-900 leading-relaxed">${esc(u.comment_text)}</p>
+        <p class="text-base font-medium text-slate-900 leading-relaxed">${esc(u.comment_text)}</p>
       </div>
 
       <!-- Enclosing Python Code Context -->
@@ -540,7 +714,6 @@ function sendUnitToLiveInspector(idx) {
   const code = u.code_snippet || `# ${u.comment_text}\n`;
   document.getElementById("inspector-code-input").value = code;
   switchTab("inspector");
-  switchInspectorSubtab("snippet");
   runLiveCodeInspect();
 }
 
@@ -670,11 +843,9 @@ function renderCompareChart() {
 // ======================== VIEW 2: LIVE CODE INSPECTOR & BUILDER ========================
 
 function populateInspectorPresets() {
+  // The quick-preset pill buttons are static; we only preload the first preset's code.
   const presets = (STATE.overview && STATE.overview.presets) || [];
-  const sel = document.getElementById("inspector-preset-select");
-  if (!presets.length) return;
-  sel.innerHTML = presets.map((p) => `<option value="${esc(p.id)}">${esc(p.title)}</option>`).join("");
-  loadCodePreset(presets[0].id);
+  if (presets.length) loadCodePreset(presets[0].id);
 }
 
 function loadCodePreset(presetId) {
@@ -685,69 +856,30 @@ function loadCodePreset(presetId) {
   }
 }
 
-function populateModelSelects() {
-  const models = (STATE.overview && STATE.overview.models) || {};
-  const userModels = models.user_models || [];
-  const opts = [
-    `<option value="default">Active Default (${esc(models.active_name || "Released Checkpoints")})</option>`,
-    `<option value="released">Released CC4Q Checkpoints (TOSEM)</option>`,
-    ...userModels.map((m) => `<option value="${esc(m.id)}">Custom: ${esc(m.name)} (${esc((m.axes || []).join(", "))})</option>`),
-  ].join("");
-
-  const inspSel = document.getElementById("inspector-model-select");
-  if (inspSel) inspSel.innerHTML = opts;
-
-  const evalA = document.getElementById("eval-model-a");
-  const evalB = document.getElementById("eval-model-b");
-  if (evalA && evalB) {
-    const evalOpts = [
-      `<option value="released">Released CC4Q Checkpoints</option>`,
-      ...userModels.map((m) => `<option value="${esc(m.id)}">${esc(m.name)}</option>`),
-    ].join("");
-    evalA.innerHTML = evalOpts;
-    evalB.innerHTML = evalOpts;
-    if (userModels.length > 0) {
-      evalB.value = userModels[0].id;
-    }
-  }
-
-  const corpora = (STATE.overview && STATE.overview.corpora) || [];
-  const cOpts = corpora.map((c) => `<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");
-  const annCorpus = document.getElementById("new-ann-corpus");
-  if (annCorpus) annCorpus.innerHTML = cOpts;
-  const evalCorpus = document.getElementById("eval-corpus");
-  if (evalCorpus) evalCorpus.innerHTML = cOpts;
-}
-
-function switchInspectorSubtab(sub) {
-  const isSnippet = sub === "snippet";
-  document.getElementById("inspector-sub-snippet").classList.toggle("hidden", !isSnippet);
-  document.getElementById("inspector-sub-repo").classList.toggle("hidden", isSnippet);
-  document.getElementById("subtab-btn-snippet").className = isSnippet ? "btn-quantum text-xs" : "btn-outline text-xs";
-  document.getElementById("subtab-btn-repo").className = !isSnippet ? "btn-quantum text-xs" : "btn-outline text-xs";
-}
-
 function openBuilderFromExplorer() {
-  switchTab("inspector");
-  switchInspectorSubtab("repo");
+  switchTab("builder");
 }
 
 async function runLiveCodeInspect() {
   const code = document.getElementById("inspector-code-input").value;
-  const modelId = document.getElementById("inspector-model-select").value;
   const btn = document.getElementById("btn-run-inspect");
   btn.disabled = true;
   btn.innerHTML = `<span>⏳ Analyzing AST &amp; Running Quantum BERT…</span>`;
+
+  // Explicit user action — swap the empty state for results (or an inline error bar).
+  const emptyState = document.getElementById("inspector-empty-state");
+  if (emptyState) emptyState.classList.add("hidden");
 
   try {
     const res = await fetch("/api/inspect", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code, model_id: modelId }),
+      body: JSON.stringify({ code }), // server resolves the currently active classifier
     });
     const data = await res.json();
     if (data.error) {
-      document.getElementById("inspector-summary-panel").innerHTML = `<div class="text-xs text-rose-600">${esc(data.error)}</div>`;
+      document.getElementById("inspector-units-container").innerHTML =
+        `<div class="text-xs text-rose-700 bg-rose-50 border border-rose-200 rounded-lg px-3 py-2">${esc(data.error)}</div>`;
       return;
     }
     renderInspectorResults(data);
@@ -758,36 +890,8 @@ async function runLiveCodeInspect() {
 }
 
 function renderInspectorResults(data) {
-  const audit = data.audit || {};
   const units = data.units || [];
   document.getElementById("inspector-elapsed-badge").textContent = `${data.elapsed_ms || 0} ms · model: ${data.model_id}`;
-
-  const findingsHtml = (audit.findings || [])
-    .map((f) => {
-      const isPass = f.severity === "pass";
-      return `
-        <div class="p-2.5 rounded-lg border text-xs flex items-start gap-2 ${
-          isPass ? "bg-emerald-50/60 border-emerald-200 text-emerald-950" : "bg-amber-50/70 border-amber-200 text-amber-950"
-        }">
-          <span>${isPass ? "✅" : "⚠️"}</span>
-          <div>
-            <div class="font-bold">${esc(f.title)}</div>
-            <div class="text-slate-600 mt-0.5">${esc(f.detail)}</div>
-          </div>
-        </div>
-      `;
-    })
-    .join("");
-
-  document.getElementById("inspector-summary-panel").innerHTML = `
-    <div class="space-y-3">
-      <div class="flex items-center justify-between">
-        <h3 class="text-sm font-bold text-slate-900">Quantum Documentation Health Check (TOSEM Guidelines)</h3>
-        <span class="badge badge-quantum">${audit.quantum_sccus || 0} / ${audit.total_sccus || 0} Quantum SCCUs (${((audit.quantum_ratio || 0) * 100).toFixed(0)}%)</span>
-      </div>
-      <div class="space-y-2">${findingsHtml}</div>
-    </div>
-  `;
 
   const container = document.getElementById("inspector-units-container");
   if (!units.length) {
@@ -797,26 +901,6 @@ function renderInspectorResults(data) {
 
   container.innerHTML = units
     .map((u, i) => {
-      const qProb = u.quantum_prob !== undefined ? (u.quantum_prob * 100).toFixed(1) : u.quantum_related ? "95.0" : "5.0";
-      const catProbs = u.category_probs || {};
-      const topCats = Object.entries(catProbs)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 3);
-
-      const probBars = u.quantum_related && topCats.length
-        ? `<div class="mt-2 pt-2 border-t border-slate-100 grid grid-cols-3 gap-2">
-            ${topCats
-              .map(([cname, p]) => {
-                const m = CATEGORY_META[cname] || CATEGORY_META["Others"];
-                return `<div class="text-[11px]">
-                  <div class="flex justify-between text-slate-600"><span>${esc(m.short)}</span><span class="font-mono">${(p * 100).toFixed(0)}%</span></div>
-                  <div class="w-full h-1 bg-slate-100 rounded-full mt-0.5"><div style="width:${(p * 100).toFixed(0)}%;background:${m.color};" class="h-full rounded-full"></div></div>
-                </div>`;
-              })
-              .join("")}
-          </div>`
-        : "";
-
       const lineTag = u.comment_line && u.comment_line.length === 2 ? `L${u.comment_line[0]}–${u.comment_line[1]}` : "";
 
       return `
@@ -831,8 +915,7 @@ function renderInspectorResults(data) {
             </div>
             <span class="text-[11px] font-mono text-slate-500">${esc(u.comment_type)} · ${esc(u.entity_type)} ${esc(lineTag)}</span>
           </div>
-          <p class="text-xs font-semibold text-slate-900 leading-relaxed">${esc(u.text)}</p>
-          ${probBars}
+          <p class="text-[14.5px] font-medium text-slate-900 leading-relaxed">${esc(u.text)}</p>
         </div>
       `;
     })
@@ -915,62 +998,112 @@ async function initAnnotationStudio() {
   const res = await fetch("/api/annotations");
   const data = await res.json();
   STATE.sessions = data.sessions || [];
-  const sel = document.getElementById("ann-session-select");
-  if (!STATE.sessions.length) {
-    sel.innerHTML = `<option value="">No sessions yet</option>`;
-    return;
+
+  // Reflect the seeded demo session size in the Load Demo button / empty-state card.
+  const demo = STATE.sessions.find((s) => s.builtin_spotcheck || /Unseen SDKs/i.test(s.name || ""));
+  const demoTotal = demo ? ` (${demo.total} units)` : "";
+  const btn = document.getElementById("btn-load-demo");
+  if (btn) btn.textContent = `📂 Load Demo Benchmark${demoTotal}`;
+  const demoTitle = document.getElementById("ann-empty-demo-title");
+  if (demoTitle) demoTitle.textContent = `Load Demo Benchmark${demoTotal}`;
+
+  updateAnnotationEmptyState();
+  // Data shows only after the user explicitly loads the demo or uploads a file;
+  // if a session is already active in this visit, just re-render its workspace.
+  if (STATE.activeSession && STATE.sessionItems.length) {
+    renderAnnotationMetrics();
+    renderAnnotationQueue();
   }
-  sel.innerHTML = STATE.sessions
-    .map((s) => `<option value="${esc(s.id)}">${esc(s.name)} (${s.labeled_count || 0}/${s.total || 0})</option>`)
-    .join("");
-
-  const targetId = STATE.activeSession ? STATE.activeSession.id : STATE.sessions[0].id;
-  sel.value = targetId;
-  await loadAnnotationSession(targetId);
 }
 
-function toggleNewAnnotationModal() {
-  document.getElementById("new-ann-drawer").classList.toggle("hidden");
+// D3: the Studio is a two-card landing (Load Demo / Upload JSONL) until a session is loaded.
+function updateAnnotationEmptyState() {
+  const empty = document.getElementById("ann-empty-state");
+  const workspace = document.getElementById("ann-workspace");
+  const loaded = !!(STATE.activeSession && STATE.sessionItems.length);
+  if (empty) empty.classList.toggle("hidden", loaded);
+  if (workspace) workspace.classList.toggle("hidden", !loaded);
 }
 
-function startAnnotationFromCurrentCorpus() {
-  switchTab("annotate");
-  setTimeout(() => {
-    const drawer = document.getElementById("new-ann-drawer");
-    drawer.classList.remove("hidden");
-    const sel = document.getElementById("new-ann-corpus");
-    if (sel) sel.value = STATE.activeCorpusId;
-    document.getElementById("new-ann-name").value = `${STATE.activeCorpusId}-review`;
-  }, 100);
-}
-
-async function createNewAnnotationSession() {
-  const name = document.getElementById("new-ann-name").value.trim();
-  const corpusId = document.getElementById("new-ann-corpus").value;
-  const sampleSize = parseInt(document.getElementById("new-ann-size").value || "50", 10);
-  const stratRaw = document.getElementById("new-ann-stratify").value;
-  const stratifyBy = stratRaw ? stratRaw.split(",") : [];
-  const mode = document.getElementById("new-ann-mode").value;
-
-  const res = await fetch("/api/annotations", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      name,
-      corpus_id: corpusId,
-      sample_size: sampleSize,
-      stratify_by: stratifyBy,
-      mode,
-    }),
-  });
+// D3: open (or re-seed and open) the pre-built labeling demo session — unlabeled items
+// carrying model predictions, so the human can verify/adjudicate from scratch.
+async function loadDemoBenchmarkSession() {
+  const res = await fetch("/api/annotations"); // the server re-seeds the demo session when missing
   const data = await res.json();
-  if (data.error) {
-    alert(data.error);
+  STATE.sessions = data.sessions || [];
+  const demo = STATE.sessions.find((s) => s.builtin_spotcheck || /Unseen SDKs/i.test(s.name || ""));
+  if (!demo) {
+    alert('Demo benchmark session not found. Make sure the server can access exp/spotcheck_annotation.csv, then retry.');
     return;
   }
-  document.getElementById("new-ann-drawer").classList.add("hidden");
-  STATE.activeSession = data.session;
-  await initAnnotationStudio();
+  await loadAnnotationSession(demo.id);
+}
+
+function uploadJsonlToLabel() {
+  document.getElementById("ann-upload-input").click();
+}
+
+// D3: parse a user-provided .jsonl / .json file and create a labeling session from it.
+async function handleAnnotationUpload(input) {
+  const file = input.files && input.files[0];
+  input.value = ""; // allow re-picking the same file later
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const trimmed = text.trim();
+    if (!trimmed) throw new Error("The file is empty.");
+
+    let records;
+    if (file.name.toLowerCase().endsWith(".json")) {
+      const parsed = JSON.parse(trimmed);
+      if (!Array.isArray(parsed)) throw new Error("A .json file must contain an array of record objects.");
+      records = parsed;
+    } else {
+      records = [];
+      const lines = trimmed.split("\n");
+      for (let i = 0; i < lines.length; i++) {
+        if (!lines[i].trim()) continue;
+        try {
+          records.push(JSON.parse(lines[i]));
+        } catch (e) {
+          throw new Error(`Line ${i + 1} is not valid JSON.`);
+        }
+      }
+    }
+    if (!records.length) throw new Error("No records found in the file.");
+
+    const MAX_RECORDS = 1000;
+    const totalCount = records.length;
+    let truncatedNote = "";
+    if (records.length > MAX_RECORDS) {
+      records = records.slice(0, MAX_RECORDS);
+      truncatedNote = `\n(Truncated to the first ${MAX_RECORDS} of ${totalCount} records.)`;
+    }
+
+    // Records carrying model labels → adjudicate (review predictions); otherwise blind labeling.
+    const mode = records.some((r) => r && typeof r === "object" && "quantum_related" in r) ? "adjudicate" : "blind";
+
+    const res = await fetch("/api/annotations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: file.name.replace(/\.(jsonl|json)$/i, ""),
+        sample_size: records.length,
+        mode,
+        records,
+      }),
+    });
+    const data = await res.json();
+    if (data.error) {
+      alert(`Could not create session: ${data.error}`);
+      return;
+    }
+    if (truncatedNote) alert(`Session created with ${records.length} records.${truncatedNote}`);
+    STATE.activeSession = data.session;
+    await loadAnnotationSession(data.session.id);
+  } catch (err) {
+    alert(`Upload failed: ${err.message || err}`);
+  }
 }
 
 async function loadAnnotationSession(sessionId) {
@@ -985,6 +1118,7 @@ async function loadAnnotationSession(sessionId) {
   STATE.activeAnnFilteredPos = 0;
 
   document.getElementById("ann-export-link").href = `/api/annotations/${encodeURIComponent(sessionId)}/export?task=full`;
+  updateAnnotationEmptyState();
   renderAnnotationMetrics();
   renderAnnotationQueue();
 }
@@ -997,30 +1131,6 @@ function renderAnnotationMetrics() {
 
   document.getElementById("ann-kpi-progress").textContent = `${done} / ${total} (${pct}%)`;
   document.getElementById("ann-progress-bar").style.width = `${pct}%`;
-
-  document.getElementById("ann-kpi-agreement").textContent =
-    m.agreement !== null && m.agreement !== undefined ? `${(m.agreement * 100).toFixed(1)}%` : "—";
-  const ci = m.wilson95 || [null, null];
-  document.getElementById("ann-kpi-ci").textContent =
-    ci[0] !== null ? `95% CI: ${(ci[0] * 100).toFixed(1)}–${(ci[1] * 100).toFixed(1)}%` : "Wilson 95% CI: —";
-
-  document.getElementById("ann-kpi-kappa").textContent =
-    m.kappa !== null && m.kappa !== undefined ? m.kappa.toFixed(3) : "—";
-
-  const p = m.precision !== null && m.precision !== undefined ? `${(m.precision * 100).toFixed(1)}%` : "—";
-  const r = m.recall !== null && m.recall !== undefined ? `${(m.recall * 100).toFixed(1)}%` : "—";
-  document.getElementById("ann-kpi-pr").textContent = `${p} / ${r}`;
-  document.getElementById("ann-kpi-f1").textContent =
-    m.f1 !== null && m.f1 !== undefined ? `F1: ${(m.f1 * 100).toFixed(1)}%` : "F1: —";
-
-  const c = m.confusion || { tp: 0, fp: 0, fn: 0, tn: 0 };
-  document.getElementById("ann-kpi-confusion").textContent = `TP:${c.tp} FP:${c.fp} FN:${c.fn} TN:${c.tn}`;
-
-  document.getElementById("ann-kpi-cat-agree").textContent =
-    m.category_agreement !== null && m.category_agreement !== undefined
-      ? `${(m.category_agreement * 100).toFixed(1)}%`
-      : "—";
-  document.getElementById("ann-kpi-cat-n").textContent = `${m.category_compared || 0} quantum units`;
 }
 
 function renderAnnotationQueue() {
@@ -1031,9 +1141,6 @@ function renderAnnotationQueue() {
     const labeled = it.human_quantum_related !== null && it.human_quantum_related !== undefined;
     if (filter === "unlabeled" && labeled) return;
     if (filter === "labeled" && !labeled) return;
-    if (filter === "disagree") {
-      if (!labeled || Boolean(it.human_quantum_related) === Boolean(it.model_quantum_related)) return;
-    }
     if (filter === "quantum" && it.human_quantum_related !== true) return;
     indices.push(idx);
   });
@@ -1057,7 +1164,6 @@ function renderAnnotationQueue() {
       const it = STATE.sessionItems[realIdx];
       const hq = it.human_quantum_related;
       const isLabeled = hq !== null && hq !== undefined;
-      const disagree = isLabeled && Boolean(hq) !== Boolean(it.model_quantum_related);
 
       let statusPill = `<span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-500">Unlabeled</span>`;
       if (isLabeled) {
@@ -1071,11 +1177,10 @@ function renderAnnotationQueue() {
           <div class="flex items-center justify-between text-xs mb-1">
             <span class="font-mono font-bold text-slate-600">#${realIdx + 1} · ${esc(it.sdk)}</span>
             <div class="flex items-center gap-1">
-              ${disagree ? `<span title="Human disagrees with Model" class="text-[10px] px-1.5 py-0.5 rounded bg-rose-100 text-rose-700 font-bold">≠ Model</span>` : ""}
               ${statusPill}
             </div>
           </div>
-          <div class="text-xs text-slate-800 truncate">${esc(it.comment_text)}</div>
+          <div class="text-[13px] text-slate-800 line-clamp-2 leading-relaxed">${esc(it.comment_text)}</div>
         </div>
       `;
     })
@@ -1096,23 +1201,9 @@ function renderActiveAnnotationItem() {
 
   document.getElementById("ann-curr-index").textContent = `#${realIdx + 1} of ${STATE.sessionItems.length}`;
   document.getElementById("ann-curr-sdk").textContent = it.sdk || "corpus";
-  document.getElementById("ann-curr-meta").textContent = `${it.comment_type || "—"} · ${it.code_entity_type || "—"}`;
   document.getElementById("ann-curr-file").textContent = it.file || "";
   document.getElementById("ann-curr-text").textContent = it.comment_text || "";
   document.getElementById("ann-item-note").value = it.notes || "";
-
-  // Model Pre-label Banner (shown in adjudicate mode)
-  const isBlind = STATE.activeSession && STATE.activeSession.mode === "blind";
-  const banner = document.getElementById("ann-model-banner");
-  if (isBlind) {
-    banner.classList.add("hidden");
-  } else {
-    banner.classList.remove("hidden");
-    document.getElementById("ann-model-pred-badges").innerHTML = `
-      ${quantumBadge(it.model_quantum_related)}
-      ${it.model_quantum_related ? catBadge(it.model_quantum_category) : ""}
-    `;
-  }
 
   // Code snippet
   const codeEl = document.getElementById("ann-curr-code");
@@ -1179,19 +1270,9 @@ async function submitHumanLabel(isQuantum, category) {
   STATE.sessionMetrics = data.metrics;
   renderAnnotationMetrics();
 
-  if (document.getElementById("ann-auto-advance").checked) {
-    if (STATE.activeAnnFilteredPos + 1 < STATE.filteredSessionIndices.length) {
-      STATE.activeAnnFilteredPos += 1;
-    }
-  }
+  // Stay on the current item so both step results remain visible — the user
+  // moves on explicitly via Prev / Next (← / →).
   renderAnnotationQueue();
-}
-
-function acceptModelPrediction() {
-  const realIdx = STATE.filteredSessionIndices[STATE.activeAnnFilteredPos];
-  const it = STATE.sessionItems[realIdx];
-  if (!it) return;
-  submitHumanLabel(Boolean(it.model_quantum_related), it.model_quantum_category);
 }
 
 async function saveItemNote(noteText) {
@@ -1253,9 +1334,6 @@ function setupKeyboardShortcuts() {
     } else if (k === "n") {
       e.preventDefault();
       submitHumanLabel(false, null);
-    } else if (k === " ") {
-      e.preventDefault();
-      acceptModelPrediction();
     } else if (["1", "2", "3", "4", "5", "6"].includes(k)) {
       e.preventDefault();
       const cat = CATEGORY_ORDER[parseInt(k, 10) - 1];
@@ -1270,18 +1348,6 @@ function setupKeyboardShortcuts() {
   });
 }
 
-function openTrainWithCurrentSession() {
-  const sid = STATE.activeSession ? STATE.activeSession.id : null;
-  switchTab("models");
-  setTimeout(() => {
-    document.getElementById("train-source-type").value = "session";
-    toggleTrainSourceInputs();
-    if (sid) {
-      document.getElementById("train-session-select").value = sid;
-    }
-  }, 120);
-}
-
 // ======================== VIEW 4: MODEL TRAINER & REGISTRY ========================
 
 async function loadModelsStudio() {
@@ -1290,94 +1356,7 @@ async function loadModelsStudio() {
   const data = await res.json();
   STATE.modelsInfo = data;
 
-  renderModelRegistryCards();
   updateTrainSourceOptions();
-}
-
-function renderModelRegistryCards() {
-  const models = (STATE.overview && STATE.overview.models) || {};
-  const released = models.released || [];
-  const userModels = models.user_models || [];
-  const activeId = models.active_id || "released";
-
-  document.getElementById("released-models-grid").innerHTML = released
-    .map(
-      (m) => `
-      <div class="p-4 rounded-xl bg-slate-50 border ${
-        activeId === "released" ? "border-violet-300 ring-1 ring-violet-200" : "border-slate-200"
-      } flex flex-col justify-between space-y-2">
-        <div>
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-sm text-slate-900">${esc(m.name)}</span>
-            <span class="badge ${m.ready ? "badge-quantum" : "badge-nonquantum"}">${
-        m.ready ? "Ready on Disk" : "Missing Checkpoint"
-      }</span>
-          </div>
-          <p class="text-xs text-slate-500 mt-1 leading-relaxed">${esc(m.desc)}</p>
-        </div>
-        <div class="pt-2 border-t border-slate-200/80 flex items-center justify-between text-xs font-mono text-slate-600">
-          <span>Base: ${esc(m.base)}</span>
-          <span>Held-out F1: <b>${(m.f1 * 100).toFixed(1)}%</b> · κ=${m.kappa}</span>
-        </div>
-      </div>
-    `
-    )
-    .join("");
-
-  const userGrid = document.getElementById("user-models-grid");
-  if (!userModels.length) {
-    userGrid.innerHTML = `
-      <div class="col-span-3 p-6 rounded-xl bg-slate-50 border border-dashed border-slate-300 text-center text-xs text-slate-500">
-        No custom fine-tuned models registered yet. Use the <b>Train Your Own Quantum Classifier</b> studio below to fine-tune a model on your labeled data!
-      </div>
-    `;
-    return;
-  }
-
-  userGrid.innerHTML = userModels
-    .map((m) => {
-      const isDef = m.is_default;
-      return `
-        <div class="p-4 rounded-xl bg-white border ${
-          isDef ? "border-violet-500 ring-1 ring-violet-400" : "border-slate-200"
-        } flex flex-col justify-between space-y-3">
-          <div>
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-sm text-slate-900">${esc(m.name)}</span>
-              <span class="badge ${isDef ? "badge-quantum" : "badge-nonquantum"}">${
-        isDef ? "★ Active Default" : "Custom Model"
-      }</span>
-            </div>
-            <div class="text-xs font-mono text-slate-500 mt-1">Task: ${esc((m.axes || []).join(", "))}</div>
-            <div class="text-[11px] text-slate-400 mt-0.5">Created: ${esc(m.created || "")}</div>
-          </div>
-          <div class="flex items-center gap-2 pt-2 border-t border-slate-100">
-            ${
-              !isDef
-                ? `<button onclick="setActiveModel('${esc(m.id)}')" class="btn-quantum text-xs py-1 px-2.5">★ Set Active</button>`
-                : ""
-            }
-            <a href="/api/models/${encodeURIComponent(m.id)}/download" class="btn-outline text-xs py-1 px-2.5 no-underline">⬇ Zip</a>
-            <button onclick="deleteUserModel('${esc(m.id)}')" class="btn-outline text-xs py-1 px-2.5 text-rose-600">Delete</button>
-          </div>
-        </div>
-      `;
-    })
-    .join("");
-}
-
-async function setActiveModel(modelId) {
-  await fetch("/api/models/default", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model_id: modelId }),
-  });
-  await loadModelsStudio();
-}
-
-async function deleteUserModel(modelId) {
-  await fetch(`/api/models/${encodeURIComponent(modelId)}`, { method: "DELETE" });
-  await loadModelsStudio();
 }
 
 function updateTrainSourceOptions() {
@@ -1388,44 +1367,47 @@ function updateTrainSourceOptions() {
   toggleTrainSourceInputs();
 }
 
+// Keep the collapsed ⚙️ Training Parameters summary in sync with the folded controls (spec §2.4.2)
+function updateAdvancedOptionsSummary() {
+  const summaryEl = document.getElementById("train-advanced-summary");
+  if (!summaryEl) return;
+  const epochs = document.getElementById("train-epochs").value || "2";
+  const batch = document.getElementById("train-batch").value || "16";
+  summaryEl.textContent = `⚙️ Training Parameters (${epochs} Epochs · Batch ${batch})`;
+}
+
+function setupAdvancedOptionsSummary() {
+  ["train-epochs", "train-batch"].forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("change", updateAdvancedOptionsSummary);
+  });
+  updateAdvancedOptionsSummary();
+}
+
 function toggleTrainSourceInputs() {
   if (!STATE.modelsInfo) return;
   const srcType = document.getElementById("train-source-type").value;
   const task = document.getElementById("train-task").value;
-  const lbl = document.getElementById("train-source-detail-label");
-  const sel = document.getElementById("train-session-select");
   const up = document.getElementById("train-upload-input");
 
-  if (srcType === "session") {
-    lbl.textContent = "Select Annotation Studio Session";
-    sel.classList.remove("hidden");
-    up.classList.add("hidden");
-    const sessions = (STATE.modelsInfo.training_sources && STATE.modelsInfo.training_sources.sessions) || [];
-    sel.innerHTML = sessions.length
-      ? sessions.map((s) => `<option value="${esc(s.id)}">${esc(s.name)} (${s.labeled_count} labeled)</option>`).join("")
-      : `<option value="">No labeled sessions available</option>`;
-  } else if (srcType === "gold") {
-    lbl.textContent = "Built-in Gold Benchmark Dataset";
-    sel.classList.remove("hidden");
-    up.classList.add("hidden");
-    const gold = (STATE.modelsInfo.training_sources && STATE.modelsInfo.training_sources.gold && STATE.modelsInfo.training_sources.gold[task]) || {};
-    sel.innerHTML = `<option value="gold">${esc(gold.name || task)} (${(gold.rows || 0).toLocaleString()} labeled units)</option>`;
-  } else {
-    lbl.textContent = "Upload Labeled JSONL File";
-    sel.classList.add("hidden");
+  // Reflect the built-in demo dataset size in the gold option label.
+  const gold = (STATE.modelsInfo.training_sources && STATE.modelsInfo.training_sources.gold && STATE.modelsInfo.training_sources.gold[task]) || {};
+  const goldOpt = document.querySelector('#train-source-type option[value="gold"]');
+  if (goldOpt) goldOpt.textContent = `Demo Dataset (${(gold.rows || 0).toLocaleString()} units)`;
+
+  if (srcType === "upload") {
     up.classList.remove("hidden");
+  } else {
+    up.classList.add("hidden");
   }
 }
 
 async function startModelTraining() {
   const task = document.getElementById("train-task").value;
-  const baseModel = document.getElementById("train-base-model").value;
   const sourceType = document.getElementById("train-source-type").value;
-  const sessionId = document.getElementById("train-session-select").value;
   const modelName = document.getElementById("train-model-name").value.trim();
   const epochs = parseInt(document.getElementById("train-epochs").value || "2", 10);
   const batchSize = parseInt(document.getElementById("train-batch").value || "16", 10);
-  const maxSamples = document.getElementById("train-max-samples").value.trim();
 
   let uploadedRecords = null;
   if (sourceType === "upload") {
@@ -1450,14 +1432,11 @@ async function startModelTraining() {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       task,
-      base_model: baseModel,
       source_type: sourceType,
-      session_id: sessionId,
       records: uploadedRecords,
       model_name: modelName,
       epochs,
       batch_size: batchSize,
-      max_samples: maxSamples || null,
     }),
   });
   const job = await res.json();
@@ -1509,89 +1488,23 @@ async function pollTrainJob(jobId) {
     const resEl = document.getElementById("train-test-results");
     resEl.classList.remove("hidden");
     resEl.innerHTML = `
-      <div class="flex flex-wrap items-center justify-between gap-2 text-xs">
-        <span class="font-bold text-emerald-800">✅ Held-Out Test Split Results (${tr.test_rows || 0} units):</span>
-        <div class="flex items-center gap-3 font-mono">
-          <span>F1: <b>${((tr.f1 || 0) * 100).toFixed(1)}%</b></span>
-          <span>Acc: <b>${((tr.accuracy || 0) * 100).toFixed(1)}%</b></span>
-          <span>Prec: <b>${((tr.precision || 0) * 100).toFixed(1)}%</b></span>
-          <span>Rec: <b>${((tr.recall || 0) * 100).toFixed(1)}%</b></span>
+      <div class="space-y-1.5 text-xs">
+        <div class="flex flex-wrap items-center justify-between gap-2">
+          <span class="font-bold text-emerald-800">✅ Held-Out Test Split Results (${tr.test_rows || 0} units):</span>
+          <div class="flex items-center gap-3 font-mono">
+            <span>F1: <b>${((tr.f1 || 0) * 100).toFixed(1)}%</b></span>
+            <span>Acc: <b>${((tr.accuracy || 0) * 100).toFixed(1)}%</b></span>
+            <span>Prec: <b>${((tr.precision || 0) * 100).toFixed(1)}%</b></span>
+            <span>Rec: <b>${((tr.recall || 0) * 100).toFixed(1)}%</b></span>
+          </div>
+        </div>
+        <div class="font-mono text-[11px] text-slate-500 break-all">
+          💾 Model saved to: <b>${esc(job.saved_to || "")}</b>
         </div>
       </div>
     `;
-    await loadModelsStudio();
   } else if (job.status === "failed") {
     document.getElementById("train-stage-label").textContent = `Training Failed: ${job.error}`;
-  }
-}
-
-async function runModelComparison() {
-  const modelA = document.getElementById("eval-model-a").value;
-  const modelB = document.getElementById("eval-model-b").value;
-  const corpusId = document.getElementById("eval-corpus").value;
-  const btn = document.getElementById("btn-run-eval");
-  btn.disabled = true;
-  btn.innerHTML = `<span>⏳ Comparing Models on Corpus…</span>`;
-
-  try {
-    const res = await fetch("/api/evaluations/run", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ model_a: modelA, model_b: modelB, corpus_id: corpusId, max_units: 200 }),
-    });
-    const data = await res.json();
-    const box = document.getElementById("eval-results-box");
-    if (data.error) {
-      box.innerHTML = `<div class="text-xs text-rose-600">${esc(data.error)}</div>`;
-      return;
-    }
-
-    const ci = data.wilson95 || [0, 0];
-    box.innerHTML = `
-      <div class="grid grid-cols-3 gap-2.5 text-xs">
-        <div class="p-3 rounded-lg bg-violet-50 border border-violet-200">
-          <div class="text-violet-800">Binary Agreement</div>
-          <div class="text-lg font-bold text-violet-700 font-mono">${((data.agreement || 0) * 100).toFixed(1)}%</div>
-          <div class="text-[10px] text-violet-600 font-mono">CI: ${(ci[0] * 100).toFixed(1)}–${(ci[1] * 100).toFixed(1)}%</div>
-        </div>
-        <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-          <div class="text-slate-500">Cohen's Kappa (κ)</div>
-          <div class="text-lg font-bold text-slate-900 font-mono">${data.kappa !== null ? data.kappa.toFixed(3) : "1.000"}</div>
-          <div class="text-[10px] text-slate-400">n = ${data.n} units</div>
-        </div>
-        <div class="p-3 rounded-lg bg-slate-50 border border-slate-200">
-          <div class="text-slate-500">Precision / Recall</div>
-          <div class="text-sm font-bold text-slate-900 font-mono mt-1">${
-            data.precision !== null ? (data.precision * 100).toFixed(0) : "100"
-          }% / ${data.recall !== null ? (data.recall * 100).toFixed(0) : "100"}%</div>
-          <div class="text-[10px] text-slate-400">${(data.disagreements || []).length} disagreements</div>
-        </div>
-      </div>
-      ${
-        (data.disagreements || []).length > 0
-          ? `<div class="max-h-48 overflow-y-auto divide-y divide-slate-100 border border-slate-200 rounded-lg p-2 text-xs">
-              ${data.disagreements
-                .slice(0, 12)
-                .map(
-                  (d) => `<div class="py-1.5">
-                  <div class="font-medium text-slate-800">${esc(d.comment_text)}</div>
-                  <div class="text-[11px] font-mono text-slate-500">
-                    A: <b>${d.a_quantum ? d.a_category || "Quantum" : "Non-Q"}</b> vs B: <b>${
-                    d.b_quantum ? d.b_category || "Quantum" : "Non-Q"
-                  }</b>
-                  </div>
-                </div>`
-                )
-                .join("")}
-            </div>`
-          : `<div class="p-3 rounded-lg bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-medium">
-              100% agreement across all ${data.n} evaluated comment units!
-            </div>`
-      }
-    `;
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = `<span>Run Agreement &amp; Profile Comparison</span>`;
   }
 }
 

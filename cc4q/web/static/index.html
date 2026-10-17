@@ -30,7 +30,7 @@
         </div>
       </div>
 
-      <!-- 4 Core Workflow Tabs -->
+      <!-- 5 Core Workflow Tabs -->
       <nav class="flex items-center gap-1.5" id="main-nav">
         <button class="nav-tab active" data-tab="explorer" onclick="switchTab('explorer')">
           <span class="nav-step">1</span>
@@ -38,15 +38,19 @@
         </button>
         <button class="nav-tab" data-tab="inspector" onclick="switchTab('inspector')">
           <span class="nav-step">2</span>
-          <span>Live Inspector &amp; Builder</span>
+          <span>Live Inspector</span>
+        </button>
+        <button class="nav-tab" data-tab="builder" onclick="switchTab('builder')">
+          <span class="nav-step">3</span>
+          <span>Corpus Builder</span>
         </button>
         <button class="nav-tab" data-tab="annotate" onclick="switchTab('annotate')">
-          <span class="nav-step">3</span>
+          <span class="nav-step">4</span>
           <span>Annotation Studio</span>
         </button>
         <button class="nav-tab" data-tab="models" onclick="switchTab('models')">
-          <span class="nav-step">4</span>
-          <span>Model Trainer &amp; Registry</span>
+          <span class="nav-step">5</span>
+          <span>Model Trainer</span>
         </button>
       </nav>
 
@@ -88,9 +92,18 @@
               </button>
             </div>
 
+            <!-- Benchmark Overview item (default landing selection, D1) -->
+            <div id="sidebar-overview-item" onclick="showBenchmarkOverview()"
+              class="px-3 py-2 rounded-lg cursor-pointer transition flex items-center justify-between border mb-3 bg-white border-transparent hover:bg-slate-50 text-slate-700">
+              <div class="truncate pr-2">
+                <div class="text-xs font-semibold truncate">📊 Benchmark Overview</div>
+                <div class="text-[11px] text-slate-400 font-mono">TOSEM benchmark · all SDKs</div>
+              </div>
+            </div>
+
             <!-- Infrastructure Layer Group -->
             <div class="mb-3">
-              <div class="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5 px-1">
+              <div class="flex items-center justify-between gap-2 pr-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5 px-1">
                 <span>Infrastructure Layer (TOSEM)</span>
                 <span class="text-blue-600 font-mono">34.3% Q</span>
               </div>
@@ -99,7 +112,7 @@
 
             <!-- Application Layer Group -->
             <div class="mb-3">
-              <div class="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5 px-1">
+              <div class="flex items-center justify-between gap-2 pr-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5 px-1">
                 <span>Application Layer (New SDKs)</span>
                 <span class="text-emerald-600 font-mono">26.0% Q</span>
               </div>
@@ -108,22 +121,11 @@
 
             <!-- User-Built Corpora Group -->
             <div id="sidebar-custom-group" class="hidden">
-              <div class="flex items-center justify-between text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5 px-1">
+              <div class="flex items-center justify-between gap-2 pr-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400 mb-1.5 px-1">
                 <span>Custom / Built Corpora</span>
               </div>
               <div id="sidebar-custom-list" class="space-y-1"></div>
             </div>
-          </div>
-
-          <!-- Key Empirical Finding Summary Card -->
-          <div class="cc-card p-4 bg-gradient-to-br from-violet-50/70 to-white border-violet-200">
-            <div class="flex items-center justify-between mb-1.5">
-              <span class="text-xs font-bold text-violet-900">Cross-Layer Insight</span>
-              <button onclick="toggleCompareDrawer()" class="text-xs font-semibold text-violet-700 underline">Compare SDKs →</button>
-            </div>
-            <p class="text-xs text-slate-600 leading-relaxed">
-              Across <b>39,593 SCCUs</b>, infrastructure-layer SDKs carry significantly higher quantum-specific comment density (<b>34.3%</b>) than application-layer SDKs (<b>26.0%</b>), which delegate more behavior to classical optimizers and ML pipelines.
-            </p>
           </div>
         </aside>
 
@@ -147,38 +149,25 @@
                 <button onclick="toggleCompareDrawer()" class="btn-outline text-xs" id="btn-toggle-compare">
                   <span>⇄ Compare SDKs</span>
                 </button>
-                <button onclick="startAnnotationFromCurrentCorpus()" class="btn-outline text-xs">
-                  <span>🏷️ Label Sample in Studio</span>
-                </button>
-                <a id="exp-download-link" href="/api/corpora/qiskit/download" class="btn-primary text-xs no-underline">
-                  <span>⬇ Export JSONL</span>
-                </a>
               </div>
             </div>
 
-            <!-- 5 KPI Metric Cards -->
-            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
-              <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/80">
-                <div class="text-xs text-slate-500">Python Files</div>
-                <div class="text-xl font-bold text-slate-900 mt-0.5 font-mono" id="kpi-files">—</div>
-              </div>
-              <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/80">
-                <div class="text-xs text-slate-500">Code–Comment Pairs</div>
-                <div class="text-xl font-bold text-slate-900 mt-0.5 font-mono" id="kpi-ccps">—</div>
-              </div>
-              <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/80">
-                <div class="text-xs text-slate-500">Sentence Units (SCCUs)</div>
-                <div class="text-xl font-bold text-slate-900 mt-0.5 font-mono" id="kpi-sccus">—</div>
-              </div>
-              <div class="p-3 rounded-lg bg-violet-50/80 border border-violet-200">
+            <!-- 3 Hero KPI Cards (spec §3 Page 1) -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div class="p-4 rounded-xl bg-violet-50/80 border border-violet-300 shadow-sm">
                 <div class="text-xs font-medium text-violet-800">Quantum-Specific Share</div>
-                <div class="text-xl font-bold text-violet-700 mt-0.5 font-mono" id="kpi-quantum-pct">—</div>
-                <div class="text-[11px] text-violet-600" id="kpi-quantum-count">— quantum units</div>
+                <div class="text-2xl font-bold text-violet-700 mt-1 font-mono" id="kpi-quantum-pct">—</div>
+                <div class="text-[11px] text-violet-600 mt-0.5" id="kpi-quantum-count">— quantum units</div>
               </div>
-              <div class="p-3 rounded-lg bg-slate-50 border border-slate-200/80">
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
+                <div class="text-xs text-slate-500">Comment Sentences (SCCUs)</div>
+                <div class="text-2xl font-bold text-slate-900 mt-1 font-mono" id="kpi-sccus">—</div>
+                <div class="text-[11px] text-slate-400 mt-0.5"><span id="kpi-files">—</span> Python files · <span id="kpi-ccps">—</span> comment blocks</div>
+              </div>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/80">
                 <div class="text-xs text-slate-500">Comment Density</div>
-                <div class="text-xl font-bold text-slate-900 mt-0.5 font-mono" id="kpi-density">—</div>
-                <div class="text-[11px] text-slate-400" id="kpi-density-lines">comment / code lines</div>
+                <div class="text-2xl font-bold text-slate-900 mt-1 font-mono" id="kpi-density">—</div>
+                <div class="text-[11px] text-slate-400 mt-0.5" id="kpi-density-lines">comment / code lines</div>
               </div>
             </div>
           </div>
@@ -211,24 +200,25 @@
             <div class="cc-card p-4 md:col-span-6 flex flex-col">
               <div class="flex items-center justify-between mb-1">
                 <div>
-                  <h3 class="text-sm font-bold text-slate-900">Six-Category Quantum Knowledge Profile</h3>
-                  <p class="text-xs text-slate-500">Distribution of quantum-specific SCCUs · Click a bar to filter units</p>
+                  <h3 class="text-sm font-bold text-slate-900">What Quantum Topics They Cover (6 Categories)</h3>
+                  <p class="text-xs text-slate-500">Distribution of quantum-specific comment sentences · Click a bar to filter units</p>
                 </div>
                 <span class="badge badge-quantum">Task 2 · 6 Classes</span>
               </div>
-              <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center flex-1">
-                <div class="sm:col-span-6">
+              <div class="space-y-1.5 flex-1" id="category-breakdown-bars"></div>
+              <details class="disclosure mt-2">
+                <summary>📊 Show Radar View ▾</summary>
+                <div class="disclosure-body">
                   <div id="chart-radar" style="width: 100%; height: 230px;"></div>
                 </div>
-                <div class="sm:col-span-6 space-y-1.5" id="category-breakdown-bars"></div>
-              </div>
+              </details>
             </div>
 
             <!-- Chart 2: Quantum Residence Heatmap (Comment Type x Code Entity) -->
             <div class="cc-card p-4 md:col-span-6 flex flex-col">
               <div class="flex items-center justify-between mb-1">
                 <div>
-                  <h3 class="text-sm font-bold text-slate-900">Quantum Comment Residence (Form × Entity)</h3>
+                  <h3 class="text-sm font-bold text-slate-900">Where Quantum Comments Live (Form × Entity)</h3>
                   <p class="text-xs text-slate-500">Where quantum comments live across AST scopes · Click cell to filter</p>
                 </div>
                 <select id="heatmap-mode" onchange="renderResidenceChart()" class="text-xs border border-slate-200 rounded-md px-2 py-1 bg-slate-50 text-slate-700">
@@ -241,8 +231,35 @@
             </div>
           </div>
 
+          <!-- Benchmark Overview: per-SDK comparison table (overview mode only, D1) -->
+          <div id="overview-sdk-table-card" class="cc-card p-4 hidden">
+            <div class="flex items-center justify-between mb-1">
+              <div>
+                <h3 class="text-sm font-bold text-slate-900">Per-SDK Benchmark Breakdown</h3>
+                <p class="text-xs text-slate-500">Click any SDK row to drill into its sentence-level dashboard</p>
+              </div>
+              <span class="badge badge-infra">TOSEM Manifest</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs">
+                <thead>
+                  <tr class="text-left text-slate-400 border-b border-slate-200">
+                    <th class="py-2 pr-3 font-semibold">SDK</th>
+                    <th class="py-2 pr-3 font-semibold">Layer</th>
+                    <th class="py-2 pr-3 font-semibold text-right">Files</th>
+                    <th class="py-2 pr-3 font-semibold text-right">CCPs</th>
+                    <th class="py-2 pr-3 font-semibold text-right">SCCUs</th>
+                    <th class="py-2 pr-3 font-semibold text-right">Q%</th>
+                    <th class="py-2 font-semibold text-right">Density</th>
+                  </tr>
+                </thead>
+                <tbody id="overview-sdk-table"></tbody>
+              </table>
+            </div>
+          </div>
+
           <!-- IDE-Style Split-Pane Code-Comment Inspector -->
-          <div class="cc-card overflow-hidden">
+          <div class="cc-card overflow-hidden" id="explorer-inspector-panel">
             <!-- Filter Bar -->
             <div class="p-3.5 bg-slate-50 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2.5">
               <div class="flex flex-wrap items-center gap-2">
@@ -253,30 +270,36 @@
                   <option value="quantum">⚛ Quantum-Specific Only</option>
                   <option value="non-quantum">Non-Quantum Only</option>
                 </select>
-                <!-- Category Filter -->
-                <select id="filter-category" onchange="resetAndLoadUnits()" class="text-xs border border-slate-300 rounded-md px-2.5 py-1.5 bg-white">
-                  <option value="">All 6 Quantum Categories</option>
-                  <option value="Quantum circuit model">Quantum circuit model</option>
-                  <option value="Quantum algorithms">Quantum algorithms</option>
-                  <option value="Mathematics for quantum information">Mathematics for quantum info</option>
-                  <option value="Quantum hardware">Quantum hardware</option>
-                  <option value="Quantum software framework">Quantum software framework</option>
-                  <option value="Others">Others</option>
-                </select>
-                <!-- Comment Form Filter -->
-                <select id="filter-ctype" onchange="resetAndLoadUnits()" class="text-xs border border-slate-300 rounded-md px-2.5 py-1.5 bg-white">
-                  <option value="">All Comment Forms</option>
-                  <option value="docstring">Docstring</option>
-                  <option value="block">Block (#)</option>
-                  <option value="inline">Inline (#)</option>
-                </select>
-                <!-- Code Entity Filter -->
-                <select id="filter-etype" onchange="resetAndLoadUnits()" class="text-xs border border-slate-300 rounded-md px-2.5 py-1.5 bg-white">
-                  <option value="">All AST Entities</option>
-                  <option value="function">Function / Method</option>
-                  <option value="class">Class</option>
-                  <option value="module">Module</option>
-                </select>
+                <!-- Fine-Grained Filters (progressive disclosure) -->
+                <details class="disclosure !bg-white">
+                  <summary>More Filters ▾</summary>
+                  <div class="disclosure-body flex flex-wrap items-center gap-2">
+                    <!-- Category Filter -->
+                    <select id="filter-category" onchange="resetAndLoadUnits()" class="text-xs border border-slate-300 rounded-md px-2.5 py-1.5 bg-white">
+                      <option value="">All 6 Quantum Categories</option>
+                      <option value="Quantum circuit model">Quantum circuit model</option>
+                      <option value="Quantum algorithms">Quantum algorithms</option>
+                      <option value="Mathematics for quantum information">Mathematics for quantum info</option>
+                      <option value="Quantum hardware">Quantum hardware</option>
+                      <option value="Quantum software framework">Quantum software framework</option>
+                      <option value="Others">Others</option>
+                    </select>
+                    <!-- Comment Form Filter -->
+                    <select id="filter-ctype" onchange="resetAndLoadUnits()" class="text-xs border border-slate-300 rounded-md px-2.5 py-1.5 bg-white">
+                      <option value="">All Comment Forms</option>
+                      <option value="docstring">Docstring</option>
+                      <option value="block">Block (#)</option>
+                      <option value="inline">Inline (#)</option>
+                    </select>
+                    <!-- Code Entity Filter -->
+                    <select id="filter-etype" onchange="resetAndLoadUnits()" class="text-xs border border-slate-300 rounded-md px-2.5 py-1.5 bg-white">
+                      <option value="">All AST Entities</option>
+                      <option value="function">Function / Method</option>
+                      <option value="class">Class</option>
+                      <option value="module">Module</option>
+                    </select>
+                  </div>
+                </details>
               </div>
 
               <!-- Search Input & Reset -->
@@ -313,27 +336,25 @@
             </div>
           </div>
 
+          <!-- Benchmark Overview: inspector placeholder (overview mode only, D1) -->
+          <div id="explorer-overview-placeholder" class="cc-card hidden">
+            <div class="text-center text-slate-400 py-16 text-sm">
+              <div class="text-3xl mb-2">🔬</div>
+              Select an SDK in the sidebar (or a row in the table above) to inspect its comment sentences and enclosing Python code.
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
 
     <!-- ======================================================================= -->
-    <!-- VIEW 2: LIVE CODE INSPECTOR & REPOSITORY PIPELINE BUILDER               -->
+    <!-- VIEW 2: LIVE CODE SNIPPET INSPECTOR                                     -->
     <!-- ======================================================================= -->
     <section id="view-inspector" class="hidden space-y-5">
-      <!-- Sub-navigation toggle -->
-      <div class="flex flex-wrap items-center justify-between gap-4 cc-card p-3.5">
-        <div class="flex items-center gap-2">
-          <button id="subtab-btn-snippet" onclick="switchInspectorSubtab('snippet')" class="btn-quantum text-xs">
-            <span>🔬 Live Code Snippet Inspector</span>
-          </button>
-          <button id="subtab-btn-repo" onclick="switchInspectorSubtab('repo')" class="btn-outline text-xs">
-            <span>🏗️ Build Corpus from Repository (4-Stage Pipeline)</span>
-          </button>
-        </div>
-        <div class="text-xs text-slate-500">
-          Parse Python code with LibCST, segment Sphinx/LaTeX docstrings into SCCUs, and run two-stage Quantum BERT classification live.
-        </div>
+      <div class="flex flex-wrap items-center justify-between gap-3 cc-card p-3.5">
+        <div class="text-sm font-bold text-slate-900">🔬 Live Code Snippet Inspector</div>
+        <div class="text-xs text-slate-500">Paste Python code on the left → see extracted &amp; classified quantum comments on the right.</div>
       </div>
 
       <!-- SUB-VIEW 2A: LIVE CODE SNIPPET INSPECTOR -->
@@ -345,32 +366,33 @@
               <h2 class="text-sm font-bold text-slate-900">Python Quantum Source Code</h2>
               <p class="text-xs text-slate-500">Paste a module/class/function or load an SDK preset</p>
             </div>
-            <div class="flex items-center gap-1.5">
-              <span class="text-xs text-slate-500">Preset:</span>
-              <select id="inspector-preset-select" onchange="loadCodePreset(this.value)" class="text-xs border border-slate-300 rounded-md px-2.5 py-1.5 bg-white font-medium"></select>
-            </div>
+          </div>
+
+          <!-- Quick one-click presets (spec §3 Page 2) -->
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-xs text-slate-500 mr-0.5">Quick Presets:</span>
+            <button onclick="loadCodePreset('bell_circuit')" class="btn-outline text-xs py-1 px-2.5">Bell State Circuit</button>
+            <button onclick="loadCodePreset('vqe_algorithm')" class="btn-outline text-xs py-1 px-2.5">VQE Algorithm</button>
+            <button onclick="loadCodePreset('hardware_transpiler')" class="btn-outline text-xs py-1 px-2.5">Hardware Transpiler</button>
           </div>
 
           <textarea id="inspector-code-input" rows="18" spellcheck="false"
             class="w-full font-mono text-xs p-3.5 rounded-lg bg-slate-900 text-slate-100 border border-slate-800 focus:outline-none focus:border-violet-500 leading-relaxed"></textarea>
 
           <div class="flex flex-wrap items-center justify-between gap-3 pt-1">
-            <div class="flex items-center gap-2 text-xs text-slate-600">
-              <span>Classifier:</span>
-              <select id="inspector-model-select" class="border border-slate-300 rounded-md px-2.5 py-1.5 bg-white font-medium text-xs"></select>
-            </div>
+            <span class="text-[11px] text-slate-400">Runs with the currently active classifier (see Model Trainer).</span>
             <button id="btn-run-inspect" onclick="runLiveCodeInspect()" class="btn-quantum">
               <span>⚡ Extract, Segment &amp; Classify Quantum Comments</span>
             </button>
           </div>
         </div>
 
-        <!-- Right: Pipeline Trace + Documentation Audit + Classified Units -->
+        <!-- Right: Empty-State + Classified Units -->
         <div class="lg:col-span-6 space-y-4">
-          <!-- Audit & Summary Strip -->
-          <div class="cc-card p-4" id="inspector-summary-panel">
-            <div class="text-xs text-slate-400 text-center py-8">
-              Click <b>Extract, Segment &amp; Classify Quantum Comments</b> to run the pipeline.
+          <!-- Empty state (D5): shown until the user clicks ⚡ Extract, Segment & Classify -->
+          <div class="cc-card p-4" id="inspector-empty-state">
+            <div class="text-xs text-slate-400 text-center py-10">
+              Paste Python code or pick a preset, then click <b>⚡ Extract, Segment &amp; Classify</b>.
             </div>
           </div>
 
@@ -385,8 +407,19 @@
         </div>
       </div>
 
-      <!-- SUB-VIEW 2B: REPOSITORY CORPUS BUILDER (4-STAGE PIPELINE) -->
-      <div id="inspector-sub-repo" class="hidden space-y-5">
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- VIEW 3: CORPUS BUILDER (REPOSITORY → LABELED SCCU CORPUS, 4-STAGE)      -->
+    <!-- ======================================================================= -->
+    <section id="view-builder" class="hidden space-y-5">
+      <div class="flex flex-wrap items-center justify-between gap-3 cc-card p-3.5">
+        <div class="text-sm font-bold text-slate-900">🏗️ Corpus Builder</div>
+        <div class="text-xs text-slate-500">Turn any Python quantum repository into a structured, quantum-labeled SCCU corpus (4-stage pipeline).</div>
+      </div>
+
+      <!-- REPOSITORY CORPUS BUILDER (4-STAGE PIPELINE) -->
+      <div id="inspector-sub-repo" class="space-y-5">
         <div class="cc-card p-5 max-w-4xl mx-auto space-y-5">
           <div>
             <h2 class="text-base font-bold text-slate-900">End-to-End Quantum Comment Corpus Builder</h2>
@@ -443,7 +476,7 @@
               </div>
               <div class="sm:col-span-3">
                 <label class="block text-xs font-semibold text-slate-700 mb-1">Git Tag / Version (Optional)</label>
-                <input id="pipe-ref-input" type="text" value="v0.1"
+                <input id="pipe-ref-input" type="text" value=""
                   placeholder="e.g. 0.8 or main"
                   class="w-full text-xs border border-slate-300 rounded-md px-3 py-2 bg-white font-mono" />
               </div>
@@ -479,10 +512,11 @@
     </section>
 
     <!-- ======================================================================= -->
-    <!-- VIEW 3: ANNOTATION STUDIO (HUMAN-IN-THE-LOOP DATA LABELING)             -->
+    <!-- VIEW 4: ANNOTATION STUDIO (HUMAN-IN-THE-LOOP DATA LABELING)             -->
     <!-- ======================================================================= -->
     <section id="view-annotate" class="hidden space-y-4">
-      <!-- Top Session Selector + Live Agreement Metrics Strip -->
+      <input id="ann-upload-input" type="file" accept=".jsonl,.json" class="hidden" onchange="handleAnnotationUpload(this)" />
+      <!-- Top Toolbar + Progress Strip -->
       <div class="cc-card p-4">
         <div class="flex flex-wrap items-center justify-between gap-3 pb-3 mb-3 border-b border-slate-100">
           <div class="flex flex-wrap items-center gap-3">
@@ -492,98 +526,40 @@
             </div>
           </div>
           <div class="flex flex-wrap items-center gap-2">
-            <span class="text-xs text-slate-500">Session:</span>
-            <select id="ann-session-select" onchange="loadAnnotationSession(this.value)" class="text-xs border border-slate-300 rounded-md px-2.5 py-1.5 bg-white font-semibold text-slate-800 min-w-[260px]"></select>
-            <button onclick="toggleNewAnnotationModal()" class="btn-quantum text-xs">+ New Labeling Session</button>
-            <button onclick="openTrainWithCurrentSession()" class="btn-outline text-xs" title="Fine-tune a BERT classifier using the labels from this session">
-              🎓 Train Model with Session →
-            </button>
+            <button id="btn-load-demo" onclick="loadDemoBenchmarkSession()" class="btn-quantum text-xs" title="Open the pre-built labeling demo session">📂 Load Demo Benchmark</button>
+            <button onclick="uploadJsonlToLabel()" class="btn-outline text-xs" title="Label your own .jsonl / .json comment sentences (up to 1,000 records)">⬆ Upload JSONL to Label</button>
             <a id="ann-export-link" href="#" class="btn-outline text-xs no-underline">⬇ Export Labeled JSONL</a>
           </div>
         </div>
 
-        <!-- New Session Drawer (Hidden by default) -->
-        <div id="new-ann-drawer" class="hidden mb-4 p-4 rounded-xl bg-violet-50/50 border border-violet-200 space-y-3">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xs font-bold text-violet-950 uppercase tracking-wider">Create New Annotation Session</h3>
-            <button onclick="toggleNewAnnotationModal()" class="text-xs text-slate-500 hover:text-slate-800">✕ Cancel</button>
-          </div>
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 text-xs">
-            <div class="sm:col-span-3">
-              <label class="block font-semibold text-slate-700 mb-1">Session Name</label>
-              <input id="new-ann-name" type="text" value="qiskit-nature-calibration" class="w-full border border-slate-300 rounded-md px-2.5 py-1.5 bg-white" />
-            </div>
-            <div class="sm:col-span-3">
-              <label class="block font-semibold text-slate-700 mb-1">Source Corpus</label>
-              <select id="new-ann-corpus" class="w-full border border-slate-300 rounded-md px-2.5 py-1.5 bg-white"></select>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block font-semibold text-slate-700 mb-1">Sample Size (n)</label>
-              <div class="flex items-center gap-1">
-                <input id="new-ann-size" type="number" value="50" min="5" max="2000" class="w-full border border-slate-300 rounded-md px-2.5 py-1.5 bg-white font-mono" />
-                <button onclick="document.getElementById('new-ann-size').value=385" class="px-2 py-1.5 rounded bg-white border border-slate-300 text-[11px] font-semibold hover:bg-slate-50" title="Cochran's Formula (95% CI, 5% margin)">385</button>
-              </div>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block font-semibold text-slate-700 mb-1">Stratify By</label>
-              <select id="new-ann-stratify" class="w-full border border-slate-300 rounded-md px-2.5 py-1.5 bg-white">
-                <option value="comment_type,code_entity_type">Form × Entity</option>
-                <option value="quantum_related">Model Quantum Label</option>
-                <option value="">Pure Random</option>
-              </select>
-            </div>
-            <div class="sm:col-span-2">
-              <label class="block font-semibold text-slate-700 mb-1">Labeling Mode</label>
-              <select id="new-ann-mode" class="w-full border border-slate-300 rounded-md px-2.5 py-1.5 bg-white">
-                <option value="adjudicate">Adjudicate (Show Model)</option>
-                <option value="blind">Blind (Hide Model)</option>
-              </select>
-            </div>
-          </div>
-          <div class="flex justify-end pt-1">
-            <button onclick="createNewAnnotationSession()" class="btn-quantum text-xs">Create &amp; Open Session</button>
-          </div>
-        </div>
-
-        <!-- Live Session Progress & Agreement KPI Strip -->
-        <div class="grid grid-cols-2 sm:grid-cols-6 gap-3">
-          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-            <div class="text-[11px] text-slate-500">Session Progress</div>
-            <div class="text-base font-bold text-slate-900 font-mono mt-0.5" id="ann-kpi-progress">0 / 0</div>
-            <div class="w-full h-1.5 bg-slate-200 rounded-full mt-1 overflow-hidden">
-              <div id="ann-progress-bar" class="h-full bg-violet-600" style="width: 0%;"></div>
-            </div>
-          </div>
-          <div class="p-2.5 rounded-lg bg-violet-50/70 border border-violet-200">
-            <div class="text-[11px] text-violet-800 font-medium">Human–Model Agreement</div>
-            <div class="text-base font-bold text-violet-700 font-mono mt-0.5" id="ann-kpi-agreement">—</div>
-            <div class="text-[11px] text-violet-600 font-mono" id="ann-kpi-ci">Wilson 95% CI: —</div>
-          </div>
-          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-            <div class="text-[11px] text-slate-500">Cohen's Kappa (κ)</div>
-            <div class="text-base font-bold text-slate-900 font-mono mt-0.5" id="ann-kpi-kappa">—</div>
-            <div class="text-[11px] text-slate-400">Inter-rater reliability</div>
-          </div>
-          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-            <div class="text-[11px] text-slate-500">Quantum Precision / Recall</div>
-            <div class="text-base font-bold text-slate-900 font-mono mt-0.5" id="ann-kpi-pr">— / —</div>
-            <div class="text-[11px] text-slate-400 font-mono" id="ann-kpi-f1">F1: —</div>
-          </div>
-          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-            <div class="text-[11px] text-slate-500">Confusion (TP/FP/FN/TN)</div>
-            <div class="text-sm font-bold text-slate-800 font-mono mt-1" id="ann-kpi-confusion">—</div>
-            <div class="text-[11px] text-slate-400">Model vs. Human</div>
-          </div>
-          <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200">
-            <div class="text-[11px] text-slate-500">6-Category Agreement</div>
-            <div class="text-base font-bold text-slate-900 font-mono mt-0.5" id="ann-kpi-cat-agree">—</div>
-            <div class="text-[11px] text-slate-400" id="ann-kpi-cat-n">on quantum units</div>
+        <!-- Compact 1-Line Progress Strip: labeling must stay blind — no model-comparison metrics here -->
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-2.5 p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+          <div class="flex items-center gap-2">
+            <span class="text-slate-500 font-medium">Progress:</span>
+            <span class="font-mono font-bold text-slate-900" id="ann-kpi-progress">0 / 0</span>
+            <span class="inline-block w-20 h-1.5 bg-slate-200 rounded-full overflow-hidden align-middle">
+              <span id="ann-progress-bar" class="block h-full bg-violet-600" style="width: 0%;"></span>
+            </span>
           </div>
         </div>
       </div>
 
+      <!-- Empty-state landing when no labeling session is loaded (D3) -->
+      <div id="ann-empty-state" class="hidden grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="cc-card cc-card-hover p-6 text-center space-y-2 cursor-pointer" onclick="loadDemoBenchmarkSession()">
+          <div class="text-3xl">📂</div>
+          <div class="font-bold text-slate-900 text-sm" id="ann-empty-demo-title">Load Demo Benchmark</div>
+          <p class="text-xs text-slate-500 leading-relaxed">Open the pre-built <b>Unseen SDKs Labeling Demo</b> session: unlabeled comment sentences from the three application-layer SDKs, ready for blind human labeling.</p>
+        </div>
+        <div class="cc-card cc-card-hover p-6 text-center space-y-2 cursor-pointer" onclick="uploadJsonlToLabel()">
+          <div class="text-3xl">⬆</div>
+          <div class="font-bold text-slate-900 text-sm">Upload JSONL to Label</div>
+          <p class="text-xs text-slate-500 leading-relaxed">Bring your own comment sentences (<b>.jsonl</b> or <b>.json</b>, up to 1,000 records) and label them — blind, or adjudicating against model predictions.</p>
+        </div>
+      </div>
+
       <!-- Main Split-Pane Annotation Workspace -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4" id="ann-workspace">
         <!-- Left Item Queue (3 cols) -->
         <div class="lg:col-span-3 cc-card flex flex-col max-h-[600px]">
           <div class="p-3 border-b border-slate-200 space-y-2">
@@ -595,68 +571,33 @@
               <option value="all">All Items in Session</option>
               <option value="unlabeled">Unlabeled Only</option>
               <option value="labeled">Labeled Only</option>
-              <option value="disagree">⚠️ Disagreements (Human ≠ Model)</option>
               <option value="quantum">Human Labeled: Quantum</option>
             </select>
           </div>
           <div id="ann-queue-list" class="flex-1 overflow-y-auto divide-y divide-slate-100"></div>
         </div>
 
-        <!-- Center: Target Sentence + Code Context + Guidelines (5 cols) -->
-        <div class="lg:col-span-5 cc-card p-4 flex flex-col justify-between space-y-4 max-h-[600px] overflow-y-auto">
-          <div class="space-y-3">
+        <!-- Focused Labeling Card (9 cols): sentence → 2-step actions → context (spec §3 Page 3) -->
+        <div class="lg:col-span-9 cc-card p-5 flex flex-col justify-between space-y-4 max-h-[640px] overflow-y-auto">
+          <div class="space-y-4">
             <!-- Item Metadata Header -->
             <div class="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-100">
               <div class="flex items-center gap-2">
                 <span class="px-2 py-0.5 rounded bg-slate-900 text-white font-mono text-xs font-bold" id="ann-curr-index">#1</span>
                 <span class="badge badge-infra" id="ann-curr-sdk">qiskit-nature</span>
-                <span class="text-xs font-mono text-slate-500" id="ann-curr-meta">docstring · function</span>
               </div>
               <span class="text-xs font-mono text-slate-400 truncate max-w-[220px]" id="ann-curr-file"></span>
             </div>
 
-            <!-- Target Sentence Box -->
+            <!-- Target Sentence Box (16px focused reading surface) -->
             <div class="p-4 rounded-xl bg-violet-50/60 border-2 border-violet-200">
-              <div class="text-[11px] font-bold uppercase tracking-wider text-violet-700 mb-1">Target Comment Unit (SCCU)</div>
-              <p class="text-base font-semibold text-slate-900 leading-snug" id="ann-curr-text">
+              <div class="text-[11px] font-bold uppercase tracking-wider text-violet-700 mb-1">Target Comment Sentence (SCCU)</div>
+              <p class="text-base font-semibold text-slate-900 leading-relaxed" id="ann-curr-text">
                 Loading annotation session…
               </p>
             </div>
 
-            <!-- Model Pre-label Banner (Adjudicate Mode) -->
-            <div id="ann-model-banner" class="p-3 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-              <div>
-                <span class="text-slate-500 font-medium">Model Pre-Label:</span>
-                <span id="ann-model-pred-badges" class="ml-1.5"></span>
-              </div>
-              <button onclick="acceptModelPrediction()" class="text-xs font-semibold text-violet-700 hover:underline">
-                Accept Model <span class="kbd-key ml-1">Space</span>
-              </button>
-            </div>
-
-            <!-- Enclosing Python Code Snippet -->
-            <div>
-              <div class="flex items-center justify-between text-xs text-slate-500 mb-1">
-                <span class="font-semibold text-slate-700">Enclosing Python Source Context</span>
-                <span class="font-mono text-[11px]" id="ann-curr-lines"></span>
-              </div>
-              <pre class="code-viewer max-h-[220px] overflow-y-auto" id="ann-curr-code"><code># Source context</code></pre>
-            </div>
-          </div>
-
-          <!-- Collapsible TOSEM Guideline Reference -->
-          <details class="rounded-lg bg-slate-50 border border-slate-200 p-3 text-xs">
-            <summary class="font-bold text-slate-800 cursor-pointer select-none">
-              📖 TOSEM Quantum-Specific Annotation Guidelines (Click to expand)
-            </summary>
-            <div class="mt-2.5 space-y-2 text-slate-600" id="ann-guideline-content"></div>
-          </details>
-        </div>
-
-        <!-- Right: Interactive Two-Stage Labeling Controls (4 cols) -->
-        <div class="lg:col-span-4 cc-card p-4 flex flex-col justify-between space-y-4 max-h-[600px] overflow-y-auto">
-          <div class="space-y-4">
-            <!-- Stage 1: Binary Quantum Relatedness -->
+            <!-- Step 1: Binary Quantum Relatedness -->
             <div>
               <div class="flex items-center justify-between mb-2">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Step 1 · Is it Quantum-Specific? (Task 1)</h3>
@@ -682,13 +623,13 @@
               </div>
             </div>
 
-            <!-- Stage 2: 6-Category Quantum Knowledge Taxonomy -->
+            <!-- Step 2: 6-Category Quantum Knowledge Taxonomy (2×3 grid) -->
             <div id="ann-stage2-panel">
               <div class="flex items-center justify-between mb-2">
                 <h3 class="text-xs font-bold uppercase tracking-wider text-slate-700">Step 2 · Quantum Knowledge Category (Task 2)</h3>
                 <span class="text-[11px] text-slate-400">Keys: <span class="kbd-key">1</span>–<span class="kbd-key">6</span></span>
               </div>
-              <div class="space-y-1.5" id="ann-category-buttons"></div>
+              <div class="grid grid-cols-2 gap-2" id="ann-category-buttons"></div>
             </div>
 
             <!-- Optional Note -->
@@ -698,7 +639,22 @@
                 onchange="saveItemNote(this.value)"
                 class="w-full text-xs border border-slate-300 rounded-md px-2.5 py-1.5 bg-white" />
             </div>
+
+            <!-- Enclosing Python Code Snippet -->
+            <div>
+              <div class="flex items-center justify-between text-xs text-slate-500 mb-1">
+                <span class="font-semibold text-slate-700">Enclosing Python Source Context</span>
+                <span class="font-mono text-[11px]" id="ann-curr-lines"></span>
+              </div>
+              <pre class="code-viewer max-h-[220px] overflow-y-auto" id="ann-curr-code"><code># Source context</code></pre>
+            </div>
           </div>
+
+          <!-- Collapsible TOSEM Guideline Reference -->
+          <details class="disclosure !bg-slate-50 text-xs">
+            <summary>📖 TOSEM Quantum-Specific Annotation Guidelines (Click to expand)</summary>
+            <div class="disclosure-body space-y-2 text-slate-600" id="ann-guideline-content"></div>
+          </details>
 
           <!-- Navigation Footer -->
           <div class="pt-3 border-t border-slate-200 flex items-center justify-between">
@@ -706,46 +662,18 @@
               <button onclick="stepAnnotationItem(-1)" class="btn-outline text-xs py-1.5 px-3">← Prev</button>
               <button onclick="stepAnnotationItem(1)" class="btn-outline text-xs py-1.5 px-3">Next →</button>
             </div>
-            <label class="flex items-center gap-1.5 text-xs text-slate-600 cursor-pointer">
-              <input id="ann-auto-advance" type="checkbox" checked class="rounded text-violet-600" />
-              <span>Auto-advance on label</span>
-            </label>
+            <span class="text-[11px] text-slate-400">Stay on item after labeling — use ← / → to navigate</span>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ======================================================================= -->
-    <!-- VIEW 4: MODEL TRAINER, REGISTRY & EVALUATION STUDIO                     -->
+    <!-- VIEW 5: MODEL TRAINER & ACTIVE CLASSIFIER STRIP                         -->
     <!-- ======================================================================= -->
     <section id="view-models" class="hidden space-y-5">
 
-      <!-- Top Row: Active Model Registry (Released + Custom Trained Models) -->
-      <div class="cc-card p-5 space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 class="text-base font-bold text-slate-900">Quantum Classifier Registry</h2>
-            <p class="text-xs text-slate-500">
-              Manage the released TOSEM BERT checkpoints and your own fine-tuned models. The active ★ model powers all live predictions.
-            </p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button onclick="setActiveModel('released')" id="btn-use-released" class="btn-outline text-xs">
-              ★ Use Released CC4Q Checkpoints
-            </button>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="released-models-grid"></div>
-
-        <!-- User-Trained Models Section -->
-        <div class="pt-3 border-t border-slate-100">
-          <h3 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2.5">Your Custom Fine-Tuned Models</h3>
-          <div id="user-models-grid" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
-        </div>
-      </div>
-
-      <!-- Bottom Grid: In-Tool Model Trainer (7 cols) | Model-vs-Model Evaluator (5 cols) -->
+      <!-- Bottom Grid: In-Tool Model Trainer (7 cols) | Live Training Monitor (5 cols) -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
 
         <!-- Left: In-Tool BERT Fine-Tuning Studio -->
@@ -760,7 +688,7 @@
             <span class="badge badge-quantum">HuggingFace Trainer</span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+          <div class="space-y-3.5 text-xs">
             <!-- 1. Task Selection -->
             <div>
               <label class="block font-semibold text-slate-700 mb-1">1. Classification Task</label>
@@ -770,110 +698,69 @@
               </select>
             </div>
 
-            <!-- 2. Base Checkpoint -->
+            <!-- 2. Training Data Source -->
             <div>
-              <label class="block font-semibold text-slate-700 mb-1">2. Starting Checkpoint</label>
-              <select id="train-base-model" class="w-full border border-slate-300 rounded-md px-3 py-2 bg-white">
-                <option value="released">Warm-Start from Released CC4Q Checkpoint (Recommended)</option>
-                <option value="bert-base-uncased">Train from Scratch (bert-base-uncased)</option>
-              </select>
-            </div>
-
-            <!-- 3. Training Data Source -->
-            <div>
-              <label class="block font-semibold text-slate-700 mb-1">3. Labeled Training Data Source</label>
+              <label class="block font-semibold text-slate-700 mb-1">2. Training Data</label>
               <select id="train-source-type" onchange="toggleTrainSourceInputs()" class="w-full border border-slate-300 rounded-md px-3 py-2 bg-white">
-                <option value="session">From an Annotation Studio Session</option>
-                <option value="gold">Built-in TOSEM Gold Training Dataset</option>
-                <option value="upload">Upload Custom JSONL File</option>
+                <option value="gold">Demo Dataset</option>
+                <option value="upload">Upload Your Own JSONL</option>
               </select>
             </div>
 
-            <!-- 4. Session / Gold Info / File Picker -->
+            <!-- 2b. File Picker (shown for upload source) -->
             <div id="train-source-detail-box">
-              <label class="block font-semibold text-slate-700 mb-1" id="train-source-detail-label">Select Annotation Session</label>
-              <select id="train-session-select" class="w-full border border-slate-300 rounded-md px-3 py-2 bg-white"></select>
               <input id="train-upload-input" type="file" accept=".jsonl,.json" class="hidden w-full text-xs" />
             </div>
 
-            <!-- 5. Hyperparameters -->
+            <!-- 3. New Model Name -->
             <div>
-              <label class="block font-semibold text-slate-700 mb-1">4. New Model Name</label>
+              <label class="block font-semibold text-slate-700 mb-1">3. New Model Name</label>
               <input id="train-model-name" type="text" value="custom-quantum-v1" class="w-full border border-slate-300 rounded-md px-3 py-2 bg-white font-mono" />
-            </div>
-
-            <div class="grid grid-cols-3 gap-2">
-              <div>
-                <label class="block font-semibold text-slate-700 mb-1">Epochs</label>
-                <input id="train-epochs" type="number" value="2" min="1" max="30" class="w-full border border-slate-300 rounded-md px-2.5 py-2 bg-white font-mono" />
-              </div>
-              <div>
-                <label class="block font-semibold text-slate-700 mb-1">Batch Size</label>
-                <input id="train-batch" type="number" value="16" min="4" max="64" step="4" class="w-full border border-slate-300 rounded-md px-2.5 py-2 bg-white font-mono" />
-              </div>
-              <div>
-                <label class="block font-semibold text-slate-700 mb-1" title="Cap rows for fast interactive CPU training, or clear for full dataset">Max Samples</label>
-                <input id="train-max-samples" type="number" value="120" min="20" max="10000" placeholder="All" class="w-full border border-slate-300 rounded-md px-2.5 py-2 bg-white font-mono" />
-              </div>
             </div>
           </div>
 
+          <!-- Advanced hyperparameters (progressive disclosure, spec §3 Page 4) -->
+          <details class="disclosure" id="train-advanced-details">
+            <summary id="train-advanced-summary">⚙️ Training Parameters (2 Epochs · Batch 16)</summary>
+            <div class="disclosure-body grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs">
+              <div class="grid grid-cols-2 gap-2">
+                <div>
+                  <label class="block font-semibold text-slate-700 mb-1">Epochs</label>
+                  <input id="train-epochs" type="number" value="2" min="1" max="30" class="w-full border border-slate-300 rounded-md px-2.5 py-2 bg-white font-mono" />
+                </div>
+                <div>
+                  <label class="block font-semibold text-slate-700 mb-1">Batch Size</label>
+                  <input id="train-batch" type="number" value="16" min="4" max="64" step="4" class="w-full border border-slate-300 rounded-md px-2.5 py-2 bg-white font-mono" />
+                </div>
+              </div>
+            </div>
+          </details>
+
           <div class="flex items-center justify-between pt-2">
             <span class="text-xs text-slate-500">
-              Splits 80% train / 10% validation / 10% held-out test · Auto-registers into Registry upon completion.
+              Splits 80% train / 10% validation / 10% held-out test.
             </span>
             <button id="btn-start-train" onclick="startModelTraining()" class="btn-quantum">
               <span>🚀 Start Fine-Tuning</span>
             </button>
           </div>
-
-          <!-- Live Training Progress & Chart Box -->
-          <div id="train-monitor-box" class="hidden p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
-            <div class="flex items-center justify-between text-xs">
-              <span class="font-bold text-slate-800" id="train-stage-label">Initializing Trainer…</span>
-              <span class="font-mono text-slate-600" id="train-step-label">0%</span>
-            </div>
-            <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-              <div id="train-progress-bar" class="h-full bg-violet-600 transition-all duration-300" style="width: 5%;"></div>
-            </div>
-            <div id="chart-train-history" style="width: 100%; height: 190px;" class="hidden"></div>
-            <div id="train-test-results" class="hidden pt-2 border-t border-slate-200"></div>
-          </div>
         </div>
 
-        <!-- Right: Side-by-Side Model Comparison & Evaluation -->
-        <div class="lg:col-span-5 cc-card p-5 space-y-4">
-          <div class="border-b border-slate-100 pb-3">
-            <h2 class="text-base font-bold text-slate-900">📏 Side-by-Side Model Evaluation</h2>
-            <p class="text-xs text-slate-500">
-              Compare two models (e.g., Released Checkpoints vs. Your Fine-Tuned Model) on any SDK corpus.
-            </p>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
-            <div>
-              <label class="block font-semibold text-slate-700 mb-1">Reference (Model A)</label>
-              <select id="eval-model-a" class="w-full border border-slate-300 rounded-md px-2.5 py-1.5 bg-white"></select>
-            </div>
-            <div>
-              <label class="block font-semibold text-slate-700 mb-1">Candidate (Model B)</label>
-              <select id="eval-model-b" class="w-full border border-slate-300 rounded-md px-2.5 py-1.5 bg-white"></select>
-            </div>
-            <div>
-              <label class="block font-semibold text-slate-700 mb-1">Target Corpus</label>
-              <select id="eval-corpus" class="w-full border border-slate-300 rounded-md px-2.5 py-1.5 bg-white"></select>
-            </div>
-          </div>
-
-          <div class="flex justify-end">
-            <button id="btn-run-eval" onclick="runModelComparison()" class="btn-primary text-xs">
-              <span>Run Agreement &amp; Profile Comparison</span>
-            </button>
-          </div>
-
-          <div id="eval-results-box" class="space-y-3 pt-2">
-            <div class="text-xs text-slate-400 text-center py-10">
-              Select two models and click <b>Run Agreement &amp; Profile Comparison</b> to compute agreement, κ, Wilson 95% CI, and category shifts.
+        <!-- Right: Live Training Monitor (real-time loss & validation F1) -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="cc-card p-4">
+            <h3 class="text-sm font-bold text-slate-900 mb-1">Live Training Monitor</h3>
+            <p class="text-xs text-slate-400 mb-3">Training loss and held-out validation F1 are charted here in real time once fine-tuning starts.</p>
+            <div id="train-monitor-box" class="hidden p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-3">
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-bold text-slate-800" id="train-stage-label">Initializing Trainer…</span>
+                <span class="font-mono text-slate-600" id="train-step-label">0%</span>
+              </div>
+              <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div id="train-progress-bar" class="h-full bg-violet-600 transition-all duration-300" style="width: 5%;"></div>
+              </div>
+              <div id="chart-train-history" style="width: 100%; height: 190px;" class="hidden"></div>
+              <div id="train-test-results" class="hidden pt-2 border-t border-slate-200"></div>
             </div>
           </div>
         </div>
@@ -883,6 +770,6 @@
 
   </main>
 
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=20261017b"></script>
 </body>
 </html>

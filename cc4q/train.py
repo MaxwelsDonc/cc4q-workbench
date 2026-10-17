@@ -237,7 +237,7 @@ def train(task, data, output_dir, base_model="bert-base-uncased",
         per_device_train_batch_size=batch_size,
         per_device_eval_batch_size=batch_size,
         num_train_epochs=epochs,
-        weight_decay=0.01, logging_dir=output_dir, logging_steps=2,
+        weight_decay=0.01, logging_steps=2,
         load_best_model_at_end=True, metric_for_best_model="f1",
         save_total_limit=1, seed=seed, report_to="none")
     trainer = Trainer(model=model, args=training_args,

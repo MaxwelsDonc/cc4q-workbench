@@ -10,6 +10,7 @@ spacy==3.8.7        # then run: python -m spacy download en_core_web_sm
 # BERT classifiers (model/**)
 torch>=2.1
 transformers>=4.45
+accelerate>=1.1.0
 datasets>=3.0
 scikit-learn>=1.3
 

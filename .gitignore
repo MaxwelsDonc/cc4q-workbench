@@ -26,3 +26,6 @@ build/
 # Default local workspace (created at runtime; CC4Q_WORKSPACE overrides)
 .cc4q_workspace/
 docs/_autosummary/
+
+# User-trained model registry (runtime artifacts; train via Tab 5 / cc4q train)
+user_models/

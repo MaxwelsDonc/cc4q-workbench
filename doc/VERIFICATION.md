@@ -35,8 +35,8 @@ pip install -e .
 ccq demo        # note: the command is `cc4q demo`
 ```
 **Expected**: server starts; opening `http://127.0.0.1:8501` shows the workbench with a
-top navigation bar of **four tabs** (Corpus Explorer · Live Inspector & Builder ·
-Annotation Studio · Model Trainer & Registry).
+top navigation bar of **five tabs** (Corpus Explorer · Live Inspector · Corpus Builder ·
+Annotation Studio · Model Trainer).
 
 ---
 
@@ -44,8 +44,12 @@ Annotation Studio · Model Trainer & Registry).
 
 *No model download required for this part.*
 
-- [ ] **1.1** Tab 1 lists **6 SDK corpora**. For each SDK, the card/row shows SCCU counts
-matching the Empirical Benchmark table:
+- [ ] **1.1** Tab 1 lands on the **📊 Benchmark Overview** (default view): aggregate cards
+for **all 6 repositories** (**39,593 Comment Sentences · 31.9% Quantum-Specific ·
+6 SDKs** — 3 TOSEM infrastructure + 3 application), an aggregate knowledge profile and
+residence heatmap, and a per-SDK breakdown table listing **6 SDK corpora** with the
+infrastructure subtotal (28,076 @ 34.3%) and application subtotal (11,517 @ 26.0%).
+For each SDK, the row shows SCCU counts matching the Empirical Benchmark table:
 
 | SDK | Expected SCCUs | Expected Quantum share |
 |---|---|---|
@@ -66,7 +70,8 @@ curl -s http://127.0.0.1:8501/api/overview | python3 -m json.tool | head -40
 ```
 **Expected**: JSON reports 6 repos and the corpus/asset counts consistent with 1.1.
 
-- [ ] **1.3** **Compare SDKs**: click `⇄ Compare SDKs`, choose `qiskit` vs
+- [ ] **1.3** **Compare SDKs**: from the Benchmark Overview, click `⇄ Compare SDKs`
+(the button is only shown on the Overview), choose `qiskit` vs
 `qiskit-machine-learning`. **Expected**: dual radar chart renders; the comparison shows
 35.4% vs 22.4% quantum share (the infra-vs-application finding).
 
@@ -93,16 +98,16 @@ cc4q download-models --check
 `--check` prints OK. An optional third asset (`bert-base-uncased.tar.gz`, for
 from-scratch fine-tuning) is fetched with `python scripts/download_models.py --with-base`.
 
-- [ ] **2.1** Tab 2 → load preset **“Bell State & Entanglement Circuit”** and click
-`⚡ Extract, Segment & Classify Quantum Comments`.
-**Expected**: a *Quantum Documentation Health Check* panel appears; every SCCU shows a
-**Quantum Confidence %** and Top-3 category probability bars; Bell-state units are
-classified quantum with high confidence.
+- [ ] **2.1** Tab 2 → load preset **“Bell State & Entanglement Circuit”** (one-click preset
+pill above the editor) and click `⚡ Extract, Segment & Classify Quantum Comments`.
+**Expected**: the right pane starts as an empty placeholder and results render **only
+after the click**; every SCCU shows a **Quantum Confidence badge (%)** and a
+knowledge-category badge; Bell-state units are classified quantum with high confidence.
 
 - [ ] **2.2** Paste non-Python text (e.g. plain English). **Expected**: graceful
 fallback (line-by-line mode or a clear "not parseable" message) — no crash.
 
-- [ ] **2.3** Switch to `🏗️ Build Corpus from Repository`, keep the pre-filled
+- [ ] **2.3** Open Tab 3 (**Corpus Builder**), keep the pre-filled
 `examples/tiny_repo`, click `🚀 Build & Label Corpus`.
 **Expected**: four stages execute (clone/verify → extract → segment → label); a new
 corpus opens in the Explorer. CLI equivalent:
@@ -116,20 +121,27 @@ files. **Expected**: a polite refusal suggesting Docker/local CLI.
 
 ---
 
-## Part 3 — Annotation Studio (README §Tab 3)
+## Part 3 — Annotation Studio (README §Tab 4)
 
-- [ ] **3.1** Tab 3 opens the preloaded session **“Unseen SDKs Human Verification
-(379 units)”**. **Expected header metrics**:
-`Human–Model agreement 85.0%`, Wilson 95% CI `81.0%–88.2%`, Cohen's κ `0.699`,
-Precision `83.0%`, Recall `86.2%`.
+- [ ] **3.1** Tab 4 opens as a two-card landing (**Load Demo Benchmark** /
+**Upload JSONL**) with no session preloaded. Click **`📂 Load Demo Benchmark (361 units)`**.
+**Expected**: the *Unseen SDKs Labeling Demo (361 units)* session opens with
+**Progress `0 / 361`**, every item marked `Unlabeled`, each item showing its target
+comment sentence and the enclosing Python source context (file path + code viewer).
+The only header metric is Progress — the UI intentionally shows no model pre-labels
+and no agreement/κ/P-R metrics (blind labeling).
 
-- [ ] **3.2** Filter dropdown → `⚠️ Disagreements (Human ≠ Model)`.
-**Expected**: exactly **57** items (32 model-false-positives, 25 false-negatives).
+- [ ] **3.2** Filter dropdown → `Unlabeled Only`. **Expected**: 361 items; after
+labeling one item and re-filtering, `Labeled Only` shows it with its Quantum/Non-Q
+pill.
 
-- [ ] **3.3** Keyboard labeling: focus an item, press `Q` / `N`, then `←`/`→`.
-**Expected**: label applied and persisted; progress counter increments.
+- [ ] **3.3** Keyboard labeling: focus an item, press `Q` or `N`, then a category
+key `1`–`6`. **Expected**: the label is applied and persisted; the view **stays on
+the same item** (both step choices remain highlighted); Progress increments; `←`/`→`
+move between items manually.
 
-- [ ] **3.4** CLI cross-check of the same numbers (README CLI §6):
+- [ ] **3.4** CLI cross-check of the human-vs-model study behind the demo benchmark
+(UI deliberately hides these numbers to keep labeling blind — README CLI §6):
 ```bash
 cc4q evaluate --annotations exp/spotcheck_annotation.csv \
               --key exp/spotcheck_answer_key.jsonl \
@@ -137,14 +149,16 @@ cc4q evaluate --annotations exp/spotcheck_annotation.csv \
 ```
 **Expected**: `n=379  agreement=85.0%  (95% CI 81.0–88.2)  precision=83.0%  recall=86.2%`.
 
-- [ ] **3.5** `+ New Labeling Session`: pick any corpus, sample size (the **`385`**
-button inserts Cochran's 95%/±5% value), Stratified (`Form × Entity`) sampling, mode
-`Adjudicate`. **Expected**: a new session with a ~50/50 quantum split and per-stratum
-balance; export produces CSV + JSONL.
+- [ ] **3.5** `⬇ Export Labeled JSONL`. **Expected**: downloads the current session
+including your human labels.
+
+- [ ] **3.6** `⬆ Upload JSONL to Label`: upload any `.jsonl` file of comment records.
+**Expected**: a new session opens directly with your records ready to label (up to
+1,000 records).
 
 ---
 
-## Part 4 — Model Trainer, Registry & Evaluator (README §Tab 4)
+## Part 4 — Model Trainer (README §Tab 5)
 
 - [ ] **4.1** Dry-run validation (no training yet):
 ```bash
@@ -153,17 +167,22 @@ cc4q train --task quantum_related --data examples/tiny_labels.jsonl \
 ```
 **Expected**: `[train] dry-run OK: quantum_related data honors the contract`.
 
-- [ ] **4.2** Tab 4 → Task 1 (`quantum_related`) → warm-start from released checkpoint →
-data source: any Tab-3 session or `examples/tiny_labels.jsonl` → `🚀 Start Fine-Tuning`.
-**Expected**: asynchronous progress + live Train-Loss / Validation-F1 curve; on
-completion, held-out metrics (F1/Accuracy/Precision/Recall) are reported and the model
-appears in the registry.
+- [ ] **4.2** Tab 5 → Task 1 (`quantum_related`) → data source **Demo Dataset
+(2,802 units)** (or upload `examples/tiny_labels.jsonl`) → `🚀 Start Fine-Tuning`.
+**Expected**: asynchronous progress + live Train-Loss / Validation-F1 curve in the
+**Live Training Monitor**; on completion, held-out metrics (F1/Accuracy/Precision/Recall)
+are reported together with the save path (`💾 Model saved to: …/user_models/<name>`).
+Starting a second job while one is running is rejected with a clear message.
 
-- [ ] **4.3** `★ Set Active` on the trained model. **Expected**: the header indicator
-(model: ...) switches to the new model; Tab 2 classification now uses it.
+- [ ] **4.3** On completion the trained model automatically becomes the active/default
+classifier. **Expected**: the page-header indicator (Active Model: ...) switches to the
+new model; Tab 2 classification now uses it. Restore the released checkpoints by
+deleting the folder under `user_models/` (or
+`curl -X POST /api/models/default -d '{"model_id":"released"}'`).
 
-- [ ] **4.4** Side-by-side evaluation panel: compare the trained model vs the released
-checkpoint on any corpus. **Expected**: agreement, κ, and category-shift report.
+- [ ] **4.4** The tab shows only the 3-step training form and the **Live Training
+Monitor**. **Expected**: no model-registry strip, no Set-Active buttons, no
+side-by-side evaluation panel (the JSON APIs remain available).
 
 - [ ] **4.5** README classifier-quality claims (architecture diagram): Task 1 held-out
 **F1 = 0.936**, Task 2 held-out **F1 = 0.840**. **Expected**: these figures are the
@@ -207,8 +226,9 @@ docker build -t cc4q-workbench . && docker run --rm -p 8501:8501 cc4q-workbench
 
 The verifier should NOT fail the verification for these (already tracked):
 
-1. Corpus Explorer group labels render tight, e.g. `APPLICATION LAYER (NEW SDKS)26.0%`
-   (missing space) — cosmetic.
+1. ~~Corpus Explorer group labels render tight, e.g. `APPLICATION LAYER (NEW SDKS)26.0%`
+   (missing space)~~ — **fixed in the v2.2 UI pass** (spacing added between the group title
+   and percentage spans). If you still see the collision, record it as a defect.
 2. The legacy `v0.1.0` release is retained for provenance; the tool uses `v0.2.0`
    (two-stage checkpoints + optional bert-base). Do not verify against v0.1.0.
 
@@ -226,8 +246,8 @@ The verifier should NOT fail the verification for these (already tracked):
 | Live inspector: presets, confidence, health check | ☐ | |
 | 4-stage repo builder (2 CCPs → 2 SCCUs on tiny_repo) | ☐ | |
 | Annotation studio: sessions, sampling, keyboard labels, export | ☐ | |
-| Trainer: dry-run, warm-start, live curves, registry, set-active | ☐ | |
-| Side-by-side model evaluation | ☐ | |
+| Trainer: dry-run, warm-start, live curves, active-model strip, set-active | ☐ | |
+| Benchmark Overview landing (28,076 @ 34.3%) + Upload-JSONL labeling | ☐ | |
 | CLI: 7 commands end-to-end | ☐ | |
 | pytest 51 passed | ☐ | |
 | Docker all-in-one (optional) | ☐ | |

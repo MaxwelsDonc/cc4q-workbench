@@ -17,8 +17,10 @@ import threading
 import time
 import uuid
 from collections import Counter
+import re
 
 from starlette.applications import Starlette
+from starlette.middleware import Middleware
 from starlette.responses import FileResponse, JSONResponse, Response
 from starlette.routing import Mount, Route
 from starlette.staticfiles import StaticFiles
@@ -255,7 +257,7 @@ def _load_manifest():
 
 
 def _seed_defaults():
-    """Ensure built-in 6 SDK corpora and the 379-unit TOSEM Spot-Check session exist."""
+    """Ensure built-in 6 SDK corpora and the unseen-SDK labeling demo session exist."""
     manifest = _load_manifest()
     existing_sdks = {
         a.get("sdk")
@@ -293,22 +295,54 @@ def _seed_defaults():
                 pass
 
 
+def _norm_comment_text(t):
+    """Normalize comment text for matching: the spot-check CSV stores literal
+    \\n/\\t escapes while unit jsonl stores real whitespace."""
+    if not t:
+        return ""
+    t = t.replace("\\n", " ").replace("\\t", " ").replace("\n", " ").replace("\t", " ")
+    return re.sub(r"\s+", " ", t).strip().lower()
+
+
 def _seed_spotcheck_session(csv_path, key_path):
-    """Create a built-in annotation session from exp/spotcheck_annotation.csv."""
+    """Create a built-in labeling demo session from exp/spotcheck_annotation.csv.
+
+    Items carry model predictions but NO human labels, so the user labels from
+    scratch (adjudicating against the model). Segmentation-noise comments
+    (embedded docutils log lines such as "<string>:14: (ERROR/3) ...") are dropped.
+    The CSV has no unit ids, so units are recovered by matching normalized
+    comment text against the built-in corpus (exact, then 60-char prefix).
+    """
     contaminated = {"1", "8", "16", "25", "62", "132"}
+    noise_pat = re.compile(r"<string>:\d+:")
     with open(key_path, encoding="utf-8") as f:
         key_map = {str(r["no"]): r for r in (json.loads(line) for line in f if line.strip())}
 
-    # Look up code snippets and quantum_category from built-in units
-    unit_lookup = {}
+    # Index built-in units by normalized comment text (per repo) for context lookup.
+    text_lookup = {}
+    units_by_repo = {}
     for sdk in ("qiskit-machine-learning", "qiskit-nature", "qiskit-algorithms"):
+        repo_units = []
         upath = os.path.join(UNITS_DIR, f"{sdk}.jsonl")
         if os.path.isfile(upath):
             with open(upath, encoding="utf-8") as f:
                 for line in f:
                     if line.strip():
                         u = json.loads(line)
-                        unit_lookup[(sdk, str(u.get("id", "")))] = u
+                        repo_units.append(u)
+                        text_lookup.setdefault((sdk, _norm_comment_text(u.get("comment_text"))), []).append(u)
+        units_by_repo[sdk] = repo_units
+
+    def find_unit(repo, comment_text):
+        key = _norm_comment_text(comment_text)
+        queue = text_lookup.get((repo, key))
+        if queue:
+            return queue.pop(0)  # 1:1 assignment when sentences repeat
+        prefix = key[:60]
+        for u in units_by_repo.get(repo, []):
+            if _norm_comment_text(u.get("comment_text")).startswith(prefix):
+                return u
+        return {}
 
     items = []
     with open(csv_path, encoding="utf-8-sig", newline="") as f:
@@ -319,32 +353,34 @@ def _seed_spotcheck_session(csv_path, key_path):
             h_lbl = str(row.get("human_label", "")).strip().lower()
             if h_lbl not in ("quantum", "non-quantum"):
                 continue
+            comment_text = row.get("comment_text") or ""
+            if noise_pat.search(comment_text) or "(ERROR/" in comment_text or "(WARNING/" in comment_text:
+                continue
             k_info = key_map.get(no, {})
             m_lbl = str(k_info.get("model_label", "non-quantum")).strip().lower()
             repo = row.get("repo", "")
-            uid = str(row.get("id", ""))
-            u_full = unit_lookup.get((repo, uid), {})
+            u_full = find_unit(repo, comment_text)
 
             m_q = m_lbl == "quantum"
-            h_q = h_lbl == "quantum"
             m_cat = u_full.get("quantum_category") if m_q else None
 
             items.append({
-                "item_id": f"{repo}:{uid}",
+                "item_id": f"{repo}:{no}",
                 "no": int(no) if no.isdigit() else no,
-                "id": uid,
+                "id": str(u_full.get("id", "")),
                 "sdk": repo,
-                "file": row.get("file") or u_full.get("file", ""),
-                "comment_type": row.get("comment_type") or u_full.get("comment_type", ""),
-                "code_entity_type": row.get("code_entity_type") or u_full.get("code_entity_type", ""),
-                "comment_text": row.get("comment_text") or u_full.get("comment_text", ""),
+                "file": u_full.get("file", ""),
+                "comment_type": u_full.get("comment_type", ""),
+                "code_entity_type": row.get("entity") or u_full.get("code_entity_type", ""),
+                "comment_text": comment_text,
                 "code_snippet": u_full.get("code_snippet", ""),
                 "comment_line": u_full.get("comment_line") or [],
                 "code_line": u_full.get("code_line") or [],
                 "model_quantum_related": m_q,
                 "model_quantum_category": m_cat,
-                "human_quantum_related": h_q,
-                "human_quantum_category": m_cat if h_q else None,
+                # Labeling demo: no human labels yet — the user verifies from scratch.
+                "human_quantum_related": None,
+                "human_quantum_category": None,
                 "notes": row.get("notes", ""),
             })
 
@@ -352,16 +388,16 @@ def _seed_spotcheck_session(csv_path, key_path):
         return
     session = ws.create_asset(
         "annotation_session",
-        name="Unseen SDKs Human Verification (379 units)",
+        name=f"Unseen SDKs Labeling Demo ({len(items)} units)",
         schema={"task": "quantum_related", "labels": ["quantum", "non-quantum"]},
         mode="adjudicate",
         corpus_name="3 Application SDKs (Stratified Cochran Sample)",
         total=len(items),
-        labeled_count=len(items),
+        labeled_count=0,
         builtin_spotcheck=True,
     )
     path = ws.write_jsonl(session["id"], "items.jsonl", items)
-    ws.update_asset(session["id"], export_path=path, labeled_count=len(items))
+    ws.update_asset(session["id"], export_path=path, labeled_count=0)
 
 
 def _resolve_model_handle(model_id=None):
@@ -1287,8 +1323,9 @@ def _run_training_job(job_id, task, train_records, model_name, base_model, epoch
         tr = res["test_results"]
         job["status"] = "completed"
         job["progress"] = 1.0
-        job["stage"] = f"Completed · Registered as '{entry['name']}'"
+        job["stage"] = f"Completed · Saved as '{entry['name']}'"
         job["registered_model"] = entry
+        job["saved_to"] = registry.package_dir(entry["id"])
         job["test_results"] = {
             "accuracy": round(float(tr.get("eval_accuracy", 0.0)), 4),
             "precision": round(float(tr.get("eval_precision", 0.0)), 4),
@@ -1330,6 +1367,14 @@ async def api_models_train(request):
         max_samples = None
 
     model_name = (body.get("model_name") or "").strip() or f"{task}-{epochs}ep"
+
+    # Only one training job at a time: concurrent Trainer instances crash the
+    # Apple MPS backend (Metal command-buffer assertion, abort trap 6).
+    if any(j.get("status") == "running" for j in _TRAIN_JOBS.values()):
+        return _json(
+            {"error": "A training job is already running. Wait for it to finish (or reload the page) before starting another."},
+            status_code=409,
+        )
 
     try:
         if source_type == "session":
@@ -1456,6 +1501,30 @@ async def index_page(request):
     return FileResponse(os.path.join(STATIC_DIR, "index.html"))
 
 
+class NoCacheStaticMiddleware:
+    """Static assets must be revalidated on every load — the workbench UI is
+    iterated on frequently and stale cached app.js causes silent breakage."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http" or not scope.get("path", "").startswith("/static"):
+            await self.app(scope, receive, send)
+            return
+
+        async def send_no_cache(message):
+            if message["type"] == "http.response.start":
+                headers = list(message.get("headers") or [])
+                headers = [(k, v) for k, v in headers if k.lower() != b"cache-control"]
+                headers.append((b"cache-control", b"no-cache, must-revalidate"))
+                message = dict(message)
+                message["headers"] = headers
+            await send(message)
+
+        await self.app(scope, receive, send_no_cache)
+
+
 routes = [
     Route("/", index_page),
     Route("/api/overview", api_overview),
@@ -1481,7 +1550,7 @@ routes = [
     Mount("/static", StaticFiles(directory=STATIC_DIR), name="static"),
 ]
 
-app = Starlette(debug=False, routes=routes)
+app = Starlette(debug=False, routes=routes, middleware=[Middleware(NoCacheStaticMiddleware)])
 
 
 def run_server(host="127.0.0.1", port=8501):

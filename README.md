@@ -15,7 +15,7 @@ For ICSE Tool Demonstration & Artifact Reviewers, CC4Q Workbench supports three 
 
 ### Tier 1 · 30-Second Instant Exploration (No Model Download Required)
 
-All precomputed corpora across **6 Qiskit-ecosystem SDKs (39,593 labeled sentence units)** and the **379-unit human-verified unseen-SDK transfer benchmark** are bundled directly in the repository (`cc4q/web/data/`, ~23 MB) with full Python source-code context (`code_snippet` + line numbers).
+All precomputed corpora across **6 Qiskit-ecosystem SDKs (39,593 labeled sentence units)** and a **361-unit unseen-SDK labeling demo** (derived from our human-verified spot-check benchmark) are bundled directly in the repository (`cc4q/web/data/`, ~23 MB) with full Python source-code context (`code_snippet` + line numbers).
 
 ```bash
 git clone https://github.com/MaxwelsDonc/cc4q-workbench.git
@@ -30,7 +30,7 @@ pip install -e .
 cc4q demo
 ```
 
-Open **`http://127.0.0.1:8501`** in your browser to immediately explore the 6 SDK dashboards, inspect source-linked comment units, and audit the 379-unit human verification session.
+Open **`http://127.0.0.1:8501`** in your browser to immediately explore the 6 SDK dashboards, inspect source-linked comment units, and label the 361-unit unseen-SDK demo session.
 
 ### Tier 2 · Full Live Inference, Repository Building & In-Tool Model Training
 
@@ -74,10 +74,10 @@ Unlike classical software comment tools that target generic Java API docstrings,
 │                                Hardware | Software Framework | Others (F1 .840)   │
 ├───────────────────────────────────────────────────────────────────────────────────┤
 │  STAGE 3: INTERACTIVE WEB WORKBENCH (Starlette/Uvicorn + ECharts SPA) & CLI       │
-│  ┌────────────────────┐ ┌────────────────────┐ ┌──────────────┐ ┌──────────────┐  │
-│  │ 1. Corpus Explorer │ │ 2. Live Inspector  │ │ 3. Annotation│ │ 4. Model     │  │
-│  │    & SDK Compare   │ │    & Repo Builder  │ │    Studio    │ │    Trainer   │  │
-│  └────────────────────┘ └────────────────────┘ └──────────────┘ └──────────────┘  │
+│  Tabs: 1. Corpus Explorer (Benchmark Overview + per-SDK dashboards & Compare) ·   │
+│        2. Live Inspector (snippet labeling) · 3. Corpus Builder (4-stage repo     │
+│        pipeline) · 4. Annotation Studio (labeling & verification) ·               │
+│        5. Model Trainer (warm-start fine-tuning)                                  │
 └───────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -99,31 +99,32 @@ Every **Sentence-level Code Comment Unit (SCCU)** is linked to its enclosing AST
 
 ## 🖥️ 5-Minute Reviewer Walkthrough (Web Workbench)
 
-Once `cc4q demo` is running at **`http://127.0.0.1:8501`**, the top navigation bar guides you through four integrated studios:
+Once `cc4q demo` is running at **`http://127.0.0.1:8501`**, the top navigation bar guides you through five integrated studios:
 
 ### 1. Corpus Explorer & Cross-SDK Compare (`Tab 1`)
+* **TOSEM Benchmark Overview (landing)**: the default view aggregates **all six repositories** into collective headline metrics (**39,593 comment sentences · 31.9% quantum-specific · 6 SDKs** — 3 TOSEM-infrastructure + 3 application SDKs we analyzed with this workbench), an aggregate knowledge profile and residence heatmap, and a per-SDK breakdown table (infrastructure subtotal **28,076 @ 34.3%**, application subtotal **11,517 @ 26.0%**) — click any row to drill into that SDK.
 * **Infrastructure vs. Application Layer Discovery**: Switch between the 3 infrastructure SDKs (`qiskit`, `qiskit-aer`, `qiskit-ibm-runtime`) and 3 application SDKs (`qiskit-nature`, `qiskit-algorithms`, `qiskit-machine-learning`). Click **`⇄ Compare SDKs`** to overlay any two SDKs on a dual radar chart and inspect our central empirical finding: **infrastructure SDKs carry 34.3% quantum-specific comments vs. 26.0% in application SDKs**.
-* **Chart-to-Code Bidirectional Filtering**: Click any bar in the **Six-Category Quantum Knowledge Profile** (e.g., *Mathematics* at 28.9% in `qiskit-nature`) or any cell in the **Quantum Residence Heatmap (`Form × Entity`)** to filter the unit list below.
+* **Chart-to-Code Bidirectional Filtering**: Click any bar in **What Quantum Topics They Cover (6 Categories)** (e.g., *Mathematics* at 28.9% in `qiskit-nature`) or any cell in **Where Quantum Comments Live (`Form × Entity`)** to filter the unit list below.
 * **IDE-Style Source Context Viewer**: Click any comment unit on the left to inspect its exact enclosing Python source code (`code_snippet`), file path, and highlighted comment line on the right.
 
-### 2. Live Code Inspector & Repository Builder (`Tab 2`)
-* **Live Code Snippet Inspector**: Load one of the 3 curated quantum presets (*Bell State & Entanglement Circuit*, *Variational Quantum Eigensolver (VQE)*, *Hardware Noise & Coupling-Map Transpiler*) or paste custom Python code. Click **`⚡ Extract, Segment & Classify Quantum Comments`** to inspect:
-  * An automated **Quantum Documentation Health Check** based on our TOSEM guidelines (checking structured docstring coverage, quantum domain signal, and inline point-of-use comments).
-  * Every segmented SCCU with its **Quantum Confidence (%)** and **Top-3 Category Probability Bars**.
-* **4-Stage Repository Corpus Builder**: Switch to **`🏗️ Build Corpus from Repository`**, keep the pre-filled local path `examples/tiny_repo` (or paste any GitHub URL), and click **`🚀 Build & Label Corpus`**. Watch the 4 stages execute live and open the newly built corpus directly in the Explorer.
+### 2. Live Code Inspector (`Tab 2`)
+* **Live Code Snippet Inspector**: Load one of the 3 one-click quantum presets (*Bell State Circuit*, *VQE Algorithm*, *Hardware Transpiler*) or paste custom Python code. Click **`⚡ Extract, Segment & Classify Quantum Comments`** to inspect:
+  * Every segmented SCCU with its **Quantum Confidence badge (%)** and its **quantum-knowledge category badge** — results render only after you click, so what you see always matches the code on the left.
 
-### 3. Annotation Studio — Human-in-the-Loop Data Labeling (`Tab 3`)
-* **Inspect the 379-Unit Unseen-SDK Verification Benchmark**: By default, the studio opens the preloaded **`Unseen SDKs Human Verification (379 units)`** session, displaying live **85.0% Human–Model Agreement** (Wilson 95% CI: `81.0%–88.2%`, Cohen's $\kappa = 0.699$, Precision `83.0%`, Recall `86.2%`). Use the left filter dropdown to select **`⚠️ Disagreements (Human ≠ Model)`** and inspect the exact 57 disagreement cases alongside their Python source code.
-* **Create Your Own Labeling Session**: Click **`+ New Labeling Session`**, choose any corpus, set a sample size (or click the **`385`** button for Cochran's 95% CI formula), choose **Stratified (`Form × Entity`)** sampling, and pick **`Adjudicate (Show Model)`** or **`Blind (Hide Model)`** mode.
-* **Ergonomic Keyboard-Driven Labeling**: Use hotkeys **`Q`** (Quantum-Specific), **`N`** (Non-Quantum), **`1`–`6`** (Six Quantum Categories), **`Space`** (Accept Model Pre-label), and **`←`/`→`** to label units rapidly while referencing the collapsible **TOSEM Annotation Guidelines** card.
+### 3. Corpus Builder (`Tab 3`)
+* **4-Stage Repository Corpus Builder**: Keep the pre-filled local path `examples/tiny_repo` (or paste any GitHub URL), and click **`🚀 Build & Label Corpus`**. Watch the 4 stages execute live (acquire → LibCST extraction → Sphinx segmentation → quantum labeling) and open the newly built corpus directly in the Explorer.
 
-### 4. Model Trainer, Registry & Side-by-Side Evaluator (`Tab 4`)
-* **Train Your Own Quantum Classifier in the Browser**:
+### 4. Annotation Studio — Human-in-the-Loop Data Labeling (`Tab 4`)
+* **Blind Labeling Demo**: the studio opens as a two-card landing — **`📂 Load Demo Benchmark (361 units)`** loads the pre-built *Unseen SDKs Labeling Demo* (361 unlabeled comment sentences from the 3 application-layer SDKs, each with its enclosing Python source context), and **`⬆ Upload JSONL to Label`** accepts your own `.jsonl`/`.json` (up to 1,000 records). Nothing is shown until you load a session.
+* **Purely Manual, No Model Leakage**: the interface deliberately shows only a **Progress** counter — no model pre-labels, no agreement/κ/P-R metrics, no disagreement filters — so your labels are never biased by model predictions (the human-vs-model agreement study behind this benchmark lives in `exp/` and the CLI).
+* **Ergonomic Keyboard-Driven Labeling**: Use hotkeys **`Q`** (Quantum-Specific), **`N`** (Non-Quantum), **`1`–`6`** (Six Quantum Categories), and **`←`/`→`** to move between items manually — labeling stays on the current item so both step choices remain visible. **`⬇ Export Labeled JSONL`** downloads the session with your labels.
+
+### 5. Model Trainer (`Tab 5`)
+* **Train Your Own Quantum Classifier in the Browser** (fine-tuning always warm-starts from the released CC4Q BERT checkpoints):
   1. Select **Task 1 (`quantum_related`, 2 classes)** or **Task 2 (`quantum_category`, 6 classes)**.
-  2. Choose your **Starting Checkpoint**: *Warm-Start from Released CC4Q Checkpoint* (recommended for fast domain adaptation) or *Train from Scratch (`bert-base-uncased`)*.
-  3. Select a **Training Data Source**: pick any **Annotation Studio Session** you labeled in Tab 3, the **Built-in TOSEM Gold Training Dataset** (2,802 binary / 1,800 balanced 6-class records), or **Upload a Custom JSONL File**.
-  4. Click **`🚀 Start Fine-Tuning`** to watch the asynchronous progress bar and real-time **Train Loss & Validation F1 ECharts Curve**, followed by held-out test split metrics (`F1`, `Accuracy`, `Precision`, `Recall`).
-* **One-Click Model Activation & Comparison**: Click **`★ Set Active`** on any newly trained model to make it the default classifier across the workbench, or run **Side-by-Side Model Evaluation** on the right panel to measure agreement, $\kappa$, and category shifts between two models on any corpus.
+  2. Select a **Training Data Source**: the built-in **Demo Dataset** (TOSEM gold training data — 2,802 binary / 1,800 balanced 6-class records) or **Upload Your Own JSONL**.
+  3. Name the model, tune **⚙️ Training Parameters** (Epochs · Batch Size), and click **`🚀 Start Fine-Tuning`** to watch the asynchronous progress bar and real-time **Train Loss & Validation F1 ECharts Curve** in the Live Training Monitor.
+* **Saved Where You Can See It**: on completion the monitor reports the held-out test split metrics (`F1`, `Accuracy`, `Precision`, `Recall`) **and the exact save path** (a self-contained model package under `user_models/<model-name>/`). The trained model automatically becomes the active classifier across the workbench (see the page header); delete its folder under `user_models/` to revert to the released checkpoints. Only one training job runs at a time — starting a second is politely refused.
 
 ---
 
