@@ -233,7 +233,8 @@ def test_spotcheck_agreement():
     """The seeded demo session is the *Unseen SDKs Labeling Demo*: 361 unlabeled
     units (noise rows dropped) with source context, ready for blind human
     labeling. The UI intentionally exposes no human-vs-model agreement — that
-    study is verified via the CLI (`cc4q evaluate`, see VERIFICATION.md 3.4)."""
+    study is verified via the CLI (`cc4q evaluate` against
+    `exp/spotcheck_annotation.csv` and `exp/spotcheck_answer_key.jsonl`)."""
     c = get_client()
     sessions = c.get("/api/annotations").json()["sessions"]
     spot = next((s for s in sessions if s.get("builtin_spotcheck")), None)
