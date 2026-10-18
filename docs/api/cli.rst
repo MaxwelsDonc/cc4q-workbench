@@ -64,20 +64,17 @@ End-to-end example
 .. code-block:: bash
 
    cc4q download-models
-   cc4q build --repo https://github.com/qiskit-community/qiskit-algorithms \
-       --include-dir qiskit_algorithms --output-dir out/algorithms
-   cc4q predict --input out/algorithms/sccus_segmented.json \
-       --output out/algorithms/labeled.jsonl
-   cc4q sample --input out/algorithms/labeled.jsonl --by SDK --n 200 \
-       --output out/algorithms/sample.jsonl
-   cc4q annotate --data out/algorithms/sample.jsonl \
-       --labels quantum,non-quantum --mode adjudicate \
-       --predictions out/algorithms/labeled.jsonl \
-       --output-dir out/algorithms/ann
-   cc4q evaluate --annotations out/algorithms/ann/annotations.csv \
-       --key out/algorithms/key.jsonl
+   cc4q build --repo https://github.com/qiskit-community/qiskit-algorithms --include-dir qiskit_algorithms --output-dir out/algorithms
+   cc4q predict --input out/algorithms/sccus_segmented.json --output out/algorithms/labeled.jsonl
+   cc4q sample --input out/algorithms/labeled.jsonl --by SDK --n 200 --output out/algorithms/sample.jsonl
+   cc4q annotate --data out/algorithms/sample.jsonl --labels quantum,non-quantum --mode adjudicate --predictions out/algorithms/labeled.jsonl --output-dir out/algorithms/ann
+   cc4q evaluate --annotations out/algorithms/ann/annotations.csv --key out/algorithms/key.jsonl
 
 .. note::
+
+   The examples are single-line and use forward-slash relative paths, so
+   they work unchanged in PowerShell, cmd, and bash. If you wrap a command
+   manually in PowerShell, use a backtick rather than ``\``.
 
    ``--contaminated`` accepts a comma-separated list of ids to exclude
    from evaluation (for example units that were part of training). The

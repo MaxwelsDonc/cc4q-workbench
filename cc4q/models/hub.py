@@ -200,7 +200,7 @@ def ensure_checkpoints(model_dir=None, verbose=True, with_base=False):
                 continue
             archive = os.path.join(tmpdir, asset)
             if verbose:
-                print(f"Downloading {asset} ({BASE_URL}/{asset}) …")
+                print(f"Downloading {asset} ({BASE_URL}/{asset}) ...")
             _download(asset, archive)
             actual_sha = _sha256(archive)
             if actual_sha != expected_sha:
@@ -209,9 +209,13 @@ def ensure_checkpoints(model_dir=None, verbose=True, with_base=False):
                     f"expected {expected_sha}. Delete {archive} and retry."
                 )
             if verbose:
-                print(f"  checksum OK ({actual_sha[:16]}…), extracting …")
+                print(f"  checksum OK ({actual_sha[:16]}...), extracting ...")
             with tarfile.open(archive, "r:gz") as tar:
-                tar.extractall(model_dir, filter="data")
+                try:
+                    tar.extractall(model_dir, filter="data")
+                except TypeError:
+                    # Python < 3.11.4 does not expose the filter argument.
+                    tar.extractall(model_dir)
             if not checkpoint_complete(model_dir, name):
                 raise RuntimeError(
                     f"Extraction of {asset} did not produce a usable "

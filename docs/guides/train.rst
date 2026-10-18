@@ -39,8 +39,7 @@ Validate a training file without training:
 
 .. code-block:: bash
 
-    cc4q train --task quantum_related --data my_annotations.jsonl \
-        --output-dir out/x --dry-run
+    cc4q train --task quantum_related --data my_annotations.jsonl --output-dir out/x --dry-run
 
 The train-ready export of the annotation UI already satisfies this
 contract: annotate first (see :doc:`annotate`), then train on the exported

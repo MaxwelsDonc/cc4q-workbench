@@ -42,8 +42,7 @@ or from the CLI:
 
 .. code-block:: bash
 
-    cc4q annotate --data sample.jsonl --schema schema.yaml \
-        --mode adjudicate --predictions labeled.jsonl --output-dir ann/
+    cc4q annotate --data sample.jsonl --schema schema.yaml --mode adjudicate --predictions labeled.jsonl --output-dir ann/
 
 Sample -> annotate -> evaluate
 ------------------------------

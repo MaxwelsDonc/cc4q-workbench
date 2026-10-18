@@ -49,7 +49,7 @@ def download_models(
     if still:
         typer.echo(f"FAILED: still missing {', '.join(still)}")
         raise typer.Exit(1)
-    typer.echo("Done — all quantum model checkpoints present.")
+    typer.echo("Done: all quantum model checkpoints present.")
 
 
 @app.command()
@@ -86,7 +86,7 @@ def build(
 
         files = get_files_from_dir(src, include_dir or None)
         if not files:
-            typer.echo(f"[✗] no .py files found under {src}", err=True)
+            typer.echo(f"[x] no .py files found under {src}", err=True)
             raise typer.Exit(1)
         records = []
         id_gen = id_generator()
@@ -209,7 +209,7 @@ def train(
     if dry_run:
         spec = TASKS.get(task)
         if spec is None:
-            typer.echo(f"[✗] unknown task {task!r}", err=True)
+            typer.echo(f"[x] unknown task {task!r}", err=True)
             raise typer.Exit(1)
         _validate(task, data, spec["text_column"], spec["num_labels"])
         typer.echo(f"[train] dry-run OK: {task} data honors the contract")
@@ -255,7 +255,7 @@ def demo(
     """Launch the CC4Q Web Workbench (Starlette/Uvicorn server)."""
     from cc4q.web.server import run_server
 
-    typer.echo(f"⚛ Launching CC4Q Web Workbench at http://{host}:{port}")
+    typer.echo(f"[cc4q] Launching CC4Q Web Workbench at http://{host}:{port}")
     run_server(host=host, port=port)
 
 
@@ -268,7 +268,7 @@ def serve(
     """Serve the CC4Q Web Workbench (bound to host:port)."""
     from cc4q.web.server import run_server
 
-    typer.echo(f"⚛ Serving CC4Q Web Workbench at http://{host}:{port}")
+    typer.echo(f"[cc4q] Serving CC4Q Web Workbench at http://{host}:{port}")
     run_server(host=host, port=port)
 
 

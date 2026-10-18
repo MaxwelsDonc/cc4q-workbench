@@ -126,6 +126,32 @@ def register(name, path, source="trained", root=None):
     return entry
 
 
+def _safe_extract_zip(zf, dest):
+    """Extract a zip after rejecting entries that escape ``dest``.
+
+    ``zipfile.extractall`` grew a ``filter=`` argument in newer Pythons, so
+    we validate paths explicitly and then call the plain API. This keeps the
+    registry upload path working on Python 3.11-3.13 and still blocks ``..``
+    or absolute-path traversal.
+    """
+    root = os.path.realpath(dest)
+    root_key = os.path.normcase(root)
+    for member in zf.infolist():
+        target = os.path.realpath(os.path.join(root, member.filename))
+        try:
+            inside = (
+                os.path.normcase(os.path.commonpath([root, target]))
+                == root_key
+            )
+        except ValueError:  # different drive on Windows
+            inside = False
+        if not inside:
+            raise ValueError(
+                f"zip entry escapes the target directory: {member.filename}"
+            )
+    zf.extractall(root)
+
+
 def register_uploaded_zip(uploaded_file, name=None, root=None):
     """Extract an uploaded zip into the registry and register it."""
     import tempfile
@@ -134,7 +160,7 @@ def register_uploaded_zip(uploaded_file, name=None, root=None):
     with open(archive, "wb") as f:
         f.write(uploaded_file.getvalue())
     with zipfile.ZipFile(archive) as zf:
-        zf.extractall(tmpdir, filter="data")
+        _safe_extract_zip(zf, tmpdir)
     os.remove(archive)
     # accept either the package root or a single nested directory
     candidates = [d for d in os.listdir(tmpdir)
