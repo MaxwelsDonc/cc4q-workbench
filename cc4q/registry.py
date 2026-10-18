@@ -21,8 +21,24 @@ from cc4q.pipeline.paths import REPO_ROOT
 
 AXES = ("quantum_related", "quantum_category")
 
+__all__ = [
+    "delete",
+    "list_models",
+    "package_dir",
+    "register",
+    "register_uploaded_zip",
+    "registry_root",
+    "set_default",
+    "zip_package",
+]
+
 
 def registry_root():
+    """Return the user-model registry directory.
+
+    Resolution order: ``$CC4Q_USER_MODELS`` > ``user_models/`` next to a
+    source checkout > ``~/.cache/cc4q/user_models`` for wheel installs.
+    """
     env = os.environ.get("CC4Q_USER_MODELS")
     if env:
         return env
@@ -63,6 +79,15 @@ def list_models(root=None):
 
 
 def package_dir(model_id, root=None):
+    """Return the directory holding one registered model package.
+
+    Args:
+        model_id: Registry id (for example ``"my-bert-3ep"``).
+        root: Optional registry root override.
+
+    Returns:
+        Path to the package directory (which may not exist).
+    """
     return os.path.join(root or registry_root(), model_id)
 
 
@@ -131,6 +156,15 @@ def register_uploaded_zip(uploaded_file, name=None, root=None):
 
 
 def set_default(model_id, root=None):
+    """Mark one registered model as the default for the Workbench.
+
+    Args:
+        model_id: Registry id to activate.
+        root: Optional registry root override.
+
+    Raises:
+        KeyError: If ``model_id`` is not registered.
+    """
     index = _load(root)
     ids = {m["id"] for m in index.get("models", [])}
     if model_id not in ids:
@@ -140,6 +174,15 @@ def set_default(model_id, root=None):
 
 
 def delete(model_id, root=None):
+    """Remove a model package from the registry and delete its directory.
+
+    If the deleted model was the default, the next remaining model becomes
+    the default (or the default is cleared when the registry is empty).
+
+    Args:
+        model_id: Registry id to delete.
+        root: Optional registry root override.
+    """
     index = _load(root)
     index["models"] = [m for m in index.get("models", [])
                        if m["id"] != model_id]
@@ -151,7 +194,16 @@ def delete(model_id, root=None):
 
 
 def zip_package(model_id, dest_path, root=None):
-    """Write a zip of the package to dest_path. Returns the path."""
+    """Write a zip archive of one model package.
+
+    Args:
+        model_id: Registry id to archive.
+        dest_path: Destination ``.zip`` path.
+        root: Optional registry root override.
+
+    Returns:
+        ``dest_path``.
+    """
     src = package_dir(model_id, root)
     with zipfile.ZipFile(dest_path, "w", zipfile.ZIP_DEFLATED) as zf:
         for dirpath, _, files in os.walk(src):

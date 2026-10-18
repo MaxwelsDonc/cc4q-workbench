@@ -9,7 +9,9 @@ distribution.
 
 The same functionality is available three ways: the Web Workbench
 (``cc4q serve`` / ``cc4q demo``), the command line (``cc4q <command>``),
-and the Python library (``import cc4q``).
+and the Python library (``import cc4q``). The :doc:`api` reference groups
+the public API by workflow, and :doc:`api/modules` maps every module to its
+documentation.
 
 .. toctree::
    :maxdepth: 2
@@ -29,6 +31,6 @@ and the Python library (``import cc4q``).
    :maxdepth: 2
    :caption: Reference
 
-   data-contracts
    api
+   data-contracts
    recipes

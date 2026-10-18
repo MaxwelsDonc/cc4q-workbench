@@ -1,2 +1,7 @@
 sphinx>=8.0
 furo>=2024.0
+# The reference imports the annotation renderer (streamlit) and pandas.
+# The spaCy English model required by cc4q.pipeline.segment is installed by
+# the Pages workflow before the build.
+streamlit>=1.30
+pandas>=2.0

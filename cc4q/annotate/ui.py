@@ -13,6 +13,8 @@ import os
 import pandas as pd
 import streamlit as st
 
+__all__ = ["render_annotation"]
+
 
 def _resolve(config):
     """Normalize a config dict into (items, preds, state_path, schema,

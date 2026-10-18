@@ -9,6 +9,14 @@
 
 ---
 
+## 📚 Documentation
+
+- **API reference:** [zhouzenghui.site/cc4q-workbench/api.html](https://zhouzenghui.site/cc4q-workbench/api.html) — grouped by workflow (pipeline, models, inference, training/evaluation, annotation, workspace, HTTP, CLI).
+- **Python API:** [top-level API](https://zhouzenghui.site/cc4q-workbench/api/python.html) · **HTTP API:** [Workbench routes](https://zhouzenghui.site/cc4q-workbench/api/web.html) · **CLI:** [commands](https://zhouzenghui.site/cc4q-workbench/api/cli.html)
+- **Module index:** [all public modules](https://zhouzenghui.site/cc4q-workbench/api/modules.html)
+
+---
+
 ## ⚡ Reviewer Quick-Start (Zero-Friction Evaluation)
 
 For ICSE Tool Demonstration & Artifact Reviewers, CC4Q Workbench supports three evaluation tiers depending on your available time and hardware:

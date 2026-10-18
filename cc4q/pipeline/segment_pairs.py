@@ -15,8 +15,23 @@ from cc4q.pipeline.segment.block import segment_block_comment
 from cc4q.pipeline.segment.docstring import segment_docstring
 from cc4q.pipeline.segment.inline import segment_inline_comment
 
+__all__ = ["fix_rst_definition_lists", "segment_comment_pairs"]
+
 
 def fix_rst_definition_lists(docstring: str) -> str:
+    """Insert blank lines before reST definition-list items.
+
+    Google/Sphinx docstrings often put a definition-list item directly
+    after a section header (``Args:`` / ``Returns:``). docutils requires a
+    blank line in that position, so the stage-03 segmentation would
+    otherwise parse the section as plain prose.
+
+    Args:
+        docstring: Raw docstring text.
+
+    Returns:
+        The docstring with the required blank lines inserted.
+    """
     lines = docstring.splitlines()
     fixed_lines = []
     pattern = re.compile('^\\s*(Args|Returns?|Raises?|Attributes|Examples|Notes?):\\s*$')

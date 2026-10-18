@@ -10,6 +10,9 @@ _LAZY = {
 }
 
 
+__all__ = sorted(_LAZY)
+
+
 def __getattr__(name):
     if name in _LAZY:
         module = importlib.import_module(_LAZY[name])

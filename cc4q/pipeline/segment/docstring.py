@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+"""Sphinx/reST-aware docstring segmentation.
+
+Docstrings in quantum SDKs carry most of the domain knowledge, but they mix
+prose with directives, field lists, definition lists, code blocks, and
+LaTeX. This module parses a docstring into docutils nodes and emits semantic
+blocks (``paragraph``, ``code``, ``params``, ``args``, ``note``, ...) so the
+stage-03 SCCU pipeline can label sentence-level units without losing the
+structure of the original documentation.
+"""
 
 import re
 import textwrap
@@ -75,6 +84,8 @@ def register_all_known_sphinx_rst_support():
 BLOCK_TYPE_MAP = {'paragraph': 'paragraph', 'literal_block': 'code', 'doctest_block': 'code', 'note': 'note', 'warning': 'note', 'hint': 'note', 'admonition': 'note', 'section': 'section', 'title': 'title', 'definition_list': 'args', 'field_list': 'params', 'bullet_list': 'list', 'enumerated_list': 'list', 'rubric': 'title', 'block_quote': 'quote'}
 SKIP_TYPES = {'system_message', 'raw', 'target', 'substitution_definition'}
 
+__all__ = ["segment_docstring", "parse_docstring_to_blocks"]
+
 def get_block_type(node):
     return BLOCK_TYPE_MAP.get(node.__class__.__name__, 'unknown')
 
@@ -148,6 +159,22 @@ def process_container(node) -> Dict[str, Any]:
     return {'type': 'directive', 'name': directive_name, 'content': directive_content}
 
 def segment_docstring(comment_text: str) -> List[Dict[str, Any]]:
+    """Split a Sphinx/reST docstring into semantic sentence blocks.
+
+    Paragraphs are sentence-split with spaCy; field/definition lists are
+    kept as ``params``/``args`` blocks; code blocks, notes, sections, and
+    unknown Sphinx directives are preserved with their type. If docutils
+    cannot parse the input, the whole docstring is returned as one
+    ``paragraph`` block rather than dropping it.
+
+    Args:
+        comment_text: Raw docstring text (without the surrounding triple
+            quotes).
+
+    Returns:
+        A list of ``{"type": str, "content": str, ...}`` dictionaries.
+        List blocks may also carry ``desc``/``title``/``name`` keys.
+    """
     if not comment_text or not comment_text.strip():
         return []
     try:
@@ -186,6 +213,7 @@ def segment_docstring(comment_text: str) -> List[Dict[str, Any]]:
         return [{'type': 'paragraph', 'content': comment_text.strip()}]
 
 def parse_docstring_to_blocks(docstring: str) -> List[Dict[str, Any]]:
+    """Alias for :func:`segment_docstring` kept for older callers."""
     return segment_docstring(docstring)
 if __name__ == '__main__':
     test_docstring = '\nBuild a :class:`.Gate` object from a :class:`.QuantumCircuit`.\n\nThe gate is anonymous (not tied to a named quantum register),\nand so can be inserted into another circuit. The gate will\nhave the same string name as the circuit.\n\nArgs:\n    circuit (QuantumCircuit): the input circuit.\n\n    parameter_map (dict): For parameterized circuits, a mapping from\n    parameters in the circuit to parameters to be used in the gate.\n    If None, existing circuit parameters will also parameterize the\n    Gate.\n\n    equivalence_library (EquivalenceLibrary): Optional equivalence library\n    where the converted gate will be registered.\n    label (str): Optional gate label.\n\nRaises:\n    QiskitError: if circuit is non-unitary or if\n    parameter_map is not compatible with circuit\n\nReturn:\n    Gate: a Gate equivalent to the action of the\n    input circuit. Upon decomposition, this gate will\n    yield the components comprising the original circuit.\n'

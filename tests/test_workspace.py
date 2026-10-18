@@ -9,6 +9,14 @@ import pytest
 import cc4q.workspace as ws
 
 
+def test_top_level_workspace_alias():
+    import cc4q
+
+    # Simulate a fresh ``import cc4q`` where the lazy alias is not cached.
+    cc4q.__dict__.pop("workspace", None)
+    assert cc4q.workspace is ws
+
+
 @pytest.fixture()
 def space(tmp_path, monkeypatch):
     root = tmp_path / "ws"

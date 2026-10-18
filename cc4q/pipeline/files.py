@@ -1,19 +1,36 @@
+"""Filesystem discovery helpers for repository checkouts."""
+
 import os
 from typing import List, Optional
 
+__all__ = ["get_files_from_dir"]
 
-def get_files_from_dir(directory: str, include_dirs: Optional[List[str]] = None) -> List[str]:
-    """.py files under ``directory``, restricted to ``include_dirs`` (paths
-    relative to ``directory``).
 
-    Empty or None ``include_dirs`` means the whole ``directory`` tree.
+def get_files_from_dir(
+    directory: str, include_dirs: Optional[List[str]] = None
+) -> List[str]:
+    """.py files under ``directory``, restricted to ``include_dirs``.
+
+    Paths in ``include_dirs`` are relative to ``directory``. Empty or
+    ``None`` ``include_dirs`` means the whole tree.
+
     Matching uses an exact-or-path-boundary rule, so a package dir like
     ``qiskit_aer`` does not swallow a sibling ``qiskit_aer_extra``.
     Results are sorted for deterministic file order.
+
+    Args:
+        directory: Repository checkout root.
+        include_dirs: Optional subdirectories to include.
+
+    Returns:
+        Absolute paths to matching ``.py`` files.
     """
     directory = os.path.abspath(directory)
     if include_dirs:
-        bases = [os.path.abspath(os.path.join(directory, d)) for d in include_dirs]
+        bases = [
+            os.path.abspath(os.path.join(directory, d))
+            for d in include_dirs
+        ]
     else:
         bases = None
     files_path = []
@@ -24,6 +41,6 @@ def get_files_from_dir(directory: str, include_dirs: Optional[List[str]] = None)
         ):
             continue
         for file in sorted(filenames):
-            if file.endswith('.py'):
+            if file.endswith(".py"):
                 files_path.append(os.path.join(root, file))
     return files_path

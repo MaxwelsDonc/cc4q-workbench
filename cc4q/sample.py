@@ -14,6 +14,8 @@ Deterministic for a fixed ``seed``.
 import json
 import random
 
+__all__ = ["sample"]
+
 
 def _load_records(data):
     if isinstance(data, (str, bytes, __import__("os").PathLike)):
@@ -42,13 +44,34 @@ def _take_size(pool_size, total_size, n, frac):
 
 
 def sample(data, by=None, n=None, frac=None, quotas=None, seed=42):
-    """Sample records from ``data`` (JSONL path or list of dicts).
+    """Sample records from a corpus.
 
-    Exactly one of ``n`` / ``frac`` applies per stratum (and globally in
-    random mode). ``quotas`` maps stratum keys (see ``by``) to explicit
-    sample sizes and requires ``by``. Returns a new list; input order is
-    not preserved (strata are processed in sorted key order, records drawn
-    without replacement via a seeded RNG).
+    Three modes are supported:
+
+    * random: ``sample(data, n=200)`` or ``sample(data, frac=0.1)``.
+    * stratified: ``sample(data, by=["SDK"], n=200)`` allocates ``n`` (or
+      ``frac``) proportionally across strata.
+    * quota: ``sample(data, by=["SDK"], quotas={"qiskit": 100, ...})``
+      draws explicit per-stratum sizes.
+
+    Args:
+        data: JSONL path or iterable of record dicts.
+        by: One or more columns used to form strata.
+        n: Total sample size (proportional across strata when ``by`` is
+            set). Mutually exclusive with ``frac``.
+        frac: Fraction to sample (proportional across strata when ``by`` is
+            set). Mutually exclusive with ``n``.
+        quotas: Mapping from stratum key to sample size. Requires ``by``.
+        seed: Random seed; sampling is deterministic for a fixed seed.
+
+    Returns:
+        A new list of sampled records. Input order is not preserved:
+        strata are processed in sorted key order and records are drawn
+        without replacement.
+
+    Raises:
+        ValueError: If both ``n`` and ``frac`` are given, if no sampling
+            mode is specified, or if ``quotas`` is used without ``by``.
     """
     records = _load_records(data)
     rng = random.Random(seed)

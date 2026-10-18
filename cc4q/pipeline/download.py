@@ -3,6 +3,8 @@
 import os
 import subprocess
 
+__all__ = ["clone_repo"]
+
 
 def clone_repo(repo, output_dir):
     """Clone one repo entry into ``output_dir``.

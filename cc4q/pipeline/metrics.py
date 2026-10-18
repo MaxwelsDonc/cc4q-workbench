@@ -15,9 +15,24 @@ import tokenize
 
 SKIP_DIRS = {".git", ".venv", "venv", "__pycache__", "node_modules"}
 
+__all__ = [
+    "compute_comment_density",
+    "count_comment_code_lines",
+    "iter_py_files",
+    "quantum_residence",
+]
+
 
 def iter_py_files(root, include_dirs=None):
-    """.py files under root, restricted to include_dirs (relative names)."""
+    """Yield ``.py`` files under ``root``, restricted to ``include_dirs``.
+
+    Args:
+        root: Repository checkout root.
+        include_dirs: Optional subdirectories (relative names) to scan.
+
+    Yields:
+        Absolute paths to Python files, sorted per directory.
+    """
     root = os.path.abspath(root)
     if include_dirs:
         bases = [os.path.abspath(os.path.join(root, d)) for d in include_dirs]
@@ -47,7 +62,16 @@ def _fallback_line_scan(source):
 
 
 def count_comment_code_lines(path):
-    """(comment_lines, code_lines) for one Python file."""
+    """Count comment and code lines in one Python file.
+
+    Args:
+        path: Path to a Python source file.
+
+    Returns:
+        A ``(comment_lines, code_lines)`` tuple. A physical line counts as
+        a comment line when it carries a ``#`` token; blank lines count as
+        neither. Files that fail to tokenize fall back to a prefix scan.
+    """
     with open(path, "rb") as f:
         raw = f.read()
     try:
@@ -73,10 +97,16 @@ def count_comment_code_lines(path):
 
 
 def compute_comment_density(root, include_dirs=None):
-    """Aggregate comment density over a repo checkout.
+    """Aggregate comment density over a repository checkout.
 
-    Returns {"comment_lines": int, "code_lines": int, "value": float}
-    where value = comment_lines / code_lines (0.0 if no code lines).
+    Args:
+        root: Repository checkout root.
+        include_dirs: Optional subdirectories (relative names) to scan.
+
+    Returns:
+        ``{"comment_lines": int, "code_lines": int, "value": float}`` where
+        ``value = comment_lines / code_lines`` (``0.0`` if there are no
+        code lines).
     """
     comment = code = 0
     for path in iter_py_files(root, include_dirs):
@@ -91,11 +121,14 @@ def compute_comment_density(root, include_dirs=None):
 
 
 def quantum_residence(units):
-    """Quantum SCCU counts per (comment_type, entity_level).
+    """Count quantum SCCUs per ``(comment_type, entity_level)``.
 
-    ``units`` are lean unit dicts/DataFrame records with keys comment_type,
-    code_entity_type, quantum_related. Returns
-    {comment_type: {entity_level: count}} over quantum units only.
+    Args:
+        units: Lean unit dicts/DataFrame records with ``comment_type``,
+            ``code_entity_type``, and ``quantum_related`` keys.
+
+    Returns:
+        ``{comment_type: {entity_level: count}}`` over quantum units only.
     """
     table = {}
     for u in units:

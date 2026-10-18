@@ -21,6 +21,20 @@ CATEGORY_LIST = [CATEGORY_MAPPING[i] for i in range(6)]
 
 MAX_LENGTH = 512
 
+__all__ = [
+    "CATEGORY_LIST",
+    "CATEGORY_MAPPING",
+    "analyze_snippet",
+    "classify_units",
+    "compact_snippet",
+    "extract_units",
+    "predict_corpus",
+    "predict_labels",
+    "predict_quantum_detailed",
+    "predict_snippet",
+    "raw_text_units",
+]
+
 
 def _resolve_device():
     from cc4q.models.hub import resolve_device
@@ -57,15 +71,29 @@ def _batch_predict(tokenizer, model, texts, device, batch=32):
 def predict_quantum_detailed(texts, models, batch=32):
     """Run the two-stage quantum classifiers with confidence scores.
 
-    Returns a list of dicts per text:
-      {
-        "quantum_related": bool,
-        "quantum_confidence": float,      # probability of predicted binary class
-        "quantum_prob": float,            # probability of being quantum-specific
-        "quantum_category": str | None,
-        "category_confidence": float | None,
-        "category_probs": dict[str, float] | None
-      }
+    Task 1 (binary) runs on every text; Task 2 (six categories) runs only
+    on texts classified as quantum-specific.
+
+    Args:
+        texts: Comment/unit strings to classify.
+        models: A :class:`cc4q.models.hub.ModelHandle`.
+        batch: Inference batch size.
+
+    Returns:
+        One dict per text with these keys:
+
+        ``quantum_related``
+            ``True`` when the unit is quantum-specific.
+        ``quantum_confidence``
+            Probability of the predicted binary class.
+        ``quantum_prob``
+            Probability that the unit is quantum-specific.
+        ``quantum_category``
+            Category name, or ``None`` for non-quantum units.
+        ``category_confidence``
+            Probability of the predicted category, or ``None``.
+        ``category_probs``
+            Mapping from category name to probability, or ``None``.
     """
     if not texts:
         return []
@@ -111,9 +139,17 @@ def predict_quantum_detailed(texts, models, batch=32):
 
 
 def predict_labels(texts, models, batch=32):
-    """Run quantum classifiers over raw texts.
+    """Run the quantum classifiers over raw texts.
 
-    Returns (quantum_related[bool], quantum_category[str|None]) per text.
+    Args:
+        texts: Comment/unit strings to classify.
+        models: A :class:`cc4q.models.hub.ModelHandle`.
+        batch: Inference batch size.
+
+    Returns:
+        A ``(quantum_related, quantum_category)`` pair of lists, where
+        ``quantum_related`` contains booleans and ``quantum_category``
+        contains category names or ``None`` for non-quantum units.
     """
     details = predict_quantum_detailed(texts, models, batch=batch)
     qr = [d["quantum_related"] for d in details]
@@ -122,7 +158,21 @@ def predict_labels(texts, models, batch=32):
 
 
 def compact_snippet(code_snippet, comment_text, max_lines=32, max_chars=1200):
-    """Extract a concise, readable window of code_snippet around the comment."""
+    """Extract a concise, readable window of code around a comment.
+
+    Used by the Workbench API and the demo-data build so long function
+    bodies do not overwhelm the UI/JSON payloads.
+
+    Args:
+        code_snippet: Full enclosing code context.
+        comment_text: Comment text used to locate the interesting window.
+        max_lines: Maximum number of lines to keep.
+        max_chars: Maximum number of characters to keep.
+
+    Returns:
+        The trimmed snippet (with ``# ... [truncated] ...`` markers when
+        content was removed), or an empty string for empty input.
+    """
     if not code_snippet:
         return ""
     lines = code_snippet.splitlines()
@@ -194,7 +244,18 @@ def _segment_record(record):
 
 
 def raw_text_units(raw_text):
-    """Automatic fallback: classify non-parseable input line by line."""
+    """Build SCCU-like units for non-Python input, line by line.
+
+    This is the fallback used by :func:`analyze_snippet` when LibCST cannot
+    parse the snippet: each non-empty line becomes one unit with
+    ``comment_type="raw"``.
+
+    Args:
+        raw_text: Arbitrary text (source code, logs, prose, ...).
+
+    Returns:
+        A list of unit dictionaries with the same keys as regular SCCUs.
+    """
     out = []
     for idx, line in enumerate(raw_text.splitlines(), 1):
         cleaned = line.strip().lstrip("#").strip()
@@ -216,9 +277,15 @@ def raw_text_units(raw_text):
 
 
 def extract_units(source_code):
-    """Extract + segment a Python snippet -> list of SCCU dicts.
+    """Extract and segment a Python snippet into SCCU dictionaries.
 
-    Returns (units, error).
+    Args:
+        source_code: Python source text.
+
+    Returns:
+        A ``(units, error)`` tuple. On parse failure, ``units`` is empty
+        and ``error`` is a human-readable message; callers can fall back to
+        :func:`raw_text_units`.
     """
     from cc4q.pipeline.extract import python_extract_comment_pairs
     from cc4q.pipeline.ids import id_generator
@@ -238,7 +305,18 @@ def extract_units(source_code):
 
 
 def classify_units(units, models, batch=32):
-    """Label SCCU dicts (``text`` key) in place with detailed quantum predictions."""
+    """Label SCCU dictionaries in place with detailed quantum predictions.
+
+    Args:
+        units: Mutable unit dictionaries (uses ``text`` or ``comment_text``).
+        models: A :class:`cc4q.models.hub.ModelHandle`.
+        batch: Inference batch size.
+
+    Returns:
+        The same ``units`` list, with ``quantum_related``,
+        ``quantum_confidence``, ``quantum_prob``, ``quantum_category``,
+        ``category_confidence``, and ``category_probs`` set on each item.
+    """
     texts = [u.get("text") or u.get("comment_text", "") for u in units]
     details = predict_quantum_detailed(texts, models, batch=batch)
     for unit, det in zip(units, details):
@@ -252,9 +330,17 @@ def classify_units(units, models, batch=32):
 
 
 def analyze_snippet(source_code, models=None):
-    """Full pipeline on a code snippet: extract -> segment -> (classify).
+    """Run extract -> segment -> classify on a code snippet.
 
-    Returns (units, parse_error, fallback_used).
+    Args:
+        source_code: Python source text (or arbitrary text for fallback).
+        models: Optional model handle. When ``None``, units are extracted
+            and segmented but not classified.
+
+    Returns:
+        A ``(units, parse_error, fallback_used)`` tuple. ``parse_error`` is
+        ``None`` on success; ``fallback_used`` is ``True`` when the input
+        was processed line by line with :func:`raw_text_units`.
     """
     units, error = extract_units(source_code)
     fallback = False
@@ -271,7 +357,18 @@ def analyze_snippet(source_code, models=None):
 
 
 def predict_snippet(code, models=None, auto_download=True):
-    """Labeled snippet analysis; loads the classifiers lazily when ``models`` is None."""
+    """Analyze and label one code snippet.
+
+    Args:
+        code: Python source text.
+        models: Optional model handle; loaded lazily when ``None``.
+        auto_download: Download checkpoints when ``models`` is ``None`` and
+            the released checkpoints are missing.
+
+    Returns:
+        The ``(units, parse_error, fallback_used)`` tuple from
+        :func:`analyze_snippet`, with each unit labeled.
+    """
     if models is None:
         from cc4q.models.hub import load_models
         models = load_models(auto_download=auto_download)
@@ -279,14 +376,36 @@ def predict_snippet(code, models=None, auto_download=True):
 
 
 def predict_corpus(units_or_path, models=None, batch=32, auto_download=True):
-    """Label an SCCU corpus (pipeline stage-03 records) on the Quantum axes."""
+    """Label an SCCU corpus on both quantum axes.
+
+    Args:
+        units_or_path: A JSON file (list of records), a JSONL path, or an
+            iterable of SCCU dictionaries. Records need a ``comment_text``
+            or ``text`` field.
+        models: Optional model handle; loaded lazily when ``None``.
+        batch: Inference batch size.
+        auto_download: Download checkpoints when ``models`` is ``None`` and
+            the released checkpoints are missing.
+
+    Returns:
+        The labeled records. Each record gains ``quantum_related`` (0/1),
+        ``quantum_prob``, ``quantum_category``, and
+        ``category_confidence``. Records are labeled in place and the list
+        is returned for convenience.
+    """
     if models is None:
         from cc4q.models.hub import load_models
         models = load_models(auto_download=auto_download)
 
     if isinstance(units_or_path, (str, os.PathLike)):
         with open(units_or_path, "r", encoding="utf-8") as f:
-            records = json.load(f)
+            text = f.read()
+        if text.lstrip().startswith("["):
+            records = json.loads(text)
+        else:
+            records = [
+                json.loads(line) for line in text.splitlines() if line.strip()
+            ]
     else:
         records = list(units_or_path)
     if not records:

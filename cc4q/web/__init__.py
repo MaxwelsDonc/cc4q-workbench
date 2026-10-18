@@ -8,3 +8,5 @@ STATIC_DIR = os.path.join(WEB_DIR, "static")
 # Corpus Explorer. Formerly cc4q/app/data; moved here with the Streamlit
 # retirement so the web stack has no dependency on cc4q.app.
 DATA_DIR = os.path.join(WEB_DIR, "data")
+
+__all__ = ["DATA_DIR", "STATIC_DIR", "WEB_DIR"]

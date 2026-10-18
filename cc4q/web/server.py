@@ -50,6 +50,8 @@ from cc4q.web import STATIC_DIR
 UNITS_DIR = os.path.join(DATA_DIR, "units")
 MANIFEST_PATH = os.path.join(DATA_DIR, "manifest.json")
 
+__all__ = ["app", "routes", "run_server"]
+
 _MODEL_CACHE = {}
 _PIPELINE_JOBS = {}
 _TRAIN_JOBS = {}
@@ -1554,6 +1556,17 @@ app = Starlette(debug=False, routes=routes, middleware=[Middleware(NoCacheStatic
 
 
 def run_server(host="127.0.0.1", port=8501):
+    """Serve the Workbench with Uvicorn (blocking).
+
+    Args:
+        host: Interface to bind, e.g. ``"127.0.0.1"`` for local use or
+            ``"0.0.0.0"`` in a container.
+        port: TCP port.
+
+    The ASGI application is available as :data:`cc4q.web.server.app` for
+    embedding in another ASGI server. HTTP routes are documented in
+    :doc:`/api/web`.
+    """
     import uvicorn
     os.makedirs(STATIC_DIR, exist_ok=True)
     _seed_defaults()

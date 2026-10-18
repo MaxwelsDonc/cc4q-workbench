@@ -30,6 +30,10 @@ jobs:
           python -m pip install -r docs/requirements-docs.txt
           python -m pip install -e .
           python -m pip install -q plotly pandas
+          python -m spacy download en_core_web_sm
+
+      - name: Check public API coverage
+        run: python docs/check_api_coverage.py
 
       - name: Build docs
         run: sphinx-build -b html docs docs/_build -W

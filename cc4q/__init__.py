@@ -1,21 +1,33 @@
 """CC4Q — build, inspect, and profile labeled comment corpora for
 Python-based quantum SDKs.
 
-Public API (imported lazily):
+The package conveniences are imported lazily so ``import cc4q`` stays cheap.
+Canonical module APIs live in the submodules listed below; the top-level
+names are aliases for the most common entry points.
 
 Pipeline:
-    python_extract_comment_pairs, segment_docstring,
-    segment_inline_comment, segment_block_comment, get_files_from_dir,
-    read_config, id_generator
+    :func:`cc4q.pipeline.extract.python_extract_comment_pairs`, :func:`cc4q.pipeline.segment.docstring.segment_docstring`,
+    :func:`cc4q.pipeline.segment.inline.segment_inline_comment`, :func:`cc4q.pipeline.segment.block.segment_block_comment`,
+    :func:`cc4q.pipeline.files.get_files_from_dir`, :func:`cc4q.pipeline.config.read_config`, :func:`cc4q.pipeline.ids.id_generator`
 
-Models / inference (WP1):
-    load_models, resolve_device, ensure_checkpoints
+Models / inference:
+    :func:`cc4q.models.hub.load_models`, :func:`cc4q.models.hub.resolve_device`, :func:`cc4q.models.hub.ensure_checkpoints`
 
-Prediction (WP1):
-    predict_snippet, predict_corpus, extract_units, analyze_snippet
+Prediction:
+    :func:`cc4q.predict.predict_snippet`, :func:`cc4q.predict.predict_corpus`, :func:`cc4q.predict.extract_units`,
+    :func:`cc4q.predict.analyze_snippet`
 
-Training / evaluation (WP1):
-    train, evaluate, evaluate_files
+Training / evaluation:
+    :func:`cc4q.train.train`, :func:`cc4q.evaluate.evaluate`, :func:`cc4q.evaluate.evaluate_files`
+
+Sampling / annotation:
+    :func:`cc4q.sample.sample`, :func:`cc4q.annotate.annotate`
+
+Persistence:
+    :mod:`cc4q.workspace`, :mod:`cc4q.registry`
+
+See :doc:`/api/python` for the grouped top-level API and
+:doc:`/api/modules` for the module map.
 """
 
 import importlib
@@ -60,12 +72,13 @@ __all__ = sorted(_LAZY)
 
 
 def __getattr__(name):
-    if name in _LAZY:
-        module = importlib.import_module(_LAZY[name])
-        value = getattr(module, name)
-        globals()[name] = value
-        return value
-    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    if name not in _LAZY:
+        raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+    module = importlib.import_module(_LAZY[name])
+    # ``workspace`` is a public module, not a function re-export.
+    value = module if name == "workspace" else getattr(module, name)
+    globals()[name] = value
+    return value
 
 
 def __dir__():

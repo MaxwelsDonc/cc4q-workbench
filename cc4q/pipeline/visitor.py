@@ -1,3 +1,11 @@
+"""LibCST visitor that turns one Python module into comment/code records.
+
+The visitor tracks module/class/function scopes so each extracted comment
+is attached to the smallest enclosing entity and carries the right source
+line ranges. It is normally used through
+:func:`cc4q.pipeline.extract.python_extract_comment_pairs`.
+"""
+
 import difflib
 import re
 import textwrap
@@ -10,7 +18,29 @@ from cc4q.pipeline.paths import split_path
 
 DEBUG_INCONSISTENT_LINENO = False
 
+__all__ = ["LibCSTVisitor"]
+
+
 class LibCSTVisitor(cst.CSTVisitor):
+    """Collect comment/code records while walking a LibCST module.
+
+    Args:
+        source_lines: Source file split into physical lines.
+        rel_path: Path relative to the repository root.
+        sdk: SDK name used for provenance.
+        version: SDK release or git ref.
+        id_gen: Iterator yielding unique record ids.
+        host_language: Source language label.
+        clean_mode: Code-context cleaning policy (``current_only``,
+            ``full``, or ``none``).
+        wrapper: Optional :class:`libcst.metadata.MetadataWrapper` for the
+            parsed module; used by the line-number diagnostic.
+
+    Attributes:
+        records: Extracted :class:`~cc4q.pipeline.types.CommentRecord`
+            dictionaries, in source order.
+        scope_ranges: Stack of active module/class/function scopes.
+    """
     METADATA_DEPENDENCIES = (PositionProvider,)
 
     def __init__(self, source_lines: List[str], rel_path: str, sdk: str, version: str, id_gen: Iterator[str], host_language: str='python', clean_mode: str='full', wrapper=None):
@@ -153,6 +183,7 @@ class LibCSTVisitor(cst.CSTVisitor):
         return result
 
     def get_records(self) -> List[Dict]:
+        """Return the extracted records in source order."""
         return self.records
 
     def debug_inconsistent_lineno(self, node: cst.CSTNode, label: str='') -> None:

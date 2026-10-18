@@ -47,6 +47,21 @@ _REQUIRED = {
 }
 SOURCES = ("url", "dir", "upload", "precomputed")
 
+__all__ = [
+    "asset_path",
+    "create_asset",
+    "delete_asset",
+    "export_asset",
+    "get_asset",
+    "list_assets",
+    "list_models",
+    "read_jsonl",
+    "rename_asset",
+    "update_asset",
+    "workspace_dir",
+    "write_jsonl",
+]
+
 
 # ------------------------------------------------------------- resolution
 
@@ -151,6 +166,17 @@ def list_assets(type_=None):
 
 
 def get_asset(asset_id):
+    """Return one asset by id.
+
+    Args:
+        asset_id: Short asset id (for example ``"a1b2c3d4"``).
+
+    Returns:
+        A copy of the asset dictionary.
+
+    Raises:
+        KeyError: If no asset with that id exists.
+    """
     for a in _load()["assets"]:
         if a["id"] == asset_id:
             return dict(a)
@@ -171,6 +197,18 @@ def update_asset(asset_id, **fields):
 
 
 def rename_asset(asset_id, name):
+    """Set an asset's display name.
+
+    Args:
+        asset_id: Asset id.
+        name: New display name.
+
+    Returns:
+        The updated asset dictionary.
+
+    Raises:
+        KeyError: If no asset with that id exists.
+    """
     return update_asset(asset_id, name=name)
 
 
@@ -218,6 +256,16 @@ def asset_path(asset_id, filename, type_=None, create_dir=False):
 
 
 def write_jsonl(asset_id, filename, records):
+    """Write records to a JSONL payload file inside an asset directory.
+
+    Args:
+        asset_id: Asset id whose payload directory should receive the file.
+        filename: File name relative to the asset directory.
+        records: Iterable of JSON-serializable records.
+
+    Returns:
+        The full path to the written file.
+    """
     path = asset_path(asset_id, filename, create_dir=True)
     with open(path, "w", encoding="utf-8") as f:
         for rec in records:
@@ -226,6 +274,7 @@ def write_jsonl(asset_id, filename, records):
 
 
 def read_jsonl(path):
+    """Read a JSONL file into a list of records (blank lines ignored)."""
     with open(path, encoding="utf-8") as f:
         return [json.loads(line) for line in f if line.strip()]
 

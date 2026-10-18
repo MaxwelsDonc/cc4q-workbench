@@ -22,6 +22,8 @@ CATEGORY_ORDER = [
     "Others",
 ]
 
+__all__ = ["normalize_training_records", "resolve_base_model", "train"]
+
 CATEGORY_ALIASES = {
     "mathematics-for-quantum": 0,
     "mathematics for quantum information": 0,
@@ -51,9 +53,22 @@ CATEGORY_ALIASES = {
 def normalize_training_records(rows, task):
     """Convert flexible annotation/corpus rows into canonical training dicts.
 
-    Accepts rows with ``comment`` / ``text`` / ``comment_text`` and label fields
-    in ``label`` / ``human_label`` / ``quantum_related`` / ``quantum_category``.
-    Returns a list of ``{text_col: str, "label": int}`` records.
+    Accepts rows with ``comment`` / ``text`` / ``comment_text`` and label
+    fields in ``label`` / ``human_label`` / ``quantum_related`` /
+    ``quantum_category`` (including the human_* variants written by the
+    annotation UI). Rows without usable text or a valid label are skipped.
+
+    Args:
+        rows: Iterable of mappings (annotation exports, corpus records, ...).
+        task: ``"quantum_related"`` (2 classes) or ``"quantum_category"``
+            (6 classes).
+
+    Returns:
+        A list of ``{text_col: str, "label": int}`` records, where
+        ``text_col`` is ``"comment"`` for Task 1 and ``"text"`` for Task 2.
+
+    Raises:
+        ValueError: If ``task`` is unknown, or no valid rows remain.
     """
     if task not in TASKS:
         raise ValueError(f"Unknown task {task!r}; expected one of {sorted(TASKS)}")
@@ -181,7 +196,20 @@ def _compute_metrics(average):
 
 
 def resolve_base_model(base_model, task):
-    """Resolve 'released' alias to the local released checkpoint if available."""
+    """Resolve the ``"released"`` alias to a local checkpoint when possible.
+
+    ``base_model="released"`` (or ``"cc4q-released"`` /
+    ``"released-checkpoint"``) means "warm-start from the released CC4Q
+    classifier for this task". If that checkpoint is not present locally,
+    the function falls back to ``bert-base-uncased``.
+
+    Args:
+        base_model: Hugging Face model id/path, or a released alias.
+        task: Axis name whose released checkpoint should be used.
+
+    Returns:
+        A model id/path accepted by ``transformers``.
+    """
     if base_model in ("released", "cc4q-released", "released-checkpoint"):
         from cc4q.models.hub import checkpoint_complete, default_model_dir
         mdir = default_model_dir()
@@ -191,11 +219,57 @@ def resolve_base_model(base_model, task):
     return base_model
 
 
-def train(task, data, output_dir, base_model="bert-base-uncased",
-          batch_size=32, epochs=30, learning_rate=2e-5, max_length=256,
-          test_size=0.2, val_size=0.1, seed=42, max_samples=None,
-          callbacks=None):
-    """Fine-tune one CC4Q classifier (`quantum_related` or `quantum_category`)."""
+def train(
+    task,
+    data,
+    output_dir,
+    base_model="bert-base-uncased",
+    batch_size=32,
+    epochs=30,
+    learning_rate=2e-5,
+    max_length=256,
+    test_size=0.2,
+    val_size=0.1,
+    seed=42,
+    max_samples=None,
+    callbacks=None,
+):
+    """Fine-tune one CC4Q classifier.
+
+    The input is a JSONL file that already honors the task's data contract:
+    ``comment`` + int ``label`` for ``quantum_related``, or ``text`` + int
+    ``label`` for ``quantum_category``. Use
+    :func:`normalize_training_records` to convert annotation/corpus exports
+    first. The data is split into train/validation/test sets; the checkpoint
+    with the best validation F1 is restored before the final test evaluation.
+
+    Args:
+        task: ``"quantum_related"`` (2 classes) or ``"quantum_category"``
+            (6 classes).
+        data: Path to a JSONL training file.
+        output_dir: Directory for the fine-tuned model and tokenizer.
+        base_model: Hugging Face model id/path, or ``"released"`` to
+            warm-start from the released checkpoint.
+        batch_size: Per-device train/eval batch size.
+        epochs: Number of training epochs.
+        learning_rate: Optimizer learning rate.
+        max_length: Tokenizer truncation length.
+        test_size: Fraction held out for the final test split.
+        val_size: Fraction of the remaining data used for validation.
+        seed: Random seed for splitting and training.
+        max_samples: Optional cap on the number of training records.
+        callbacks: Optional list of Hugging Face ``TrainerCallback``
+            instances (the Workbench uses this for live progress).
+
+    Returns:
+        A dict with ``trainer``, ``test_results`` (``eval_*`` metrics on the
+        test split), ``output_dir``, and ``train_rows`` / ``val_rows`` /
+        ``test_rows`` counts.
+
+    Raises:
+        ValueError: If ``task`` is unknown or the data file violates the
+            contract.
+    """
     if task not in TASKS:
         raise ValueError(
             f"Unknown task {task!r}; expected one of {sorted(TASKS)}")

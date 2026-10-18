@@ -1,8 +1,17 @@
 #!/usr/bin/env python3
+"""Sentence segmentation for block comments.
+
+Block comments often contain license headers, file headers, and
+multi-paragraph prose. Copyright/license blocks and structured file
+headers are kept as one unit; other text is split into paragraphs and
+then sentences with spaCy.
+"""
 
 import re
 import spacy
 from typing import List, Dict, Any
+
+__all__ = ["segment_block_comment"]
 try:
     nlp = spacy.load('en_core_web_sm')
 except OSError:
@@ -15,6 +24,17 @@ except OSError:
             raise ImportError('Please install the spaCy English model: python -m spacy download en_core_web_sm')
 
 def segment_block_comment(comment_text: str) -> List[str]:
+    """Split a block comment into sentence-level units.
+
+    Copyright/license blocks and structured file headers are returned as a
+    single unit; other text is split by paragraph and then by sentence.
+
+    Args:
+        comment_text: Comment text without the leading ``#`` markers.
+
+    Returns:
+        Non-empty sentence strings; an empty list for blank input.
+    """
     if not comment_text or not comment_text.strip():
         return []
     special_blocks = _detect_special_blocks(comment_text)

@@ -39,9 +39,30 @@ BASE_MODEL = {
 
 REQUIRED_FILES = ("config.json", "model.safetensors", "tokenizer_config.json")
 
+__all__ = [
+    "BASE_MODEL",
+    "BASE_URL",
+    "CHECKPOINTS",
+    "ModelHandle",
+    "RELEASE",
+    "RELEASE_REPO",
+    "checkpoint_complete",
+    "default_model_dir",
+    "ensure_checkpoints",
+    "load_models",
+    "load_models_from",
+    "missing_checkpoints",
+    "resolve_device",
+]
+
 
 def default_model_dir():
-    """Default checkpoint location."""
+    """Return the default checkpoint directory.
+
+    Resolution order: ``$CC4Q_MODEL_DIR`` > ``models_checkpoints/`` next to
+    a source checkout > ``~/.cache/cc4q/models_checkpoints`` for wheel
+    installs.
+    """
     env = os.environ.get("CC4Q_MODEL_DIR")
     if env:
         return env
@@ -53,7 +74,19 @@ def default_model_dir():
 
 
 def resolve_device(device=None):
-    """Resolve the inference device."""
+    """Resolve the torch device used for inference.
+
+    Resolution order: explicit ``device`` > ``$CC4Q_DEVICE`` > CUDA when
+    available > CPU. MPS is never selected automatically because some torch
+    builds hang on it; opt in with ``CC4Q_DEVICE=mps``.
+
+    Args:
+        device: Optional device override, e.g. ``"cuda"``, ``"cpu"``,
+            ``"mps"``, or ``"cuda:1"``.
+
+    Returns:
+        The normalized device string.
+    """
     import torch
     forced = (device or os.environ.get("CC4Q_DEVICE", "")).strip().lower()
     if forced:
@@ -62,11 +95,32 @@ def resolve_device(device=None):
 
 
 def checkpoint_complete(model_dir, name):
+    """Return whether a checkpoint directory contains every required file.
+
+    Args:
+        model_dir: Directory containing the per-axis checkpoint
+            directories.
+        name: Axis directory name, e.g. ``"quantum_related"``.
+
+    Returns:
+        ``True`` when ``config.json``, ``model.safetensors``, and
+        ``tokenizer_config.json`` are all present.
+    """
     path = os.path.join(model_dir, name)
     return all(os.path.isfile(os.path.join(path, f)) for f in REQUIRED_FILES)
 
 
 def missing_checkpoints(model_dir=None):
+    """List the released classifier axes whose checkpoints are missing.
+
+    Args:
+        model_dir: Optional checkpoint root; defaults to
+            :func:`default_model_dir`.
+
+    Returns:
+        Axis names (``"quantum_related"`` / ``"quantum_category"``) that
+        are not complete on disk. An empty list means both are ready.
+    """
     model_dir = model_dir or default_model_dir()
     return [name for name, _ in CHECKPOINTS.values()
             if not checkpoint_complete(model_dir, name)]
@@ -106,10 +160,23 @@ def _download(asset, dest_path):
 
 
 def ensure_checkpoints(model_dir=None, verbose=True, with_base=False):
-    """Download + verify + extract any missing checkpoint.
+    """Download, SHA256-verify, and extract any missing checkpoint.
 
-    with_base=True additionally fetches the bert-base-uncased base model
-    (only needed for from-scratch fine-tuning, not for inference).
+    Args:
+        model_dir: Optional checkpoint root; defaults to
+            :func:`default_model_dir`.
+        verbose: Print download/extraction progress.
+        with_base: Also fetch the ``bert-base-uncased`` base model. Only
+            needed for from-scratch fine-tuning, not for inference.
+
+    Returns:
+        A list of checkpoint names that are still missing after the
+        attempt. An empty list means everything is ready.
+
+    Raises:
+        RuntimeError: If a release asset cannot be downloaded, its SHA256
+            does not match, or extraction does not produce a usable
+            checkpoint.
     """
     model_dir = model_dir or default_model_dir()
     missing = missing_checkpoints(model_dir)
@@ -162,7 +229,21 @@ def ensure_checkpoints(model_dir=None, verbose=True, with_base=False):
 
 
 class ModelHandle:
-    """The fine-tuned quantum classifiers plus the device they live on."""
+    """The fine-tuned quantum classifiers plus the device they live on.
+
+    A handle behaves like a small mapping over the two axes
+    (``quantum_related`` and ``quantum_category``). Each value is a
+    ``(tokenizer, model)`` tuple; both models are in eval mode.
+
+    Attributes:
+        device: Torch device string used by both classifiers.
+        model_dir: Checkpoint root the handle was loaded from.
+
+    Example:
+        >>> models = load_models()
+        >>> tokenizer, model = models["quantum_related"]
+        >>> models.quantum_category[1].eval()
+    """
 
     AXES = ("quantum_related", "quantum_category")
 
@@ -197,7 +278,22 @@ def _load_axis(model_dir, name, device):
 
 
 def load_models(model_dir=None, device=None, auto_download=True):
-    """Load the two Quantum BERT classifiers (eval mode) on the resolved device."""
+    """Load both quantum classifiers in eval mode.
+
+    Args:
+        model_dir: Optional checkpoint root; defaults to
+            :func:`default_model_dir`.
+        device: Optional torch device override; see :func:`resolve_device`.
+        auto_download: Download missing checkpoints instead of raising.
+
+    Returns:
+        A :class:`ModelHandle` with a ``(tokenizer, model)`` tuple for each
+        axis.
+
+    Raises:
+        RuntimeError: If checkpoints are missing and ``auto_download`` is
+            ``False``, or the download cannot be completed.
+    """
     model_dir = model_dir or default_model_dir()
     missing = missing_checkpoints(model_dir)
     if missing:
@@ -220,7 +316,23 @@ def load_models(model_dir=None, device=None, auto_download=True):
 
 
 def load_models_from(axis_dirs, device=None, auto_download=True):
-    """Compose a handle from per-axis model directories, falling back to released checkpoints."""
+    """Compose a handle from per-axis model directories.
+
+    Args:
+        axis_dirs: Mapping from axis name (``"quantum_related"`` /
+            ``"quantum_category"``) to a Hugging Face model directory.
+            Missing or ``None`` axes fall back to the released checkpoint.
+        device: Optional torch device override.
+        auto_download: Download missing released checkpoints instead of
+            raising.
+
+    Returns:
+        A :class:`ModelHandle` combining the provided and released models.
+
+    Raises:
+        RuntimeError: If a required released checkpoint is missing and
+            ``auto_download`` is ``False``.
+    """
     device = resolve_device(device)
     released_dir = None
     models = {}

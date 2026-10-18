@@ -28,6 +28,8 @@ import sys
 
 APP_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "app.py")
 
+__all__ = ["annotate", "prepare"]
+
 
 def _load_records(data):
     if isinstance(data, (str, os.PathLike)):
@@ -81,12 +83,40 @@ def _normalize_schema(schema, records):
     return schema
 
 
-def prepare(data, schema=None, mode="blind", model_predictions=None,
-            output_dir="annotations"):
-    """Materialize the annotation session under ``output_dir`` and return
-    the session config path. The Streamlit app reads that config from the
-    CC4Q_ANNOTATE_CONFIG env var (AppTest-friendly). Raises on invalid
-    inputs (also used by the CLI --dry-run path)."""
+def prepare(
+    data,
+    schema=None,
+    mode="blind",
+    model_predictions=None,
+    output_dir="annotations",
+):
+    """Materialize an annotation session on disk.
+
+    Normalizes the records/schema, writes the session items (and model
+    predictions in adjudicate mode), and returns the path to the session
+    config JSON. The Streamlit app reads that config from the
+    ``CC4Q_ANNOTATE_CONFIG`` environment variable, which makes the setup
+    testable with ``streamlit.testing`` and reusable by the CLI
+    ``--dry-run`` path.
+
+    Args:
+        data: JSONL/JSON/CSV path or an iterable of record dicts.
+        schema: Schema dict, or path to a YAML/JSON schema file. Must define
+            ``labels`` and ``text_column``; ``id_column`` may be inferred
+            from ``id``/``no``/``uuid`` fields.
+        mode: ``"blind"`` (no model input) or ``"adjudicate"`` (show model
+            suggestions for confirmation/override).
+        model_predictions: Optional predictions file (JSONL/JSON/CSV) or
+            iterable joined to items by the id column.
+        output_dir: Directory for the session config and private item files.
+
+    Returns:
+        Path to the generated ``.cc4q_session.json`` config.
+
+    Raises:
+        ValueError: If there are no records, the schema is incomplete, or a
+            required input is missing.
+    """
     records = _load_records(data)
     if not records:
         raise ValueError("no records to annotate")
@@ -111,9 +141,37 @@ def prepare(data, schema=None, mode="blind", model_predictions=None,
     return config_path
 
 
-def annotate(data, schema=None, mode="blind", model_predictions=None,
-             output_dir="annotations", streamlit_args=None):
-    """Launch the annotation UI in Streamlit (blocking until closed)."""
+def annotate(
+    data,
+    schema=None,
+    mode="blind",
+    model_predictions=None,
+    output_dir="annotations",
+    streamlit_args=None,
+):
+    """Launch the annotation UI in Streamlit (blocking until closed).
+
+    This calls :func:`prepare` and then starts ``streamlit run
+    cc4q/annotate/app.py`` as a subprocess with the session config in the
+    environment. Progress is persisted under ``output_dir`` so a closed
+    session resumes at the first unlabeled item.
+
+    Args:
+        data: JSONL/JSON/CSV path or an iterable of record dicts.
+        schema: Schema dict or path to a YAML/JSON schema file.
+        mode: ``"blind"`` or ``"adjudicate"``.
+        model_predictions: Optional model predictions for adjudicate mode.
+        output_dir: Directory for session state and exports.
+        streamlit_args: Extra arguments appended to the ``streamlit run``
+            command (for example ``["--server.port", "8503"]``).
+
+    Returns:
+        The subprocess exit code (``0`` on a normal close).
+
+    Raises:
+        ValueError: If the session inputs are invalid (see
+            :func:`prepare`).
+    """
     config_path = prepare(data, schema=schema, mode=mode,
                           model_predictions=model_predictions,
                           output_dir=output_dir)

@@ -11,6 +11,8 @@ import sys
 
 import typer
 
+__all__ = ["app", "main"]
+
 app = typer.Typer(
     name="cc4q",
     help="Build, inspect, label, and train quantum code-comment classifiers "
@@ -271,6 +273,7 @@ def serve(
 
 
 def main():
+    """Console-script entry point (``cc4q``)."""
     app()
 
 
