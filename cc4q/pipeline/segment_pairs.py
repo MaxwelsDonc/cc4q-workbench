@@ -107,7 +107,7 @@ def segment_comment_pairs(input_file: str, output_file: str = None) -> int:
             logger.error(f'Error processing id {original_id} - {e}')
             segmented_data.append(item)
     try:
-        os.makedirs(os.path.dirname(output_file) or ".", exist_ok=True)
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(segmented_data, f, ensure_ascii=False, indent=2)
         logger.info(f'Segmentation finished!')

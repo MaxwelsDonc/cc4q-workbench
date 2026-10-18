@@ -120,13 +120,11 @@ Analyze a snippet:
 
 .. code-block:: bash
 
-   curl -s -X POST http://127.0.0.1:8501/api/inspect -H 'Content-Type: application/json' -d '{"code": "def f(qc):\n    # Apply a Hadamard gate\n    qc.h(0)\n"}'
+   curl -s -X POST http://127.0.0.1:8501/api/inspect \
+     -H 'Content-Type: application/json' \
+     -d '{"code": "def f(qc):\n    # Apply a Hadamard gate\n    qc.h(0)\n"}'
 
 .. note::
-
-   On Windows PowerShell, ``curl`` may be an alias for
-   ``Invoke-WebRequest``; use ``curl.exe`` (or the Python ``httpx`` client)
-   for these examples.
 
    Pipeline and training jobs run in background threads and are polled
    through their ``/jobs/{job_id}`` endpoints. The server keeps jobs in

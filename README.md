@@ -25,57 +25,23 @@ For ICSE Tool Demonstration & Artifact Reviewers, CC4Q Workbench supports three 
 
 All precomputed corpora across **6 Qiskit-ecosystem SDKs (39,593 labeled sentence units)** and a **361-unit unseen-SDK labeling demo** (derived from our human-verified spot-check benchmark) are bundled directly in the repository (`cc4q/web/data/`, ~23 MB) with full Python source-code context (`code_snippet` + line numbers).
 
-#### Windows (PowerShell)
++ For Windows
 
-```powershell
-git clone https://github.com/MaxwelsDonc/cc4q-workbench.git
-cd cc4q-workbench
-
-# Create the environment. Use `python -m venv .venv` if `py -3.11` is unavailable.
-py -3.11 -m venv .venv
-
-# Allow this one activation script for the current PowerShell session only.
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\.venv\Scripts\Activate.ps1
-
-# Install into the activated environment (do not use a global pip).
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt -r demo/requirements-demo.txt
-python -m pip install -e .
-
-# Launch the Starlette/Uvicorn Web Workbench at http://127.0.0.1:8501
-cc4q demo
-```
-
-If PowerShell blocks script execution, open **cmd.exe** instead and use:
-
-```bat
-py -3.11 -m venv .venv
-.venv\Scripts\activate.bat
-python -m pip install -r requirements.txt -r demo/requirements-demo.txt
-python -m pip install -e .
-cc4q demo
-```
-
-#### macOS / Linux
-
-```bash
-git clone https://github.com/MaxwelsDonc/cc4q-workbench.git
-cd cc4q-workbench
-
-python3 -m venv .venv
-source .venv/bin/activate
-
-python -m pip install --upgrade pip
-python -m pip install -r requirements.txt -r demo/requirements-demo.txt
-python -m pip install -e .
-
-cc4q demo
-```
-
-> **Note:** The `cc4q` console script lives in `.venv\Scripts` on Windows
-> and `.venv/bin` on macOS/Linux. If `cc4q` is not found, the environment
-> was not activated; use `python -m cc4q.cli demo` as a fallback.
+    ```bash
+    git clone https://github.com/MaxwelsDonc/cc4q-workbench.git
+    cd cc4q-workbench
+    
+    # Create environment and install package
+    py -3.11 -m venv .venv
+    # Activate the virtual environment
+    .\.venv\Scripts\Activate.ps1
+    pip install -r requirements.txt -r demo/requirements-demo.txt
+    pip install -e .
+    
+    # Launch the Starlette/Uvicorn Web Workbench at http://127.0.0.1:8501
+    cc4q demo
+    ```
++ For Mac / Linux:
 
 Open **`http://127.0.0.1:8501`** in your browser to immediately explore the 6 SDK dashboards, inspect source-linked comment units, and label the 361-unit unseen-SDK demo session.
 
@@ -177,34 +143,38 @@ Once `cc4q demo` is running at **`http://127.0.0.1:8501`**, the top navigation b
 
 ## 🛠️ Command-Line Interface (`cc4q`) Reference
 
-Every workflow in the Web Workbench has a 1:1 standalone CLI command for headless execution, CI pipelines, and batch reproduction. The examples below use single-line commands and relative paths, so they work unchanged in **PowerShell, cmd, and bash**:
+Every workflow in the Web Workbench has a 1:1 standalone CLI command for headless execution, CI pipelines, and batch reproduction:
 
 ```bash
 # 1. Build a segmented comment corpus (CCPs -> SCCUs) from a local dir or GitHub URL
-cc4q build --repo examples/tiny_repo --output-dir out/cc4q_out
+cc4q build --repo examples/tiny_repo --output-dir /tmp/cc4q_out
 
 # 2. Predict two-stage quantum labels (quantum_related & quantum_category)
-cc4q predict --input out/cc4q_out/sccus_segmented.json --output out/cc4q_out/labeled.jsonl
+cc4q predict --input /tmp/cc4q_out/sccus_segmented.json \
+             --output /tmp/cc4q_out/labeled.jsonl
 
 # 3. Draw a stratified or random sample for human verification
-cc4q sample --input out/cc4q_out/labeled.jsonl --by comment_type --n 50 --output out/cc4q_out/sample.jsonl
+cc4q sample --input /tmp/cc4q_out/labeled.jsonl --by comment_type \
+            --n 50 --output /tmp/cc4q_out/sample.jsonl
 
 # 4. Prepare or run an interactive annotation session
-cc4q annotate --data out/cc4q_out/sample.jsonl --labels quantum,non-quantum --mode adjudicate --predictions out/cc4q_out/labeled.jsonl --output-dir out/cc4q_out/ann --dry-run
+cc4q annotate --data /tmp/cc4q_out/sample.jsonl \
+              --labels quantum,non-quantum --mode adjudicate \
+              --predictions /tmp/cc4q_out/labeled.jsonl \
+              --output-dir /tmp/cc4q_out/ann --dry-run
 
 # 5. Fine-tune a custom Task 1 (quantum_related) or Task 2 (quantum_category) classifier
-cc4q train --task quantum_related --data examples/tiny_labels.jsonl --output-dir out/cc4q_out/clf --dry-run
+cc4q train --task quantum_related --data examples/tiny_labels.jsonl \
+           --output-dir /tmp/cc4q_out/clf --dry-run
 
 # 6. Compute human-vs-model agreement, Cohen's kappa, Precision/Recall, and Wilson 95% CI
-cc4q evaluate --annotations exp/spotcheck_annotation.csv --key exp/spotcheck_answer_key.jsonl --contaminated 1,8,16,25,62,132
+cc4q evaluate --annotations exp/spotcheck_annotation.csv \
+              --key exp/spotcheck_answer_key.jsonl \
+              --contaminated 1,8,16,25,62,132
 
 # 7. Launch the Web Workbench (Starlette/Uvicorn)
 cc4q demo --host 127.0.0.1 --port 8501
 ```
-
-> **Windows tip:** PowerShell uses the backtick character (`` ` ``) for line
-> continuation, not `\`. Keep commands on one line (as above) or use a backtick
-> if you wrap them manually.
 
 ---
 

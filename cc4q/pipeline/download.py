@@ -29,11 +29,11 @@ def clone_repo(repo, output_dir):
                 ['git', '-C', repo_path, 'describe', '--tags', '--always'],
                 capture_output=True, text=True, check=True).stdout.strip()
             if actual != ref:
-                print(f'[x] {name}: existing checkout is at "{actual}", '
+                print(f'[✗] {name}: existing checkout is at "{actual}", '
                       f'expected "{ref}" - remove {repo_path} to re-clone',
                       file=os.sys.stderr)
                 return False
-        print(f'[ok] Skipping existing repo: {name}')
+        print(f'[✓] Skipping existing repo: {name}')
         return True
 
     cmd = ['git', 'clone', '--depth', '1']
@@ -41,6 +41,6 @@ def clone_repo(repo, output_dir):
         cmd += ['--branch', ref]
     cmd += [url, repo_path]
     label = f'{name}@{ref}' if ref else name
-    print(f'[..] Cloning {label}...')
+    print(f'[→] Cloning {label}...')
     subprocess.run(cmd, check=True)
     return True
