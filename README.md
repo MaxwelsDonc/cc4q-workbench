@@ -25,18 +25,23 @@ For ICSE Tool Demonstration & Artifact Reviewers, CC4Q Workbench supports three 
 
 All precomputed corpora across **6 Qiskit-ecosystem SDKs (39,593 labeled sentence units)** and a **361-unit unseen-SDK labeling demo** (derived from our human-verified spot-check benchmark) are bundled directly in the repository (`cc4q/web/data/`, ~23 MB) with full Python source-code context (`code_snippet` + line numbers).
 
-```bash
-git clone https://github.com/MaxwelsDonc/cc4q-workbench.git
-cd cc4q-workbench
++ For Windows
 
-# Create environment and install package
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt -r demo/requirements-demo.txt
-pip install -e .
-
-# Launch the Starlette/Uvicorn Web Workbench at http://127.0.0.1:8501
-cc4q demo
-```
+    ```bash
+    git clone https://github.com/MaxwelsDonc/cc4q-workbench.git
+    cd cc4q-workbench
+    
+    # Create environment and install package
+    py -3.11 -m venv .venv
+    # Activate the virtual environment
+    .\.venv\Scripts\Activate.ps1
+    pip install -r requirements.txt -r demo/requirements-demo.txt
+    pip install -e .
+    
+    # Launch the Starlette/Uvicorn Web Workbench at http://127.0.0.1:8501
+    cc4q demo
+    ```
++ For Mac / Linux:
 
 Open **`http://127.0.0.1:8501`** in your browser to immediately explore the 6 SDK dashboards, inspect source-linked comment units, and label the 361-unit unseen-SDK demo session.
 
