@@ -73,20 +73,13 @@ cc4q demo                       # Launch full interactive workbench at http://12
 
 ### Tier 3 · All-in-One Docker Container
 
-Pull the prebuilt image — the two released BERT checkpoints are baked in, so the container starts instantly with **zero downloads** (exposes the Web Workbench on http://localhost:8501):
+Pull the prebuilt image — **all model weights** (the two released quantum classifiers plus `bert-base-uncased` for fine-tuning, ~1.2 GB) are baked in, so the container runs every feature with **zero downloads**, even fully offline (exposes the Web Workbench on http://localhost:8501):
 
 ```bash
 docker run --rm -p 8501:8501 ghcr.io/maxwelsdonc/cc4q-workbench:latest
 ```
 
-Or build from source:
-
-```bash
-docker build -t cc4q-workbench .
-docker run --rm -p 8501:8501 cc4q-workbench
-```
-
-(The image is single-flavor and CPU-based (x86_64 — Apple Silicon Docker Desktop runs it via Rosetta); the app auto-detects a host GPU at runtime. CI builds and boot-tests the image on every push, and publishes a new `latest` with every release tag.)
+(The image is single-flavor and CPU-based (x86_64 — Apple Silicon Docker Desktop runs it via Rosetta); the app auto-detects a host GPU at runtime. CI builds and boot-tests the image on every push, and publishes a new `latest` with every release tag. To build from source instead, see the run commands in the `Dockerfile` header.)
 
 ---
 
