@@ -1,226 +1,165 @@
-# CC4Q Workbench — Quantum Code Comment Corpus Construction, Labeling & Model Adaptation Studio
+<p align="center">
+  <img src="docs/_static/cc4q_logo.png" width="150" alt="CC4Q Workbench">
+</p>
+
+# CC4Q Workbench
+
+<p align="center"><b>Building, Verifying, and Adapting Quantum Code Comment Corpora</b></p>
 
 [![CI](https://github.com/MaxwelsDonc/cc4q-workbench/actions/workflows/ci.yml/badge.svg)](https://github.com/MaxwelsDonc/cc4q-workbench/actions/workflows/ci.yml)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-violet.svg)](LICENSE)
-[![Companion Paper: TOSEM](https://img.shields.io/badge/Companion%20Paper-ACM%20TOSEM%202026-6D28D9.svg)](#citation)
+[![Companion Paper: ACM TOSEM 2026](https://img.shields.io/badge/Companion%20Paper-ACM%20TOSEM%202026-6D28D9.svg)](#citation)
 
-**CC4Q Workbench** is an open-source, end-to-end experimentation and curation workbench for **Quantum Software Engineering (QSE)** code documentation research and practice. It operationalizes and extends the methodology of our ACM TOSEM companion study (*"Code Comments for Quantum Software Development Kits: An Empirical Study on Qiskit"*), turning any Python-based quantum SDK repository into a structured, sentence-level comment corpus labeled across our **Two-Stage Quantum-Specific Taxonomy**, while providing an interactive **Web Studio** and **CLI/Python API** for human-in-the-loop data labeling, custom BERT fine-tuning, and cross-SDK evaluation.
+> Turn any Python-based quantum SDK repository into a labeled, source-linked code-comment corpus — then explore, verify, and fine-tune on it.
 
----
+Studying comments in a new quantum SDK used to mean rebuilding three things from scratch: a comment extractor, quantum-specific classifiers, and a manual-checking workflow. CC4Q Workbench packages all three as a four-stage pipeline (acquire → extract → segment → label), an interactive five-tab web studio, and an equivalent CLI/Python API. It operationalizes the methodology of our [ACM TOSEM companion study](#citation).
 
-## 📚 Documentation
-
-- **API reference:** [zhouzenghui.site/cc4q-workbench/api.html](https://zhouzenghui.site/cc4q-workbench/api.html) — grouped by workflow (pipeline, models, inference, training/evaluation, annotation, workspace, HTTP, CLI).
-- **Python API:** [top-level API](https://zhouzenghui.site/cc4q-workbench/api/python.html) · **HTTP API:** [Workbench routes](https://zhouzenghui.site/cc4q-workbench/api/web.html) · **CLI:** [commands](https://zhouzenghui.site/cc4q-workbench/api/cli.html)
-- **Module index:** [all public modules](https://zhouzenghui.site/cc4q-workbench/api/modules.html)
+![CC4Q Workbench architecture — five-module UI over the developer API, with the 4-stage corpus pipeline](docs/_static/framework.png)
 
 ---
 
-## ⚡ Reviewer Quick-Start (Zero-Friction Evaluation)
+## Contents
 
-For ICSE Tool Demonstration & Artifact Reviewers, CC4Q Workbench supports three evaluation tiers depending on your available time and hardware:
+- [Quick start](#quick-start)
+- [What it does](#what-it-does)
+- [The five studios](#the-five-studios)
+- [Command-line interface](#command-line-interface)
+- [Released corpora & benchmark](#released-corpora--benchmark)
+- [Repository layout](#repository-layout)
+- [Citation](#citation)
+- [License](#license)
 
-### Tier 1 · 30-Second Instant Exploration (No Model Download Required)
+---
 
-Precomputed corpora across **6 Qiskit-ecosystem SDKs** (**17,517 sentence units** bundled — all units of the 3 application SDKs plus a 2,000-unit random sample, seed 42, for each infrastructure SDK; the full **39,593-unit** corpus statistics are summarized in the benchmark table below) and a **361-unit unseen-SDK labeling demo** (derived from our human-verified spot-check benchmark) are bundled directly in the repository (`cc4q/web/data/`, ~22 MB) with full Python source-code context (`code_snippet` + line numbers).
+## Quick start
 
-#### Windows
+Requires **Python 3.11+**. The bundled corpora need **no model download** — you can be browsing data within a minute.
 
 ```bash
 git clone https://github.com/MaxwelsDonc/cc4q-workbench.git
 cd cc4q-workbench
 
-# Create environment and install package
-py -3.11 -m venv .venv
-# Activate the virtual environment
-.\.venv\Scripts\Activate.ps1
+python3 -m venv .venv && source .venv/bin/activate   # Windows: py -3.11 -m venv .venv; .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt -r demo/requirements-demo.txt
 pip install -e .
 
-# Launch the Starlette/Uvicorn Web Workbench at http://127.0.0.1:8501
-cc4q demo
+cc4q demo                                            # → http://127.0.0.1:8501
 ```
 
-#### macOS / Linux
+Open <http://127.0.0.1:8501> and you land on **Corpus Explorer**: six pre-indexed Qiskit-ecosystem SDKs (**39,593** sentence-level comment units; **17,517** browsable with full source context) plus a **361-unit** blind-labeling demo.
 
-```bash
-git clone https://github.com/MaxwelsDonc/cc4q-workbench.git
-cd cc4q-workbench
-
-# Create environment and install package
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt -r demo/requirements-demo.txt
-pip install -e .
-
-# Launch the Starlette/Uvicorn Web Workbench at http://127.0.0.1:8501
-cc4q demo
-```
-
-Open **`http://127.0.0.1:8501`** in your browser to immediately explore the 6 SDK dashboards, inspect source-linked comment units, and label the 361-unit unseen-SDK demo session.
-
-### Tier 2 · Full Live Inference, Repository Building & In-Tool Model Training
-
-To enable **live code snippet classification** and **quantum labeling when building corpora from new GitHub repositories**, download the SHA256-verified released checkpoints (~835 MB for the two quantum classifiers) and the spaCy English sentence model:
+**For live inference & building new corpora**, download the SHA256-verified checkpoints (~835 MB) and the spaCy English model:
 
 ```bash
 python -m spacy download en_core_web_sm
-cc4q download-models            # Downloads & SHA256-verifies released BERT checkpoints
-cc4q download-models --check    # Verifies checkpoint integrity on disk
-cc4q download-models --with-base  # Also caches bert-base-uncased for offline cold-start fine-tuning
-cc4q demo                       # Launch full interactive workbench at http://127.0.0.1:8501
+cc4q download-models              # download + verify
+cc4q download-models --check      # verify an existing installation
+cc4q download-models --with-base  # also cache bert-base-uncased for offline fine-tuning
 ```
 
-### Tier 3 · All-in-One Docker Container
-
-Pull the prebuilt image — **all model weights** (the two released quantum classifiers plus `bert-base-uncased` for fine-tuning, ~1.2 GB) are baked in, so the container runs every feature with **zero downloads**, even fully offline (exposes the Web Workbench on http://localhost:8501):
+**Docker** — all model weights are baked into the image (CPU x86_64; Apple Silicon via Rosetta), so it runs every feature with zero downloads:
 
 ```bash
 docker run --rm -p 8501:8501 ghcr.io/maxwelsdonc/cc4q-workbench:latest
 ```
 
-(The image is single-flavor and CPU-based (x86_64 — Apple Silicon Docker Desktop runs it via Rosetta); the app auto-detects a host GPU at runtime. CI builds and boot-tests the image on every push, and publishes a new `latest` with every release tag. To build from source instead, see the run commands in the `Dockerfile` header.)
+> Full installation tiers, API reference, and troubleshooting: [docs](https://zhouzenghui.site/cc4q-workbench/) · [API reference](https://zhouzenghui.site/cc4q-workbench/api.html)
 
 ---
 
-## 🧭 System Architecture & Two-Stage Quantum Taxonomy
+## What it does
 
-Unlike classical software comment tools that target generic Java API docstrings, **CC4Q Workbench** is purpose-built for Python quantum SDKs where domain semantics (superposition, entanglement, Hamiltonians, qubit topology, and decoherence constraints) are carried in complex Sphinx/reStructuredText/LaTeX docstrings and inline gate comments.
+Given a repository — local directory or GitHub URL, pinned to a release tag — the workbench acquires it, extracts code–comment pairs (CCPs) from Python sources, segments them into sentence-level comment units (SCCUs) with source links intact, and labels each unit with two released BERT classifiers:
 
-The workbench couples a **five-module user interface** (Corpus Explorer · Live Inspector · Corpus Builder · Annotation Studio · Model Trainer) with a **developer API** covering the full lifecycle — corpus pipeline (`cc4q.pipeline`), model hub (`cc4q.models`), inference (`cc4q.predict`), training & evaluation (`cc4q.train` / `cc4q.evaluate`), sampling & annotation (`cc4q.sample` / `cc4q.annotate`), and workspace & registry (`cc4q.workspace` / `cc4q.registry`):
-
-![CC4Q Workbench architecture — five-module UI over the developer API, with the 4-stage corpus pipeline (① Acquire Source → ② LibCST Extraction → ③ Sphinx Segmentation → ④ Quantum Labeling)](docs/_static/framework.png)
-
-### Two-Stage Quantum-Specific Taxonomy
-
-Every **Sentence-level Code Comment Unit (SCCU)** is linked to its enclosing AST entity (`module`, `class`, `function`) and comment form (`docstring`, `block`, `inline`), and labeled across two hierarchical quantum stages:
-
-| Stage & Task | Category | Definition & Representative Quantum Scope |
+| Stage | Task | Classes |
 | :--- | :--- | :--- |
-| **Task 1 · Binary**<br>(`quantum_related`) | **Quantum-Specific (`1`)**<br>vs. **Non-Quantum (`0`)** | An SCCU is marked **Quantum-Specific** iff it satisfies *(1) Domain Relevance* (quantum physics/computing concepts), *(2) Exclusivity* (not shared with classical computing), and *(3) Explicitness* (direct mention in the sentence). |
-| **Task 2 · 6-Class**<br>(`quantum_category`)<br>*(Applied to Quantum SCCUs)* | **1. Mathematics for quantum info** | Hilbert spaces, unitary/Hermitian operators, Pauli/fermionic matrices, eigenstates, tensor products, and probability amplitudes. |
-| | **2. Quantum algorithms** | High-level quantum/variational algorithms and problem mappings: VQE, QAOA, Grover, Shor, QPE, amplitude estimation, quantum kernels. |
-| | **3. Quantum circuit model** | Qubits, quantum/classical registers, logic gates (`H`, `CX`, `RZ`), state preparation, circuit composition, and projective measurements. |
-| | **4. Quantum hardware** | Physical QPU constraints: coupling maps, qubit connectivity, $T_1/T_2$ thermal relaxation/dephasing, gate/readout error rates, pulse control. |
-| | **5. Quantum software framework** | Compilers, transpiler passes, simulators, runtime primitives (`Estimator`/`Sampler`), OpenQASM intermediate representations, cloud backends. |
-| | **6. Others** | Quantum-specific comments spanning multiple domains or conveying general quantum context not attributable to a single primary class above. |
+| Task 1 · binary | `quantum_related` | quantum-specific vs. non-quantum (domain relevance, exclusivity, explicitness) |
+| Task 2 · 6-class | `quantum_category` | mathematics · algorithms · circuit model · hardware · software framework · others |
+
+Every SCCU stays linked to its enclosing AST entity (`module` / `class` / `function`) and comment form (`docstring` / `block` / `inline`).
 
 ---
 
-## 🖥️ 5-Minute Reviewer Walkthrough (Web Workbench)
+## The five studios
 
-Once `cc4q demo` is running at **`http://127.0.0.1:8501`**, the top navigation bar guides you through five integrated studios:
+The web workbench follows the order you would actually work in: **explore → inspect → build → verify → adapt**.
 
-### 1. Corpus Explorer & Cross-SDK Compare (`Tab 1`)
-* **TOSEM Benchmark Overview (landing)**: the default view aggregates **all six repositories** into collective headline metrics (**39,593 comment sentences · 31.9% quantum-specific · 6 SDKs** — 3 TOSEM-infrastructure + 3 application SDKs we analyzed with this workbench), an aggregate knowledge profile and residence heatmap, and a per-SDK breakdown table (infrastructure subtotal **28,076 @ 34.3%**, application subtotal **11,517 @ 26.0%**) — click any row to drill into that SDK.
-* **Infrastructure vs. Application Layer Discovery**: Switch between the 3 infrastructure SDKs (`qiskit`, `qiskit-aer`, `qiskit-ibm-runtime`) and 3 application SDKs (`qiskit-nature`, `qiskit-algorithms`, `qiskit-machine-learning`). Click **`⇄ Compare SDKs`** to overlay any two SDKs on a dual radar chart and inspect our central empirical finding: **infrastructure SDKs carry 34.3% quantum-specific comments vs. 26.0% in application SDKs**.
-* **Chart-to-Code Bidirectional Filtering**: Click any bar in **What Quantum Topics They Cover (6 Categories)** (e.g., *Mathematics* at 28.9% in `qiskit-nature`) or any cell in **Where Quantum Comments Live (`Form × Entity`)** to filter the unit list below.
-* **IDE-Style Source Context Viewer**: Click any comment unit on the left to inspect its exact enclosing Python source code (`code_snippet`), file path, and highlighted comment line on the right.
+| Tab | What you do there |
+| :--- | :--- |
+| **1 · Corpus Explorer** | Cross-SDK dashboards (quantum share, six-category profile, form × entity heatmap); click a chart to filter units; overlay any two SDKs to compare. |
+| **2 · Live Inspector** | Paste Python code (or load a Bell-state / VQE / transpiler preset) and see every sentence unit with label, confidence, and category. |
+| **3 · Corpus Builder** | Repository → labeled corpus in four visible stages, from a local directory or GitHub URL. |
+| **4 · Annotation Studio** | Blind human checking: model predictions stay hidden while you label, keyboard-driven (`Q`/`N`, `1`–`6`), export as JSONL. |
+| **5 · Model Trainer** | Warm-start fine-tuning from the BERT base model on built-in or uploaded labels, with live train loss and validation F1. |
 
-### 2. Live Code Inspector (`Tab 2`)
-* **Live Code Snippet Inspector**: Load one of the 3 one-click quantum presets (*Bell State Circuit*, *VQE Algorithm*, *Hardware Transpiler*) or paste custom Python code. Click **`⚡ Extract, Segment & Classify Quantum Comments`** to inspect:
-  * Every segmented SCCU with its **Quantum Confidence badge (%)** and its **quantum-knowledge category badge** — results render only after you click, so what you see always matches the code on the left.
-
-### 3. Corpus Builder (`Tab 3`)
-* **4-Stage Repository Corpus Builder**: Keep the pre-filled local path `examples/tiny_repo` (or paste any GitHub URL), and click **`🚀 Build & Label Corpus`**. Watch the 4 stages execute live (acquire → LibCST extraction → Sphinx segmentation → quantum labeling) and open the newly built corpus directly in the Explorer.
-
-### 4. Annotation Studio — Human-in-the-Loop Data Labeling (`Tab 4`)
-* **Blind Labeling Demo**: the studio opens as a two-card landing — **`📂 Load Demo Benchmark (361 units)`** loads the pre-built *Unseen SDKs Labeling Demo* (361 unlabeled comment sentences from the 3 application-layer SDKs, each with its enclosing Python source context), and **`⬆ Upload JSONL to Label`** accepts your own `.jsonl`/`.json` (up to 1,000 records). Nothing is shown until you load a session.
-* **Purely Manual, No Model Leakage**: the interface deliberately shows only a **Progress** counter — no model pre-labels, no agreement/κ/P-R metrics, no disagreement filters — so your labels are never biased by model predictions (the human-vs-model agreement study behind this benchmark lives in `exp/` and the CLI).
-* **Ergonomic Keyboard-Driven Labeling**: Use hotkeys **`Q`** (Quantum-Specific), **`N`** (Non-Quantum), **`1`–`6`** (Six Quantum Categories), and **`←`/`→`** to move between items manually — labeling stays on the current item so both step choices remain visible. **`⬇ Export Labeled JSONL`** downloads the session with your labels.
-
-### 5. Model Trainer (`Tab 5`)
-* **Train Your Own Quantum Classifier in the Browser** (fine-tuning starts from the `bert-base-uncased` BERT base model, the starting point stated in the companion paper):
-  1. Select **Task 1 (`quantum_related`, 2 classes)** or **Task 2 (`quantum_category`, 6 classes)**.
-  2. Select a **Training Data Source**: the built-in **Demo Dataset** (TOSEM gold training data — 2,802 binary / 1,800 balanced 6-class records) or **Upload Your Own JSONL**.
-  3. Name the model, tune **⚙️ Training Parameters** (Epochs · Batch Size), and click **`🚀 Start Fine-Tuning`** to watch the asynchronous progress bar and real-time **Train Loss & Validation F1 ECharts Curve** in the Live Training Monitor.
-* **Saved Where You Can See It**: on completion the monitor reports the held-out test split metrics (`F1`, `Accuracy`, `Precision`, `Recall`) **and the exact save path** (a self-contained model package under `user_models/<model-name>/`). The trained model automatically becomes the active classifier across the workbench (see the page header); delete its folder under `user_models/` to revert to the released checkpoints. Only one training job runs at a time — starting a second is politely refused.
+Every studio has a 1:1 CLI equivalent — see below.
 
 ---
 
-## 🛠️ Command-Line Interface (`cc4q`) Reference
+## Command-line interface
 
-Every workflow in the Web Workbench has a 1:1 standalone CLI command for headless execution, CI pipelines, and batch reproduction:
+Each web workflow has a standalone command, so the same analysis can be scripted headlessly:
 
 ```bash
-# 1. Build a segmented comment corpus (CCPs -> SCCUs) from a local dir or GitHub URL
-cc4q build --repo examples/tiny_repo --output-dir /tmp/cc4q_out
-
-# 2. Predict two-stage quantum labels (quantum_related & quantum_category)
-cc4q predict --input /tmp/cc4q_out/sccus_segmented.json \
-             --output /tmp/cc4q_out/labeled.jsonl
-
-# 3. Draw a stratified or random sample for human verification
-cc4q sample --input /tmp/cc4q_out/labeled.jsonl --by comment_type \
-            --n 50 --output /tmp/cc4q_out/sample.jsonl
-
-# 4. Prepare or run an interactive annotation session
-cc4q annotate --data /tmp/cc4q_out/sample.jsonl \
-              --labels quantum,non-quantum --mode adjudicate \
-              --predictions /tmp/cc4q_out/labeled.jsonl \
-              --output-dir /tmp/cc4q_out/ann --dry-run
-
-# 5. Fine-tune a custom Task 1 (quantum_related) or Task 2 (quantum_category) classifier
-cc4q train --task quantum_related --data examples/tiny_labels.jsonl \
-           --output-dir /tmp/cc4q_out/clf --dry-run
-
-# 6. Compute human-vs-model agreement, Cohen's kappa, Precision/Recall, and Wilson 95% CI
-cc4q evaluate --annotations exp/spotcheck_annotation.csv \
-              --key exp/spotcheck_answer_key.jsonl \
+cc4q build    --repo examples/tiny_repo --output-dir /tmp/cc4q_out          # CCPs → SCCUs
+cc4q predict  --input /tmp/cc4q_out/sccus_segmented.json --output /tmp/cc4q_out/labeled.jsonl
+cc4q sample   --input /tmp/cc4q_out/labeled.jsonl --by comment_type --n 50 --output /tmp/cc4q_out/sample.jsonl
+cc4q annotate --data /tmp/cc4q_out/sample.jsonl --labels quantum,non-quantum \
+              --mode adjudicate --predictions /tmp/cc4q_out/labeled.jsonl --output-dir /tmp/cc4q_out/ann --dry-run
+cc4q train    --task quantum_related --data examples/tiny_labels.jsonl --output-dir /tmp/cc4q_out/clf --dry-run
+cc4q evaluate --annotations exp/spotcheck_annotation.csv --key exp/spotcheck_answer_key.jsonl \
               --contaminated 1,8,16,25,62,132
-
-# 7. Launch the Web Workbench (Starlette/Uvicorn)
-cc4q demo --host 127.0.0.1 --port 8501
+cc4q demo    --host 127.0.0.1 --port 8501
 ```
 
----
-
-## 📊 Empirical Benchmark Summary (6 Quantum SDKs)
-
-All six corpora below are pre-indexed in the workbench (`cc4q/web/data/`) and reproducible from pinned release tags (`config/*.yaml`):
-
-| SDK Repository | Pinned Release | Stack Layer | Python Files | Extracted CCPs | Segmented SCCUs | Quantum SCCUs | Quantum Share (%) | Comment Density |
-| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| `qiskit` | `2.1.0` | Infrastructure | 1,038 | 9,677 | 21,970 | 7,778 | **35.4%** | 0.126 |
-| `qiskit-aer` | `0.17.2` | Infrastructure | 109 | 1,153 | 2,368 | 961 | **40.6%** | 0.114 |
-| `qiskit-ibm-runtime` | `0.45.1` | Infrastructure | 280 | 1,982 | 3,738 | 878 | **23.5%** | 0.210 |
-| **Infrastructure Subtotal** | — | **Infrastructure** | **1,427** | **12,812** | **28,076** | **9,617** | **34.3%** | — |
-| `qiskit-machine-learning` | `0.9.1` | Application | 132 | 1,663 | 3,140 | 704 | **22.4%** | 0.172 |
-| `qiskit-nature` | `0.8` | Application | 246 | 2,037 | 4,842 | 1,379 | **28.5%** | 0.127 |
-| `qiskit-algorithms` | `0.4.0` | Application | 175 | 1,802 | 3,535 | 915 | **25.9%** | 0.155 |
-| **Application Subtotal** | — | **Application** | **553** | **5,502** | **11,517** | **2,998** | **26.0%** | — |
-| **Total Across 6 SDKs** | — | **All Layers** | **1,980** | **18,314** | **39,593** | **12,615** | **31.9%** | — |
+The Python API (`cc4q.pipeline`, `cc4q.models`, `cc4q.predict`, `cc4q.train`, `cc4q.workspace`, …) exposes the same capabilities; see the [API reference](https://zhouzenghui.site/cc4q-workbench/api.html).
 
 ---
 
-## 📁 Repository Structure
+## Released corpora & benchmark
+
+Six Qiskit-ecosystem SDKs are pre-indexed in the workbench (`cc4q/web/data/`) and reproducible from pinned release tags (`config/*.yaml`):
+
+| SDK Repository | Pinned Release | Layer | Files | CCPs | SCCUs | Quantum | Share |
+| :--- | :--- | :--- | ---: | ---: | ---: | ---: | ---: |
+| `qiskit` | `2.1.0` | Infrastructure | 1,038 | 9,677 | 21,970 | 7,778 | 35.4% |
+| `qiskit-aer` | `0.17.2` | Infrastructure | 109 | 1,153 | 2,368 | 961 | 40.6% |
+| `qiskit-ibm-runtime` | `0.45.1` | Infrastructure | 280 | 1,982 | 3,738 | 878 | 23.5% |
+| **Infrastructure subtotal** | | | **1,427** | **12,812** | **28,076** | **9,617** | **34.3%** |
+| `qiskit-machine-learning` | `0.9.1` | Application | 132 | 1,663 | 3,140 | 704 | 22.4% |
+| `qiskit-nature` | `0.8` | Application | 246 | 2,037 | 4,842 | 1,379 | 28.5% |
+| `qiskit-algorithms` | `0.4.0` | Application | 175 | 1,802 | 3,535 | 915 | 25.9% |
+| **Application subtotal** | | | **553** | **5,502** | **11,517** | **2,998** | **26.0%** |
+| **Total (6 SDKs)** | | | **1,980** | **18,314** | **39,593** | **12,615** | **31.9%** |
+
+**Validation.** The pipeline runs without code changes on three application-layer repositories outside the original study: corpus construction takes **8.6–10.9 s** per repository, two-stage labeling **under 8 CPU-minutes** per SDK. A manual check of **379** units sampled from the three new repositories reached **85.0%** agreement with the binary model — 57 disagreements (32 false positives, 25 false negatives). Reproduce it with `cc4q evaluate` above.
+
+---
+
+## Repository layout
 
 ```text
 cc4q-workbench/
 ├── cc4q/
-│   ├── pipeline/          # Stage 1–3: LibCST AST extraction, ~30 Sphinx-directive shims, spaCy segmentation
-│   ├── models/            # SHA256-verified checkpoint downloader & lazy BERT ModelHandle loader
-│   ├── web/               # Starlette/Uvicorn REST API (server.py) + Modern SPA Frontend (static/)
-│   ├── web/data/          # Precomputed manifest.json + source-enriched unit corpora (units/*.jsonl)
-│   ├── predict.py         # Two-stage quantum inference with softmax confidence probabilities
-│   ├── train.py           # HuggingFace Trainer wrapper with warm-start & automatic schema normalization
-│   ├── evaluate.py        # Agreement, Cohen's kappa, Precision/Recall/F1, Wilson 95% CI, confusion matrix
-│   ├── sample.py          # Random, stratified, and quota sampling
-│   ├── workspace.py       # Atomic JSON persistence for user corpora, annotation sessions & evaluations
-│   └── cli.py             # Typer CLI entry point (`cc4q <command>`)
+│   ├── pipeline/          # Stages 1–3: LibCST extraction, Sphinx segmentation, spaCy splitting
+│   ├── models/            # SHA256-verified checkpoint downloader & lazy BERT loader
+│   ├── web/               # Starlette/Uvicorn REST API (server.py) + web frontend (static/)
+│   ├── web/data/          # Precomputed manifest.json + source-enriched unit corpora
+│   ├── predict.py · train.py · evaluate.py · sample.py · workspace.py · cli.py
 ├── config/                # Pinned repository configurations (URL, release tag, include_dirs)
-├── exp/                   # Unseen-SDK generalization results & 379-unit human verification benchmark
-├── model/                 # TOSEM gold training datasets for Task 1 (quantum_related) & Task 2 (quantum_category)
-├── tests/                 # Automated pytest suite (pipeline, workspace, registry, sampling, models)
-├── Dockerfile             # Self-contained container image (build/run-verified by CI)
+├── exp/                   # Unseen-SDK generalization results & 379-unit human-verified benchmark
+├── model/                 # TOSEM gold training data for Task 1 & Task 2
+├── tests/ · docs/         # Automated pytest suite · Sphinx documentation
+├── Dockerfile             # Self-contained image (build/run-verified by CI)
 └── pyproject.toml         # Package metadata and dependencies
 ```
 
 ---
 
-## 📖 Citation
+## Citation
 
-If you use **CC4Q Workbench**, the released BERT classifiers, or the labeled quantum code-comment corpora in your research, please cite our companion paper:
+If you use CC4Q Workbench, the released BERT classifiers, or the labeled quantum code-comment corpora, please cite our companion study:
 
 ```bibtex
 @article{cc4q2026tosem,
@@ -232,6 +171,10 @@ If you use **CC4Q Workbench**, the released BERT classifiers, or the labeled qua
 }
 ```
 
-## 📄 License
+The original CC4Q dataset is archived at [doi:10.6084/m9.figshare.30085657.v1](https://doi.org/10.6084/m9.figshare.30085657.v1).
+
+---
+
+## License
 
 Code, workbench UI, and annotations are released under the [MIT License](LICENSE). Extracted code and comment snippets remain under the Apache-2.0 license of their upstream Qiskit repositories; fine-tuned model checkpoints derive from `bert-base-uncased` (Apache-2.0).
