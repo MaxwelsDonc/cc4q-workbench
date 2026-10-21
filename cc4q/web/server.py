@@ -1358,7 +1358,7 @@ async def api_models_train(request):
     source_type = body.get("source_type", "gold")
     session_id = body.get("session_id")
     uploaded_rows = body.get("records")
-    base_model = body.get("base_model", "released")
+    base_model = body.get("base_model", "bert-base-uncased")
     epochs = max(1, min(30, int(body.get("epochs", 2))))
     batch_size = max(4, min(64, int(body.get("batch_size", 16))))
     learning_rate = float(body.get("learning_rate", 2e-5))
