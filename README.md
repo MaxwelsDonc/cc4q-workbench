@@ -85,7 +85,7 @@ docker build -t cc4q-workbench .
 docker run --rm -p 8501:8501 cc4q-workbench
 ```
 
-(The image is single-flavor and CPU-based (x86_64 — Apple Silicon Docker Desktop runs it via Rosetta); the app auto-detects a host GPU at runtime. The image is built, boot-tested, and published by CI on every push to `main`.)
+(The image is single-flavor and CPU-based (x86_64 — Apple Silicon Docker Desktop runs it via Rosetta); the app auto-detects a host GPU at runtime. CI builds and boot-tests the image on every push, and publishes a new `latest` with every release tag.)
 
 ---
 
