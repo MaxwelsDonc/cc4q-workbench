@@ -34,4 +34,4 @@ html_extra_path = ["_redirects"]
 
 html_theme = "furo"
 html_title = "CC4Q"
-html_static_path = []
+html_static_path = ["_static"]

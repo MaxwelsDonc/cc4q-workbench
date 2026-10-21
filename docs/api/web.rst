@@ -2,8 +2,9 @@ Web Workbench HTTP API
 ======================
 
 ``cc4q serve`` starts a Starlette/Uvicorn server that serves the single-page
-Workbench UI and a JSON API. The browser UI uses the same routes documented
-here; they are also usable from scripts and notebooks.
+Workbench UI and a JSON API. The browser UI is served by the same app and
+drives a subset of these routes; every route is also usable from scripts
+and notebooks.
 
 .. automodule:: cc4q.web.server
 

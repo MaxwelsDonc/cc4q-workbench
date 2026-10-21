@@ -1,7 +1,8 @@
-# CC4Q Workbench demo theme (Kimi-style minimal, light mode) — picked up
-# automatically when `streamlit run demo/app.py` is launched from the
-# workbench root. cc4q/app/ui.py injects the same palette as CSS so launches
-# from other working directories keep the theme too.
+# CC4Q annotation UI theme (Kimi-style minimal, light mode) — picked up
+# automatically when the Streamlit annotation app is launched from the
+# workbench root (`cc4q annotate` runs `streamlit run cc4q/annotate/app.py`).
+# Launching from any other working directory falls back to Streamlit
+# defaults.
 [theme]
 primaryColor = "#1A1A1A"
 backgroundColor = "#FBFBFC"

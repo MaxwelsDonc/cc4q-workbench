@@ -1,8 +1,10 @@
 Train on your annotated data
 =============================
 
-``cc4q.train`` fine-tunes one of the three classifiers with the HF
-Trainer, using the same recipe as the released models.
+``cc4q.train`` fine-tunes one of the two released quantum classifiers
+with the HF Trainer, using the same recipe as the released models —
+starting from ``bert-base-uncased`` by default, or warm-started from the
+released checkpoints via ``base_model="released"``.
 
 Data contract
 -------------

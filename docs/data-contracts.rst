@@ -22,8 +22,8 @@ Label vocabularies
 
 Two-stage Quantum-Specific taxonomy (v2.0). Task 1 decides whether a unit
 is quantum-specific at all; Task 2 applies only to quantum units (the
-retired ``developer_intent`` axis of v1 is gone — see the repository
-README for the rationale).
+retired ``developer_intent`` axis of v1 was dropped when the taxonomy was
+refocused on quantum-specific knowledge for the companion study).
 
 Quantum relatedness (2): ``quantum``, ``non-quantum``.
 

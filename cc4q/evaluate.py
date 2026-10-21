@@ -182,7 +182,7 @@ def evaluate_files(
     disagreements = []
     skipped = excluded = 0
     for r in annotations:
-        h = str(r.get("human_label", "")).strip().lower()
+        h = str(r.get("human_label") or r.get("label") or "").strip().lower()
         if h not in human_values:
             skipped += 1
             continue

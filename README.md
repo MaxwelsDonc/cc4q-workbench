@@ -23,7 +23,7 @@ For ICSE Tool Demonstration & Artifact Reviewers, CC4Q Workbench supports three 
 
 ### Tier 1 · 30-Second Instant Exploration (No Model Download Required)
 
-All precomputed corpora across **6 Qiskit-ecosystem SDKs (39,593 labeled sentence units)** and a **361-unit unseen-SDK labeling demo** (derived from our human-verified spot-check benchmark) are bundled directly in the repository (`cc4q/web/data/`, ~23 MB) with full Python source-code context (`code_snippet` + line numbers).
+Precomputed corpora across **6 Qiskit-ecosystem SDKs** (**17,517 sentence units** bundled — all units of the 3 application SDKs plus a 2,000-unit random sample, seed 42, for each infrastructure SDK; the full **39,593-unit** corpus statistics are summarized in the benchmark table below) and a **361-unit unseen-SDK labeling demo** (derived from our human-verified spot-check benchmark) are bundled directly in the repository (`cc4q/web/data/`, ~22 MB) with full Python source-code context (`code_snippet` + line numbers).
 
 #### Windows
 
@@ -61,7 +61,7 @@ Open **`http://127.0.0.1:8501`** in your browser to immediately explore the 6 SD
 
 ### Tier 2 · Full Live Inference, Repository Building & In-Tool Model Training
 
-To enable **live code snippet classification**, **building corpora for new GitHub repositories**, and **warm-start BERT fine-tuning** in the browser or CLI, download the SHA256-verified released checkpoints (~835 MB for the two quantum classifiers) and the spaCy English sentence model:
+To enable **live code snippet classification** and **quantum labeling when building corpora from new GitHub repositories**, download the SHA256-verified released checkpoints (~835 MB for the two quantum classifiers) and the spaCy English sentence model:
 
 ```bash
 python -m spacy download en_core_web_sm
@@ -72,14 +72,20 @@ cc4q demo                     # Launch full interactive workbench at http://127.
 
 ### Tier 3 · All-in-One Docker Container
 
+Pull the prebuilt image — the two released BERT checkpoints are baked in, so the container starts instantly with **zero downloads** (exposes the Web Workbench on http://localhost:8501):
+
 ```bash
-# Build & run (exposes the Web Workbench on http://localhost:8501)
+docker run --rm -p 8501:8501 ghcr.io/maxwelsdonc/cc4q-workbench:latest
+```
+
+Or build from source:
+
+```bash
 docker build -t cc4q-workbench .
 docker run --rm -p 8501:8501 cc4q-workbench
 ```
 
-(The image is single-flavor and CPU-based; every push is build- and
-run-verified by CI, so no manual Docker verification is needed.)
+(The image is single-flavor and CPU-based (x86_64 — Apple Silicon Docker Desktop runs it via Rosetta); the app auto-detects a host GPU at runtime. The image is built, boot-tested, and published by CI on every push to `main`.)
 
 ---
 
@@ -87,26 +93,9 @@ run-verified by CI, so no manual Docker verification is needed.)
 
 Unlike classical software comment tools that target generic Java API docstrings, **CC4Q Workbench** is purpose-built for Python quantum SDKs where domain semantics (superposition, entanglement, Hamiltonians, qubit topology, and decoherence constraints) are carried in complex Sphinx/reStructuredText/LaTeX docstrings and inline gate comments.
 
-```text
-┌───────────────────────────────────────────────────────────────────────────────────┐
-│                         CC4Q WORKBENCH ARCHITECTURE (v2.0)                        │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│  STAGE 1: CORPUS CONSTRUCTION PIPELINE (cc4q.pipeline)                            │
-│  [GitHub Repo / Local Dir] ──► LibCST AST Scope Parser (CCPs)                     │
-│                            ──► ~30 Sphinx-Directive Shims + spaCy (SCCUs)         │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│  STAGE 2: TWO-STAGE QUANTUM-SPECIFIC CLASSIFICATION (cc4q.models / cc4q.predict)  │
-│  [Task 1 · Binary BERT]    ──► Quantum-Specific vs. Non-Quantum (Held-out F1 .936)│
-│  [Task 2 · 6-Class BERT]   ──► Mathematics | Algorithms | Circuit Model |         │
-│                                Hardware | Software Framework | Others (F1 .840)   │
-├───────────────────────────────────────────────────────────────────────────────────┤
-│  STAGE 3: INTERACTIVE WEB WORKBENCH (Starlette/Uvicorn + ECharts SPA) & CLI       │
-│  Tabs: 1. Corpus Explorer (Benchmark Overview + per-SDK dashboards & Compare) ·   │
-│        2. Live Inspector (snippet labeling) · 3. Corpus Builder (4-stage repo     │
-│        pipeline) · 4. Annotation Studio (labeling & verification) ·               │
-│        5. Model Trainer (warm-start fine-tuning)                                  │
-└───────────────────────────────────────────────────────────────────────────────────┘
-```
+The workbench couples a **five-module user interface** (Corpus Explorer · Live Inspector · Corpus Builder · Annotation Studio · Model Trainer) with a **developer API** covering the full lifecycle — corpus pipeline (`cc4q.pipeline`), model hub (`cc4q.models`), inference (`cc4q.predict`), training & evaluation (`cc4q.train` / `cc4q.evaluate`), sampling & annotation (`cc4q.sample` / `cc4q.annotate`), and workspace & registry (`cc4q.workspace` / `cc4q.registry`):
+
+![CC4Q Workbench architecture — five-module UI over the developer API, with the 4-stage corpus pipeline (① Acquire Source → ② LibCST Extraction → ③ Sphinx Segmentation → ④ Quantum Labeling)](docs/_static/framework.png)
 
 ### Two-Stage Quantum-Specific Taxonomy
 
@@ -147,7 +136,7 @@ Once `cc4q demo` is running at **`http://127.0.0.1:8501`**, the top navigation b
 * **Ergonomic Keyboard-Driven Labeling**: Use hotkeys **`Q`** (Quantum-Specific), **`N`** (Non-Quantum), **`1`–`6`** (Six Quantum Categories), and **`←`/`→`** to move between items manually — labeling stays on the current item so both step choices remain visible. **`⬇ Export Labeled JSONL`** downloads the session with your labels.
 
 ### 5. Model Trainer (`Tab 5`)
-* **Train Your Own Quantum Classifier in the Browser** (fine-tuning always warm-starts from the released CC4Q BERT checkpoints):
+* **Train Your Own Quantum Classifier in the Browser** (fine-tuning starts from the `bert-base-uncased` BERT base model, the starting point stated in the companion paper):
   1. Select **Task 1 (`quantum_related`, 2 classes)** or **Task 2 (`quantum_category`, 6 classes)**.
   2. Select a **Training Data Source**: the built-in **Demo Dataset** (TOSEM gold training data — 2,802 binary / 1,800 balanced 6-class records) or **Upload Your Own JSONL**.
   3. Name the model, tune **⚙️ Training Parameters** (Epochs · Batch Size), and click **`🚀 Start Fine-Tuning`** to watch the asynchronous progress bar and real-time **Train Loss & Validation F1 ECharts Curve** in the Live Training Monitor.

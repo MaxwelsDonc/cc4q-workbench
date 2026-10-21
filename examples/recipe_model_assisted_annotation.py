@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Recipe 1 — model-assisted annotation, end to end.
 
-The full CC4Q loop: build (extract + segment) -> predict (three-axis
-labels) -> sample (stratified) -> annotate (human spot-check, blind or
-adjudicate) -> evaluate (agreement / precision / recall / Wilson CI).
+The full CC4Q loop: build (extract + segment) -> predict (two-stage
+quantum labels) -> sample (stratified) -> annotate (human spot-check,
+blind or adjudicate) -> evaluate (agreement / precision / recall / Wilson CI).
 
 Every step is also runnable standalone:
 
@@ -20,11 +20,12 @@ Every step is also runnable standalone:
         --predictions /tmp/recipe/labeled.jsonl --output-dir /tmp/recipe/ann
     python examples/recipe_model_assisted_annotation.py evaluate \
         --annotations /tmp/recipe/ann/annotations.csv \
-        --key /tmp/recipe/labeled_key.jsonl
+        --key /tmp/recipe/key.jsonl --id-join id
 
 `run-all` executes build -> predict -> sample with one command (annotate
 launches the interactive UI unless --auto is given, which simulates the
-human by confirming every model suggestion — a fixture for CI/demo only).
+human by confirming every model suggestion — a fixture for CI/demo only)
+and writes ``key.jsonl`` (``id`` + ``model_label``) for the evaluate step.
 `walk-spotcheck` replays the paper's 385-item spot-check through
 predict -> sample -> annotate -> evaluate and asserts 85.0% agreement.
 """
@@ -130,6 +131,10 @@ def cmd_annotate(args):
                   "labels": args.labels.split(",")}
     if args.auto:
         # fixture: simulate the human by confirming every model suggestion
+        if isinstance(schema, str):
+            import yaml
+            with open(schema, encoding="utf-8") as f:
+                schema = yaml.safe_load(f)
         records = _read_jsonl(args.input)
         preds = {str(r[schema["id_column"]]): str(r.get("quantum_category") or
                  ("quantum" if r.get("quantum_related") else "non-quantum"))
@@ -181,10 +186,10 @@ def cmd_run_all(args):
     labeled = cmd_predict(argparse.Namespace(input=seg, output=os.path.join(
         args.output_dir, "labeled.jsonl"), models_dir=None, batch=32))
     key = os.path.join(args.output_dir, "key.jsonl")
-    _write_jsonl(key, [{**{"no": i + 1, "model_label":
-                           ("quantum" if r["quantum_related"] else
-                            "non-quantum")}} for i, r in
-                       enumerate(_read_jsonl(labeled))])
+    _write_jsonl(key, [{"id": str(r["id"]),
+                        "model_label": ("quantum" if r["quantum_related"] else
+                                        "non-quantum")}
+                       for r in _read_jsonl(labeled)])
     sample_out = cmd_sample(argparse.Namespace(
         input=labeled, by=["SDK"], n=args.n, frac=None, quotas=None,
         seed=42, output=os.path.join(args.output_dir, "sample.jsonl")))
@@ -195,19 +200,19 @@ def cmd_run_all(args):
     if args.auto:
         cmd_annotate(argparse.Namespace(
             input=sample_out, schema=schema_path, mode="adjudicate",
-            predictions=key, output_dir=os.path.join(args.output_dir, "ann"),
+            predictions=labeled, output_dir=os.path.join(args.output_dir, "ann"),
             auto=True, text_column="comment_text", id_column="id",
             labels="quantum,non-quantum"))
     else:
         print("[annotate] launching the interactive UI (Ctrl-C to stop)...")
         cmd_annotate(argparse.Namespace(
             input=sample_out, schema=schema_path, mode="adjudicate",
-            predictions=key, output_dir=os.path.join(args.output_dir, "ann"),
+            predictions=labeled, output_dir=os.path.join(args.output_dir, "ann"),
             auto=False, text_column="comment_text", id_column="id",
             labels="quantum,non-quantum"))
     cmd_evaluate(argparse.Namespace(
         annotations=os.path.join(args.output_dir, "ann", "annotations.csv"),
-        key=key, id_join="no", contaminated=None))
+        key=key, id_join="id", contaminated=None))
 
 
 # ------------------------------------------------------------- spot-check
@@ -306,7 +311,7 @@ def main():
     b.add_argument("--source-dir", required=True)
     b.add_argument("--output-dir", required=True)
 
-    pr = sub.add_parser("predict", help="three-axis labeling of SCCUs")
+    pr = sub.add_parser("predict", help="two-stage quantum labeling of SCCUs")
     pr.add_argument("--input", required=True)
     pr.add_argument("--output", required=True)
     pr.add_argument("--models-dir", default=None)

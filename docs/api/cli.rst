@@ -74,11 +74,14 @@ End-to-end example
        --labels quantum,non-quantum --mode adjudicate \
        --predictions out/algorithms/labeled.jsonl \
        --output-dir out/algorithms/ann
-   cc4q evaluate --annotations out/algorithms/ann/annotations.csv \
-       --key out/algorithms/key.jsonl
+   cc4q evaluate --annotations exp/spotcheck_annotation.csv \
+       --key exp/spotcheck_answer_key.jsonl \
+       --contaminated 1,8,16,25,62,132
 
 .. note::
 
+   ``--key`` expects a JSONL whose records carry an id column (matching
+   ``--id-join``, default ``no``) and a ``model_label``/``label`` field.
    ``--contaminated`` accepts a comma-separated list of ids to exclude
    from evaluation (for example units that were part of training). The
    equivalent Python option is ``contaminated=...`` in

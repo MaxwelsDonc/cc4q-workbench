@@ -9,8 +9,8 @@ Install the library and CLI straight from the repository (Python >= 3.11):
     python -m spacy download en_core_web_sm
 
 This installs the ``cc4q`` package and the ``cc4q`` console script. The
-three fine-tuned classifiers (about 1.2 GB) are fetched on first use, or
-explicitly:
+two released quantum classifiers (about 835 MB) are fetched on first use,
+or explicitly:
 
 .. code-block:: bash
 
@@ -24,8 +24,10 @@ Build a labeled corpus from any small GitHub repository:
     cc4q build --repo https://github.com/qiskit-community/qiskit-algorithms \
         --include-dir qiskit_algorithms --output-dir out/algorithms
 
-Then label it, draw a stratified sample, spot-check it in the annotation
-UI, and score the agreement:
+Then label it, draw a stratified sample, and spot-check it in the
+annotation UI (interactive sessions launch a Streamlit app — install the
+extra ``pip install -r demo/requirements-demo.txt`` first, or pass
+``--dry-run`` to only prepare the session config):
 
 .. code-block:: bash
 
@@ -37,8 +39,17 @@ UI, and score the agreement:
         --labels quantum,non-quantum --mode adjudicate \
         --predictions out/algorithms/labeled.jsonl \
         --output-dir out/algorithms/ann
-    cc4q evaluate --annotations out/algorithms/ann/annotations.csv \
-        --key out/algorithms/key.jsonl
+
+Finally, score human-vs-model agreement against an answer key. ``--key``
+expects a JSONL whose records carry an id column (matching ``--id-join``,
+default ``no``) and a ``model_label`` field. The bundled spot-check
+benchmark ships one and reproduces the companion paper's numbers:
+
+.. code-block:: bash
+
+    cc4q evaluate --annotations exp/spotcheck_annotation.csv \
+        --key exp/spotcheck_answer_key.jsonl \
+        --contaminated 1,8,16,25,62,132
 
 The same steps in Python:
 
@@ -55,8 +66,9 @@ The same steps in Python:
         "labels": ["quantum", "non-quantum"]}, mode="adjudicate",
         model_predictions=labeled, output_dir="out/algorithms/ann")
     result = cc4q.evaluate_files(
-        csv_path="out/algorithms/ann/annotations.csv",
-        key_path="out/algorithms/key.jsonl")
+        csv_path="exp/spotcheck_annotation.csv",
+        key_path="exp/spotcheck_answer_key.jsonl",
+        contaminated=[1, 8, 16, 25, 62, 132])
     print(result["agreement"])
 
 To try the full web workbench from a source checkout, see the repository
