@@ -4,7 +4,10 @@ Train on your annotated data
 ``cc4q.train`` fine-tunes one of the two released quantum classifiers
 with the HF Trainer, using the same recipe as the released models —
 starting from ``bert-base-uncased`` by default, or warm-started from the
-released checkpoints via ``base_model="released"``.
+released checkpoints via ``base_model="released"``. Run
+``cc4q download-models --with-base`` once to cache ``bert-base-uncased``
+locally and cold-start fine-tuning also works offline (the Docker image
+already ships all three models).
 
 Data contract
 -------------

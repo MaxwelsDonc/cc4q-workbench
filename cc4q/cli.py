@@ -33,23 +33,33 @@ def _read_records(path):
 
 @app.command("download-models")
 def download_models(
-    check: bool = typer.Option(False, "--check", help="verify only; exit 1 if incomplete")
+    check: bool = typer.Option(False, "--check", help="verify only; exit 1 if incomplete"),
+    with_base: bool = typer.Option(
+        False, "--with-base",
+        help="also fetch bert-base-uncased so cold-start fine-tuning works offline"
+    ),
 ):
-    """Download/verify the quantum classifier checkpoints (SHA256-verified)."""
-    from cc4q.models.hub import ensure_checkpoints, missing_checkpoints
+    """Download/verify the model checkpoints (SHA256-verified)."""
+    from cc4q.models.hub import (BASE_MODEL, checkpoint_complete, default_model_dir,
+                                 ensure_checkpoints, missing_checkpoints)
 
     if check:
         missing = missing_checkpoints()
+        if with_base:
+            mdir = default_model_dir()
+            for _asset, (name, _sha) in BASE_MODEL.items():
+                if not checkpoint_complete(mdir, name):
+                    missing.append(name)
         if missing:
             typer.echo(f"MISSING: {', '.join(missing)}")
             raise typer.Exit(1)
-        typer.echo("OK: all quantum model checkpoints present.")
+        typer.echo("OK: all requested model checkpoints present.")
         return
-    still = ensure_checkpoints()
+    still = ensure_checkpoints(with_base=with_base)
     if still:
         typer.echo(f"FAILED: still missing {', '.join(still)}")
         raise typer.Exit(1)
-    typer.echo("Done — all quantum model checkpoints present.")
+    typer.echo("Done — all requested model checkpoints present.")
 
 
 @app.command()

@@ -21,9 +21,11 @@ Commands
      - Main options
      - Purpose
    * - ``cc4q download-models``
-     - ``--check``
+     - ``--check``, ``--with-base``
      - Download/SHA256-verify/extract the released checkpoints. ``--check``
-       only verifies and exits non-zero when incomplete.
+       only verifies and exits non-zero when incomplete; ``--with-base``
+       also fetches ``bert-base-uncased`` so cold-start fine-tuning works
+       offline.
    * - ``cc4q build``
      - ``--repo``, ``--output-dir``, ``--ref``, ``--include-dir``,
        ``--clean-mode``

@@ -65,9 +65,10 @@ To enable **live code snippet classification** and **quantum labeling when build
 
 ```bash
 python -m spacy download en_core_web_sm
-cc4q download-models          # Downloads & SHA256-verifies released BERT checkpoints
-cc4q download-models --check  # Verifies checkpoint integrity on disk
-cc4q demo                     # Launch full interactive workbench at http://127.0.0.1:8501
+cc4q download-models            # Downloads & SHA256-verifies released BERT checkpoints
+cc4q download-models --check    # Verifies checkpoint integrity on disk
+cc4q download-models --with-base  # Also caches bert-base-uncased for offline cold-start fine-tuning
+cc4q demo                       # Launch full interactive workbench at http://127.0.0.1:8501
 ```
 
 ### Tier 3 · All-in-One Docker Container
