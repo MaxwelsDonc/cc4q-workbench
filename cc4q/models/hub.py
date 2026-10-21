@@ -94,6 +94,11 @@ def resolve_device(device=None):
     return "cuda" if torch.cuda.is_available() else "cpu"
 
 
+def _checkpoint_dir_complete(path):
+    """Whether ``path`` itself is a complete checkpoint directory."""
+    return all(os.path.isfile(os.path.join(path, f)) for f in REQUIRED_FILES)
+
+
 def checkpoint_complete(model_dir, name):
     """Return whether a checkpoint directory contains every required file.
 
@@ -106,8 +111,7 @@ def checkpoint_complete(model_dir, name):
         ``True`` when ``config.json``, ``model.safetensors``, and
         ``tokenizer_config.json`` are all present.
     """
-    path = os.path.join(model_dir, name)
-    return all(os.path.isfile(os.path.join(path, f)) for f in REQUIRED_FILES)
+    return _checkpoint_dir_complete(os.path.join(model_dir, name))
 
 
 def missing_checkpoints(model_dir=None):
@@ -212,6 +216,17 @@ def ensure_checkpoints(model_dir=None, verbose=True, with_base=False):
                 print(f"  checksum OK ({actual_sha[:16]}…), extracting …")
             with tarfile.open(archive, "r:gz") as tar:
                 tar.extractall(model_dir, filter="data")
+            dest = os.path.join(model_dir, name)
+            if not _checkpoint_dir_complete(dest) and not os.path.exists(dest):
+                # Tolerate HF-cache-style packing: the asset nests the
+                # checkpoint under a snapshot-hash directory instead of the
+                # canonical name. Normalize the first complete candidate.
+                for entry in sorted(os.listdir(model_dir)):
+                    cand = os.path.join(model_dir, entry)
+                    if os.path.isdir(cand) and entry != name \
+                            and _checkpoint_dir_complete(cand):
+                        os.rename(cand, dest)
+                        break
             if not checkpoint_complete(model_dir, name):
                 raise RuntimeError(
                     f"Extraction of {asset} did not produce a usable "

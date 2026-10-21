@@ -196,12 +196,18 @@ def _compute_metrics(average):
 
 
 def resolve_base_model(base_model, task):
-    """Resolve the ``"released"`` alias to a local checkpoint when possible.
+    """Resolve model aliases and local caches to a loadable model path.
 
     ``base_model="released"`` (or ``"cc4q-released"`` /
     ``"released-checkpoint"``) means "warm-start from the released CC4Q
     classifier for this task". If that checkpoint is not present locally,
     the function falls back to ``bert-base-uncased``.
+
+    ``base_model="bert-base-uncased"`` resolves to the locally cached copy
+    when one was fetched via ``cc4q download-models --with-base`` (or baked
+    into the Docker image), so cold-start fine-tuning also works offline;
+    otherwise the Hugging Face id is returned and ``transformers``
+    downloads the weights on first use.
 
     Args:
         base_model: Hugging Face model id/path, or a released alias.
@@ -216,6 +222,11 @@ def resolve_base_model(base_model, task):
         if checkpoint_complete(mdir, task):
             return os.path.join(mdir, task)
         return "bert-base-uncased"
+    if base_model == "bert-base-uncased":
+        from cc4q.models.hub import checkpoint_complete, default_model_dir
+        mdir = default_model_dir()
+        if checkpoint_complete(mdir, "bert-base-uncased"):
+            return os.path.join(mdir, "bert-base-uncased")
     return base_model
 
 
