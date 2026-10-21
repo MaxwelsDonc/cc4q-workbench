@@ -124,6 +124,8 @@ jobs:
         run: |
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL 2>/dev/null || true
 
+      - uses: docker/setup-qemu-action@v3
+
       - uses: docker/setup-buildx-action@v3
 
       - name: Build image (BuildKit layer cache)
@@ -131,6 +133,7 @@ jobs:
         with:
           context: .
           load: true
+          platforms: linux/amd64
           tags: cc4q-workbench:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
@@ -166,17 +169,22 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Compute image tags
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags/v')
         id: imagetags
         run: |
-          echo "tags=ghcr.io/maxwelsdonc/cc4q-workbench:latest,ghcr.io/maxwelsdonc/cc4q-workbench:${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          if [[ "${GITHUB_REF}" == refs/tags/v* ]]; then
+            echo "tags=ghcr.io/maxwelsdonc/cc4q-workbench:latest,ghcr.io/maxwelsdonc/cc4q-workbench:${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tags=cc4q-workbench:multiarch-test" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Push image to GHCR (releases only)
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Build multi-arch image (pushes to GHCR on release tags only)
+        if: github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags/v')
         uses: docker/build-push-action@v6
         with:
           context: .
-          push: true
+          push: ${{ startsWith(github.ref, 'refs/tags/v') }}
+          platforms: linux/amd64,linux/arm64
           cache-from: type=gha
           tags: ${{ steps.imagetags.outputs.tags }}
 
