@@ -1,8 +1,8 @@
 """Comment-segmentation unit tests.
 
-The cases come from scripts/test_segment.py (kept as a runnable usage
-example); here they are real assertions. The demo smoke suite exercises the
-same segmenters end-to-end through the full pipeline.
+These cases double as runnable usage examples for the segmenters. The demo
+smoke suite exercises the same segmenters end-to-end through the full
+pipeline.
 
 Imports are skipped (not failed) when the spaCy English model is missing,
 so data-only tests still run on lean checkouts.
