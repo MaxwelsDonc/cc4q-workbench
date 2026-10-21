@@ -2,8 +2,6 @@
   <img src="docs/_static/cc4q_logo_wide.png" width="420" alt="CC4Q Workbench">
 </p>
 
-# CC4Q Workbench
-
 <p align="center"><b>Building, Verifying, and Adapting Quantum Code Comment Corpora</b></p>
 
 [![CI](https://github.com/MaxwelsDonc/cc4q-workbench/actions/workflows/ci.yml/badge.svg)](https://github.com/MaxwelsDonc/cc4q-workbench/actions/workflows/ci.yml)
