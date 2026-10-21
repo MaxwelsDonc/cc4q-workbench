@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/_static/cc4q_logo.png" width="150" alt="CC4Q Workbench">
+  <img src="docs/_static/cc4q_logo_wide.png" width="420" alt="CC4Q Workbench">
 </p>
 
 # CC4Q Workbench
