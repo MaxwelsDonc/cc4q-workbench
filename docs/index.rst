@@ -1,5 +1,5 @@
-CC4Q documentation
-==================
+CC4Q Workbench documentation
+============================
 
 CC4Q turns Python-based quantum SDK repositories into labeled comment
 corpora (CCPs -> SCCUs with two-stage Quantum-Specific labels) and

@@ -7,7 +7,7 @@ sys.path.insert(
     0, os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 )
 
-project = "CC4Q"
+project = "CC4Q Workbench"
 copyright = "2026, CC4Q authors"
 author = "CC4Q authors"
 release = "0.2.0"
@@ -33,5 +33,5 @@ exclude_patterns = ["_build", "_redirects", "Thumbs.db", ".DS_Store"]
 html_extra_path = ["_redirects"]
 
 html_theme = "furo"
-html_title = "CC4Q"
+html_title = "CC4Q Workbench"
 html_static_path = ["_static"]
