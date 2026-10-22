@@ -1,7 +1,7 @@
 The annotation loop
 ====================
 
-Model-assisted annotation closes the CC4Q quality loop: predict, draw a
+Model-assisted annotation closes the CC4Q Workbench quality loop: predict, draw a
 spot-check sample, have a human confirm or override in the UI, then score
 agreement.
 

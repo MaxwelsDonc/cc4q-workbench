@@ -1,7 +1,7 @@
 Sampling and annotation
 =======================
 
-CC4Q samples a small, reproducible spot-check from a labeled corpus, then
+CC4Q Workbench samples a small, reproducible spot-check from a labeled corpus, then
 collects human labels in a schema-driven Streamlit UI. The same session can
 be exported directly as a training file.
 

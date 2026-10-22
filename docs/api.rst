@@ -1,7 +1,7 @@
 API reference
 =============
 
-CC4Q exposes the same corpus-construction and analysis capabilities through
+CC4Q Workbench exposes the same corpus-construction and analysis capabilities through
 three interfaces:
 
 * the **Web Workbench** (``cc4q serve`` / ``cc4q demo``),
